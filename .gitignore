@@ -557,9 +557,6 @@ $RECYCLE.BIN/
 ##
 ## Get latest from `dotnet new gitignore`
 
-# DO NOT PUSH CSPROJ FILES TO GIT
-*.csproj
-
 #Ignorer secretfil
 secrets.json
 
