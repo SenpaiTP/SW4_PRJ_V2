@@ -19,6 +19,75 @@ kan du lavet en samlet gitignore. ## Ignore Visual Studio temporary files, build
 # Mono auto generated files
 mono_crash.*
 
+# .gitignore for React frontend and .NET backend
+
+# Node.js (for React frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+.yarn-integrity
+.pnp.*
+
+# React build output
+build/
+dist/
+public/static/
+
+# Log files
+*.log
+*.log.*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# .NET (for backend)
+bin/
+obj/
+*.user
+*.rsuser
+*.suo
+.vscode/
+.vscode/**/*
+*.psess
+*.pidb
+.idea/
+ReSharper/
+
+# Visual Studio Code
+.vscode/*
+
+# Rider
+.idea/
+.idea/**/
+*.sln.iml
+*.suo
+
+# Generated files
+*.sln.docstates
+*.swp
+.vscode/*
+
+# Backup files
+*.bak
+
+# Local Environment files
+.env
+.env.local
+.env.*.local
+
+# ASP.NET Core secrets
+secrets.json
+
+# Docker
+docker-compose.override.yml
+**/Dockerfile*
+
+# GitLab and CI/CD
+.gitlab-ci.yml
+.idea
+
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
