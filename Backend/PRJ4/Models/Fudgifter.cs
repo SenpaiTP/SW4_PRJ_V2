@@ -15,8 +15,8 @@ public partial class Fudgifter
     public int KategoriId {get; set;}
     public int BrugerId {get; set;}
 
-    // [ForeignKey(nameof(KategoriId))]
-    // public Kategori? Kategori {get; set;}
+    [ForeignKey(nameof(KategoriId))]
+    public Kategori? Kategori {get; set;}
     // [ForeignKey(nameof(BrugerId))]
     // public virtual Bruger Bruger { get; set; } = null!;
 

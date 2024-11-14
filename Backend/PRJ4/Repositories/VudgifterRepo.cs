@@ -21,7 +21,7 @@ namespace PRJ4.Repositories
         public async Task<IEnumerable<Vudgifter>> GetAllAsync()
         {
             var Vudgifter = await _context.Vudgifters
-                //.Include(f => f.Kategori)
+                .Include(f => f.Kategori)
                 .ToListAsync();
             return Vudgifter;
         }
@@ -29,7 +29,7 @@ namespace PRJ4.Repositories
         {
             return await _context.Vudgifters
                 .Where(v => v.BrugerId == brugerId)
-                //.Include(v => v.Kategori)
+                .Include(v => v.Kategori)
                 .ToListAsync();
         }
 
