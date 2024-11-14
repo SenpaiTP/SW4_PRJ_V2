@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-//using PRJ4.Models;
+using PRJ4.Models;
 
 namespace PRJ4.Data;
 
@@ -15,11 +15,11 @@ public partial class ApplicationDbContext : DbContext
     }
 
     // public DbSet<Bruger> Brugers { get; set; }
-    // public DbSet<Kategori> Kategorier {get; set;}
+    public DbSet<Kategori> Kategorier {get; set;}
     // public DbSet<Findtægt> Findtægts { get; set; }
-    // public DbSet<Fudgifter> Fudgifters { get; set; }
+    public DbSet<Fudgifter> Fudgifters { get; set; }
     // public DbSet<Vindtægter> Vindtægters { get; set; }
-    // public DbSet<Vudgifter> Vudgifters { get; set; }
+    public DbSet<Vudgifter> Vudgifters { get; set; }
     // public DbSet<Budget> Budgets { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
