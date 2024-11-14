@@ -1,5 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using PRJ4.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
+var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    {options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
+    });
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
