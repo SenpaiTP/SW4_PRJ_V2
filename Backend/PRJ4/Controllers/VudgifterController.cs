@@ -50,7 +50,7 @@ namespace PRJ4.Controllers
                 VudgiftId = v.VudgiftId,
                 Pris = v.Pris,
                 Tekst = v.Tekst,
-                KategoriName = v.Kategori?.Name,
+                KategoriNavn = v.Kategori?.Navn,
                 Dato = v.Dato
             });
 
@@ -86,7 +86,7 @@ namespace PRJ4.Controllers
             // If KategoriId is zero, create a new category
             if (vudgifter.KategoriId == 0)
             {
-                kategori = await _kategoriRepo.NewKategori(vudgifter.KategoriName);
+                kategori = await _kategoriRepo.NyKategori(vudgifter.KategoriNavn);
             }
             else
             {
@@ -168,9 +168,9 @@ namespace PRJ4.Controllers
                 vudgifter.KategoriId = kategori.KategoriId;
                 vudgifter.Kategori = kategori;
             }
-            else if(!string.IsNullOrWhiteSpace(updateDTO.KategoriName))
+            else if(!string.IsNullOrWhiteSpace(updateDTO.KategoriNavn))
             {
-                var kategori = await _kategoriRepo.NewKategori(updateDTO.KategoriName);
+                var kategori = await _kategoriRepo.NyKategori(updateDTO.KategoriNavn);
                 if (kategori == null)
                 {
                     return BadRequest("New Kategori wasnt created.");

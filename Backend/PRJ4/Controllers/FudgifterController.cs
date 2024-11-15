@@ -50,7 +50,7 @@ namespace PRJ4.Controllers
                 FudgiftId = f.FudgiftId,
                 Pris = f.Pris,
                 Tekst = f.Tekst,
-                KategoriName = f.Kategori?.Name,
+                KategoriNavn = f.Kategori?.Navn,
                 Dato = f.Dato
             });
 
@@ -58,7 +58,7 @@ namespace PRJ4.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Fudgifter>> Add(newFudgifterDTO fudgifter)
+        public async Task<ActionResult<Fudgifter>> Add(nyFudgifterDTO fudgifter)
         {
             // Validate that the input data is not null
             if (fudgifter == null)
@@ -84,7 +84,7 @@ namespace PRJ4.Controllers
             // Ensure Kategori exists or create a new one if KategoriId is not provide
             if (fudgifter.KategoriId == 0)
             {
-                kategori = await _kategoriRepo.NewKategori(fudgifter.KategoriName);
+                kategori = await _kategoriRepo.NyKategori(fudgifter.KategoriNavn);
             }
             else
             {
@@ -96,7 +96,7 @@ namespace PRJ4.Controllers
             }
 
             // Map DTO to Fudgifter model
-            Fudgifter newFudgifter = new Fudgifter
+            Fudgifter nyFudgifter = new Fudgifter
             {
                 Pris = fudgifter.Pris,
                 Tekst = fudgifter.Tekst,
@@ -108,34 +108,34 @@ namespace PRJ4.Controllers
             };
 
             // Save the new Fudgifter to the database
-            await _fudgifterRepo.AddAsync(newFudgifter);
+            await _fudgifterRepo.AddAsync(nyFudgifter);
             await _fudgifterRepo.SaveChangesAsync();
 
             // Return the newly created Fudgifter object
-            return CreatedAtAction(nameof(Add), new { id = newFudgifter.FudgiftId }, newFudgifter);
+            return CreatedAtAction(nameof(Add), new { id = nyFudgifter.FudgiftId }, nyFudgifter);
         }
 
-        [HttpPut("update/{id}")]
-        public async Task<ActionResult<Fudgifter>> Updatefudgifter(int id, [FromBody] FudgifterUpdateDTO updateDTO)
+        [HttpPut("opdater/{id}")]
+        public async Task<ActionResult<Fudgifter>> Opdaterfudgifter(int id, [FromBody] FudgifterUpdateDTO updateDTO)
         {
             // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
 
             // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
             // {
-            //     return Unauthorized("User ID claim missing or invalid.");
+            //     return Unauthorized("Bruger Id claim manglende or invalid.");
             // }
 
             // Step 1: Get the fudgifter entity from the database
             var fudgifter = await _fudgifterRepo.GetByIdAsync(id);
             if (fudgifter == null)
             {
-                return NotFound("fudgifter not found.");
+                return NotFound("fudgifter ikke fundet.");
             }
 
             // Ensure that the Vudgift belongs to the authenticated user
             // if (fudgifter.BrugerId != brugerId)
             // {
-            //     return Unauthorized("You do not have permission to update this Vudgift.");
+            //     return Unauthorized("Du har ikke tilladelse til at ændre Vudgift.");
             // }
 
             // Step 2: Handle dynamic updates for each property only if it's provided in the DTO
@@ -160,18 +160,18 @@ namespace PRJ4.Controllers
                 var kategori = await _kategoriRepo.GetByIdAsync(updateDTO.KategoriId.Value);
                 if (kategori == null)
                 {
-                    return BadRequest("No kategori exist by that id.");
+                    return BadRequest("Ingen kategori eksistere på denne id.");
                 }
 
                 fudgifter.KategoriId = kategori.KategoriId;
                 fudgifter.Kategori = kategori;
             }
-            else if(!string.IsNullOrWhiteSpace(updateDTO.KategoriName))
+            else if(!string.IsNullOrWhiteSpace(updateDTO.KategoriNavn))
             {
-                var kategori = await _kategoriRepo.NewKategori(updateDTO.KategoriName);
+                var kategori = await _kategoriRepo.NyKategori(updateDTO.KategoriNavn);
                 if (kategori == null)
                 {
-                    return BadRequest("New Kategori wasnt created.");
+                    return BadRequest("Ny Kategori er ikke skabt.");
                 }
 
                 fudgifter.KategoriId = kategori.KategoriId;
@@ -186,18 +186,18 @@ namespace PRJ4.Controllers
             return Ok(fudgifter);
         }
 
-        [HttpDelete("{id}/delete")]
-        public async Task<ActionResult<Fudgifter>> DeleteFudgiftById(int id)
+        [HttpDelete("{id}/slet")]
+        public async Task<ActionResult<Fudgifter>> SletFudgiftVedId(int id)
         {
-            Console.WriteLine("Made it here 1");
+            
             if (id <= 0)
             {
-                return NotFound("Fudigft id cannot be less or equal to 0.");
+                return NotFound("Fudigft id kan ikke være mindre eller ligmed 0.");
             }
             Fudgifter fudgifter = await _fudgifterRepo.GetByIdAsync(id);
-            Console.WriteLine("Made it here 2");
-            if(fudgifter == null){ return BadRequest($"Couldnt find fast udgift with id: {id}");}
-            Console.WriteLine("Made it here 3");
+          
+            if(fudgifter == null){ return BadRequest($"Kan ikke finde fast udgift med id: {id}");}
+            
             _fudgifterRepo.Delete(id);
             await _fudgifterRepo.SaveChangesAsync();
             return NoContent();
