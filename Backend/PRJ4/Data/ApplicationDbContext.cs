@@ -20,7 +20,7 @@ public partial class ApplicationDbContext : DbContext
     public DbSet<Fudgifter> Fudgifters { get; set; }
     // public DbSet<Vindtægter> Vindtægters { get; set; }
     public DbSet<Vudgifter> Vudgifters { get; set; }
-    // public DbSet<Budget> Budgets { get; set; }
+    public DbSet<Budget> Budgets { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
   
