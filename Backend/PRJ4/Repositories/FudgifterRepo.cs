@@ -20,7 +20,7 @@ namespace PRJ4.Repositories
 
         public async Task<IEnumerable<Fudgifter>> GetAllAsync()
         {
-            var Fudgifter =     await _context.Fudgifters
+            var Fudgifter = await _context.Fudgifters
                 .Include(f => f.Kategori)
                 .ToListAsync();
             return Fudgifter;

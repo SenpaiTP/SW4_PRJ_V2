@@ -15,17 +15,17 @@ namespace PRJ4.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize] // Ensure the user is authenticated for all endpoints
+    [Authorize] // Ensure the user is authenticated for all endpoints
     public class VudgifterController : ControllerBase
     {
         private readonly IVudgifter _vudgifterRepo;
-        //private readonly IBrugerRepo _brugerRepo;
+        private readonly IBrugerRepo _brugerRepo;
         private readonly IKategori _kategoriRepo;
 
-        public VudgifterController(IVudgifter vudgifterRepo, /*IBrugerRepo brugerRepo*/ IKategori kategoriRepo)
+        public VudgifterController(IVudgifter vudgifterRepo, IBrugerRepo brugerRepo,IKategori kategoriRepo)
         {
             _vudgifterRepo = vudgifterRepo;
-            //_brugerRepo = brugerRepo;
+            _brugerRepo = brugerRepo;
             _kategoriRepo = kategoriRepo;
         }
 
@@ -34,12 +34,12 @@ namespace PRJ4.Controllers
         public async Task<ActionResult<IEnumerable<VudgifterResponseDTO>>> GetAllByUser()
         {
             // // Get the BrugerId (User ID) from the JWT token's "sub" claim
-            // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
 
-            // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
-            // {
-            //     return Unauthorized("User ID claim missing or invalid.");
-            // }
+            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            {
+                return Unauthorized("Bruger ID claim magnlende eller invalid.");
+            }
 
             // Retrieve the user's vudgifter records using the BrugerId
             var vudgifter = await _vudgifterRepo.GetAllByUserId(1);
@@ -62,11 +62,11 @@ namespace PRJ4.Controllers
         public async Task<ActionResult<Vudgifter>> Add(newVudgifterDTO vudgifter)
         {
             // Extract BrugerId from the JWT token (the "sub" claim or NameIdentifier)
-            // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
-            // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int authenticatedBrugerId))
-            // {
-            //     return Unauthorized("Invalid token or missing BrugerId.");
-            // }
+            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int authenticatedBrugerId))
+            {
+                return Unauthorized("Invalid token eller manglende BrugerId.");
+            }
             // Validate that the input data is not null
             if (vudgifter == null)
             {
@@ -74,12 +74,12 @@ namespace PRJ4.Controllers
             }
 
 
-            // Check if the user (Bruger) exists
-            // Bruger bruger = await _brugerRepo.GetByIdAsync(authenticatedBrugerId);
-            // if (bruger == null)
-            // {
-            //     return NotFound($"Bruger with ID {authenticatedBrugerId} not found.");
-            // }
+            //Check if the user (Bruger) exists
+            Bruger bruger = await _brugerRepo.GetByIdAsync(authenticatedBrugerId);
+            if (bruger == null)
+            {
+                return NotFound($"Bruger med Id {authenticatedBrugerId} ikke fundet.");
+            }
 
             Kategori kategori;
 
@@ -104,28 +104,35 @@ namespace PRJ4.Controllers
                 Pris = vudgifter.Pris,
                 Tekst = vudgifter.Tekst,
                 Dato = DateTime.Now,
-                //BrugerId = bruger.BrugerId,
+                BrugerId = bruger.BrugerId,
                 KategoriId = kategori.KategoriId,
-                //Bruger = bruger,
+                Bruger = bruger,
                 Kategori = kategori
             };
 
             // Save the new Vudgifter to the database
             await _vudgifterRepo.AddAsync(newVudgifter);
             await _vudgifterRepo.SaveChangesAsync();
-
+            var responseDTO = new VudgifterResponseDTO
+            {
+                VudgiftId = newVudgifter.VudgiftId,
+                Pris = newVudgifter.Pris,
+                Tekst = newVudgifter.Tekst,
+                Dato = newVudgifter.Dato,
+                KategoriNavn = newVudgifter.Kategori.Navn
+            };
             // Return the newly created Vudgifter object
             return Ok(newVudgifter);
         }
         [HttpPut("update/{id}")]
         public async Task<ActionResult<Vudgifter>> Updatevudgifter(int id, [FromBody] VudgifterUpdateDTO updateDTO)
         {
-            // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
 
-            // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
-            // {
-            //     return Unauthorized("User ID claim missing or invalid.");
-            // }
+            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            {
+                return Unauthorized("Bruger Id claim magnlende eller invalid.");
+            }
 
             // Step 1: Get the vudgifter entity from the database
             var vudgifter = await _vudgifterRepo.GetByIdAsync(id);
@@ -135,10 +142,10 @@ namespace PRJ4.Controllers
             }
 
             // Ensure that the Vudgift belongs to the authenticated user
-            // if (vudgifter.BrugerId != brugerId)
-            // {
-            //     return Unauthorized("You do not have permission to update this Vudgift.");
-            // }
+            if (vudgifter.BrugerId != brugerId)
+            {
+                return Unauthorized("Du har ikke permission til at opdatere denne Variable udgift.");
+            }
 
             // Step 2: Handle dynamic updates for each property only if it's provided in the DTO
             if (updateDTO.Pris.HasValue)
@@ -162,7 +169,7 @@ namespace PRJ4.Controllers
                 var kategori = await _kategoriRepo.GetByIdAsync(updateDTO.KategoriId.Value);
                 if (kategori == null)
                 {
-                    return BadRequest("No kategori exist by that id.");
+                    return BadRequest("Ingen kategori eksistere med denne id.");
                 }
 
                 vudgifter.KategoriId = kategori.KategoriId;
@@ -173,7 +180,7 @@ namespace PRJ4.Controllers
                 var kategori = await _kategoriRepo.NyKategori(updateDTO.KategoriNavn);
                 if (kategori == null)
                 {
-                    return BadRequest("New Kategori wasnt created.");
+                    return BadRequest("ny kategori var ikke skabt.");
                 }
 
                 vudgifter.KategoriId = kategori.KategoriId;
@@ -191,14 +198,20 @@ namespace PRJ4.Controllers
         [HttpDelete("{id}/delete")]
         public async Task<ActionResult<Vudgifter>> DeleteVudgiftById(int id)
         {
+            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            {
+                return Unauthorized("Bruger Id claim manglende eller invalid.");
+            }
             if (id <= 0)
             {
-                return NotFound("Fudigft id cannot be less or equal to 0.");
+                return NotFound("Vudigft id kan ikke være mindre eller eller ligmed 0.");
             }
             Vudgifter vudgifter = await _vudgifterRepo.GetByIdAsync(id);
             if(vudgifter == null)
             {
-                return BadRequest($"No Variable udgift with id {id}");
+                return BadRequest($"Ingen variable udgift med id {id}");
             }
             _vudgifterRepo.Delete(id);
             await _vudgifterRepo.SaveChangesAsync();

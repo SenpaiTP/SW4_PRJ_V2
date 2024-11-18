@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRJ4.Data;
 
@@ -11,9 +12,11 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241118121741_Add_LoginModel")]
+    partial class Add_LoginModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,34 +90,13 @@ namespace PRJ4.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("KategoriId"));
 
-                    b.Property<string>("Navn")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("KategoriId");
 
                     b.ToTable("Kategorier");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.LoginModel", b =>
-                {
-                    b.Property<int>("LoginId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginId"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("LoginId");
-
-                    b.ToTable("LoginModels");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
@@ -151,7 +133,7 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
-                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                    b.HasOne("PRJ4.Models.Bruger", null)
                         .WithMany("Fudgifters")
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -163,14 +145,12 @@ namespace PRJ4.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Bruger");
-
                     b.Navigation("Kategori");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
                 {
-                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                    b.HasOne("PRJ4.Models.Bruger", null)
                         .WithMany("Vudgifters")
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -179,8 +159,6 @@ namespace PRJ4.Migrations
                     b.HasOne("PRJ4.Models.Kategori", "Kategori")
                         .WithMany()
                         .HasForeignKey("KategoriId");
-
-                    b.Navigation("Bruger");
 
                     b.Navigation("Kategori");
                 });
