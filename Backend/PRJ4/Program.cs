@@ -35,7 +35,7 @@ builder.Services.AddScoped<IBrugerRepo,BrugerRepo>(); // Add the BrugerRepo to t
 builder.Services.AddScoped<ITemplateRepo<Bruger>,BrugerRepo>(); // Add the BrugerRepo to the service container
 builder.Services.AddScoped<IBrugerService,BrugerService>();
 builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
-builder.Services.AddScoped<IBudget,BudgetRepo>();
+builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
 builder.Services.AddScoped<IKategori,KategoriRepo>();
 builder.Services.AddScoped<TokenProvider>();
