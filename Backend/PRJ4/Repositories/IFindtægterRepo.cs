@@ -12,5 +12,6 @@ namespace PRJ4.Repositories
     {
         Task<IEnumerable<Findtægt>> GetAllAsync();
         Task<IEnumerable<Findtægt>> GetAllByUserId(int brugerId);
+        Task<IEnumerable<Findtægt>> GetByUserIdAsync(int userId);
     }
 }

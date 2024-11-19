@@ -31,5 +31,10 @@ namespace PRJ4.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Findtægt>> GetByUserIdAsync(int userId)
+        {
+            return await _context.Findtægter.Where(f => f.BrugerId == userId).ToListAsync();
+        }
+
     }
 }

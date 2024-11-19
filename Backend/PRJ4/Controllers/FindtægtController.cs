@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using PRJ4.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -31,14 +32,27 @@ public class FindtægtController:ControllerBase
     }
 
 
-    [HttpGet]
+    [HttpGet("indtægt")]
     [Authorize]
+    public async Task<ActionResult<IEnumerable<FindtægtResponseDTO>>> GetIndtægt(ClaimsPrincipal user)
+        {
+            var findtægter = await _findtægtservice.GetIndtægtAsync(findtægtDto, user);
 
-    public async Task<ActionResult<IEnumerable<Findtægt>>> GetFindtægt()
-    {
-        var findtægt = await _findtægtRepo.GetAllAsync();
-        return Ok(findtægt);
-    }
+            if (findtægter == null || !findtægter.Any())
+            {
+                return NoContent(); // If no income records are found
+            }
+
+            var findtægterDTO = findtægter.Select(f => new FindtægtResponseDTO
+            {
+                Tekst = f.Tekst,
+                Indtægt = f.Indtægt,
+                Dato = f.Dato
+            });
+            
+
+            return Ok(findtægterDTO); // Return the income records
+        }
 
     [HttpPost]
     [Authorize]

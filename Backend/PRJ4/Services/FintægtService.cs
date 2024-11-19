@@ -4,6 +4,8 @@ using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.Services;
 using PRJ4.Infrastructure;
+using PRJ4.DTOs;
+using PRJ4.Data;
 
 namespace PRJ4.Services
 {
@@ -11,29 +13,19 @@ namespace PRJ4.Services
     {
         private readonly IFindtægtRepo _findtægtRepo;
         private readonly TokenProvider _tokenProvider;
+        private readonly ApplicationDbContext _context;
 
         public FindtægtService(IFindtægtRepo findtægtRepo, TokenProvider tokenProvider)
         {
             _findtægtRepo = findtægtRepo;
             _tokenProvider = tokenProvider;
+            _context = _context;
         }
 
-        public async Task<decimal?> GetIndtægtAsync(Findtægt findtægt, ClaimsPrincipal user)
+        public async Task<IEnumerable<Findtægt>> GetIndtægtAsync(int userId)
         {
-            // Implement method
-            var brugerIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(brugerIdClaim == null)
-            {
-                return null;
-            }
-            var indtægt=await _findtægtRepo.GetByIdAsync(int.Parse(brugerIdClaim));
-
-            if(indtægt == null)
-            {
-                throw new KeyNotFoundException("User not found");
-            }
-
-            return indtægt.Indtægt;
+            // Fetch the income records for the given user ID
+            return Findtægt = await _context.Findtægter.Where(f => f.BrugerId == userId).ToListAsync();
         }
 
         public async Task AddFindtægtAsync(Findtægt findtægt, ClaimsPrincipal user)
