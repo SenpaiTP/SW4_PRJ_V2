@@ -7,7 +7,8 @@ namespace PRJ4.Services
 {
     public interface IFindtægtService
     {
-        Task AddAsync(Findtægt findtægt);
+        Task AddFindtægtAsync(Findtægt findtægt, ClaimsPrincipal user);
+        Task<decimal?> GetIndtægtAsync(Findtægt findtægt, ClaimsPrincipal user);
 
     }
 }

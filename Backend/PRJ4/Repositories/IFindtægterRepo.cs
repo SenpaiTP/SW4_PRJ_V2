@@ -8,12 +8,9 @@ using PRJ4.Models;
 
 namespace PRJ4.Repositories
 {
-    public class FindtægtRepo : TemplateRepo<Findtægt>,IFindtægtRepo
+    public interface IFindtægtRepo : ITemplateRepo<Findtægt>
     {
-        private readonly ApplicationDbContext _context;
-        public FindtægtRepo(ApplicationDbContext context) : base(context)
-        {
-            _context = context;
-        }
+        Task<IEnumerable<Findtægt>> GetAllAsync();
+        Task<IEnumerable<Findtægt>> GetAllByUserId(int brugerId);
     }
 }

@@ -36,6 +36,8 @@ builder.Services.AddScoped<ITemplateRepo<Bruger>,BrugerRepo>(); // Add the Bruge
 builder.Services.AddScoped<IBrugerService,BrugerService>();
 builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
 builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
+builder.Services.AddScoped<IFindtægtRepo,FindtægtRepo>();
+builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IKategori,KategoriRepo>();
 builder.Services.AddScoped<TokenProvider>();
 

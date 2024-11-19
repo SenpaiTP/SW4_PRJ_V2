@@ -16,7 +16,7 @@ public partial class ApplicationDbContext : DbContext
 
     // public DbSet<Bruger> Brugers { get; set; }
     public DbSet<Kategori> Kategorier {get; set;}
-    // public DbSet<Findtægt> Findtægts { get; set; }
+    public DbSet<Findtægt> Findtægter { get; set; }
     public DbSet<Fudgifter> Fudgifters { get; set; }
     // public DbSet<Vindtægter> Vindtægters { get; set; }
     public DbSet<Vudgifter> Vudgifters { get; set; }

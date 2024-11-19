@@ -32,6 +32,8 @@ public class FindtægtController:ControllerBase
 
 
     [HttpGet]
+    [Authorize]
+
     public async Task<ActionResult<IEnumerable<Findtægt>>> GetFindtægt()
     {
         var findtægt = await _findtægtRepo.GetAllAsync();
@@ -39,17 +41,24 @@ public class FindtægtController:ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddFindtægt(FindtægtDTO findtægtDto)
+    [Authorize]
+    public async Task<IActionResult> AddFindtægtAsync(FindtægtDTO findtægtDto)
     {
+        if (findtægtDto == null)
+        {
+            return BadRequest("Fast Indtægt kan ikke være 0");
+        }
         var findtægt = new Findtægt
         {
-            BrugerId = findtægtDto.BrugerId,
             Tekst = findtægtDto.Tekst,
             Indtægt = findtægtDto.Indtægt,
             Dato = findtægtDto.Dato
         };
-        await _findtægtservice.AddAsync(findtægt);
-        return CreatedAtAction(nameof(GetFindtægt), new { id = findtægt.FindtægtId }, findtægt);
+
+        var user = User;
+        await _findtægtservice.AddFindtægtAsync(findtægt,user);
+        await _findtægtRepo.SaveChangesAsync();
+        return Ok(findtægt);
     }
 
     [HttpDelete("{id}")]
