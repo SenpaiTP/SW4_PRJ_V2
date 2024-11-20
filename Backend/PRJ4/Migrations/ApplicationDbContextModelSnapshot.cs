@@ -47,6 +47,33 @@ namespace PRJ4.Migrations
                     b.ToTable("Brugers");
                 });
 
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.Property<int>("BudgetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+
+                    b.Property<int?>("BrugerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("BudgetSlut")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("BudgetStart")
+                        .HasColumnType("date");
+
+                    b.Property<int>("SavingsGoal")
+                        .HasColumnType("int");
+
+                    b.HasKey("BudgetId");
+
+                    b.HasIndex("BrugerId");
+
+                    b.ToTable("Budgets");
+                });
+
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
                     b.Property<int>("FudgiftId")
@@ -147,6 +174,15 @@ namespace PRJ4.Migrations
                     b.HasIndex("KategoriId");
 
                     b.ToTable("Vudgifters");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                        .WithMany()
+                        .HasForeignKey("BrugerId");
+
+                    b.Navigation("Bruger");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>

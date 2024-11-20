@@ -10,10 +10,11 @@ public partial class Budget
     public int BudgetId { get; set; }
     public int? BrugerId { get; set; }
     public int SavingsGoal { get; set; }
-    public int MonthlySavingsAmount { get; set; }
-    public int SavingsPeriodInMonths { get; set; }
+    public DateOnly BudgetStart { get; set; }
+    public DateOnly BudgetSlut { get; set; }
+
     
-    //[ForeignKey(nameof(BrugerId))]
-    //public Bruger? Bruger { get; set; }
+    [ForeignKey(nameof(BrugerId))]
+    public Bruger? Bruger { get; set; }
 
 }

@@ -12,8 +12,8 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241118121741_Add_LoginModel")]
-    partial class Add_LoginModel
+    [Migration("20241120162757_migration1")]
+    partial class migration1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,33 @@ namespace PRJ4.Migrations
                     b.HasKey("BrugerId");
 
                     b.ToTable("Brugers");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.Property<int>("BudgetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+
+                    b.Property<int?>("BrugerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("BudgetSlut")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("BudgetStart")
+                        .HasColumnType("date");
+
+                    b.Property<int>("SavingsGoal")
+                        .HasColumnType("int");
+
+                    b.HasKey("BudgetId");
+
+                    b.HasIndex("BrugerId");
+
+                    b.ToTable("Budgets");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
@@ -99,6 +126,27 @@ namespace PRJ4.Migrations
                     b.ToTable("Kategorier");
                 });
 
+            modelBuilder.Entity("PRJ4.Models.LoginModel", b =>
+                {
+                    b.Property<int>("LoginId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LoginId");
+
+                    b.ToTable("LoginModels");
+                });
+
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
                 {
                     b.Property<int>("VudgiftId")
@@ -129,6 +177,15 @@ namespace PRJ4.Migrations
                     b.HasIndex("KategoriId");
 
                     b.ToTable("Vudgifters");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                        .WithMany()
+                        .HasForeignKey("BrugerId");
+
+                    b.Navigation("Bruger");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>

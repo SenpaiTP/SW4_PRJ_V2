@@ -11,5 +11,7 @@ public class BudgetRepo: TemplateRepo<Budget>, IBudgetRepo
     {
         _context = context;
     }
+
+     
    
 }
