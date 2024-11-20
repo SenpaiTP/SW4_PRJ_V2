@@ -37,6 +37,7 @@ namespace PRJ4.Controllers
             // }
 
             // Step 2: Find the best matching category using fuzzy matching
+            suggestedCategory = suggestedCategory.ToLower();
             var bestMatchCategory = await _kategorirepo.SearchByBestFuzzyMatch(suggestedCategory);
 
             if (bestMatchCategory != null)
