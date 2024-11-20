@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
+
 function ResetPassword() {
   return (
     <Box sx={{ padding: 2, maxWidth: 400, margin: 'auto' }}>

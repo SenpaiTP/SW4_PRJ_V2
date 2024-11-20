@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Checkbox, FormControlLabel } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { getBoxStyles } from '../../Assets/Styles/boxStyles'; // Box styling
+import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // TextField styling
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +18,7 @@ function Login() {
     console.log('Remember Me:', rememberMe);
 
     if (!email || !password) {
-      alert("Please fill in all fields");
+      alert('Please fill in all fields');
       return;
     }
   };
@@ -25,37 +28,31 @@ function Login() {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: 2,
-        maxWidth: 400,
-        margin: 'auto',
-        boxShadow: 3,
-        borderRadius: 2,
-        backgroundColor: 'white',
+        ...getBoxStyles('medium'), // Dynamically get the medium box styles
       }}
     >
       <Typography variant="h5" gutterBottom>
         Login
       </Typography>
+
+      {/* Email Input */}
       <TextField
         label="Enter your email"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles
       />
+
+      {/* Password Input */}
       <TextField
         label="Enter your password"
         type="password"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles
       />
+
+      {/* Remember me checkbox */}
       <FormControlLabel
         control={
           <Checkbox
@@ -66,9 +63,13 @@ function Login() {
         }
         label="Remember me"
       />
+
+      {/* Login button */}
       <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
         LOGIN NOW
       </Button>
+
+      {/* Register and forgot password links */}
       <Typography variant="body2" sx={{ mt: 2 }}>
         Not a member? <Link to="/Register">Register Now</Link>
       </Typography>

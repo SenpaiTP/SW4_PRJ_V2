@@ -1,7 +1,9 @@
-// SignupForm.js
+// SignupForm.js (or Register.js)
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { getBoxStyles } from '../../Assets/Styles/boxStyles';
+import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // Import textFieldStyles
 
 function Register() {
   const [firstName, setFirstName] = useState('');
@@ -39,65 +41,51 @@ function Register() {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: 2,
-        maxWidth: 400,
-        margin: 'auto',
-        boxShadow: 3,
-        borderRadius: 2,
-        backgroundColor: 'white',
+        ...getBoxStyles('medium'), // Dynamically get the medium box styles
       }}
     >
       <Typography variant="h5" gutterBottom>
         Sign Up
       </Typography>
+
+      {/* Apply shared styles to the TextFields */}
       <TextField
         label="First Name"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles here
       />
       <TextField
         label="Last Name"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={lastName}
         onChange={(e) => setLastName(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles here
       />
       <TextField
         label="Email"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles here
       />
       <TextField
         label="Password"
         type="password"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles here
       />
       <TextField
         label="Confirm Password"
         type="password"
-        variant="outlined"
-        fullWidth
-        margin="normal"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
+        {...getTextFieldStyles()} // Apply the shared styles here
       />
+
       <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
         Sign Up Now
       </Button>
+
       <Typography variant="body2" sx={{ mt: 2 }}>
         Already have an account? <Link to="/login">Login Here</Link>
       </Typography>
