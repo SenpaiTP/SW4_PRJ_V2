@@ -12,5 +12,6 @@ namespace PRJ4.Repositories
     {
         Task<Kategori> NyKategori(string KategoriNavn);
         Task<Kategori> SearchByName(string kategoriNavn);
+        Task<Kategori> SearchByBestFuzzyMatch(string SuggestedKategoriNavn);
     }
 }

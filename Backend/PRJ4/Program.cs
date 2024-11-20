@@ -45,6 +45,8 @@ builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddControllers();
+string openAiKey = builder.Configuration["OpenAI:ApiKey"];
+builder.Services.AddSingleton(new OpenAIClient(openAiKey));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
     });
