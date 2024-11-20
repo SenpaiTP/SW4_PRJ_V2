@@ -43,12 +43,12 @@ namespace PRJ4.Services
             {
                 // Search for Kategori by name
                 kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
-                Console.WriteLine($"{kategori.Navn}, {kategori.KategoriId}, Service Before create new");
+                
 
                 // If Kategori not found, create a new one
                 if (kategori == null)
                 {
-                     Console.WriteLine($"{kategori.Navn}, {kategori.KategoriId}, Service In create new");
+                     
                     kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
                 }
             }
