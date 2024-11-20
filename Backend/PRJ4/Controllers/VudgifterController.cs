@@ -73,7 +73,7 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
-                await _VudgifterService.UpdateVudgifter(brugerId, id, updateDTO);
+                await _VudgifterService.UpdateVudgifter( id,brugerId, updateDTO);
                 return NoContent();
             }
             catch (Exception ex)
