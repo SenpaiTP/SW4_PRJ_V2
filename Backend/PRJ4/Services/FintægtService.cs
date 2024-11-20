@@ -22,10 +22,16 @@ namespace PRJ4.Services
             _context = _context;
         }
 
-        public async Task<IEnumerable<Findtægt>> GetIndtægtAsync(int userId)
+        public async Task<IEnumerable<Findtægt>> GetIndtægtAsync(ClaimsPrincipal user)
         {
-            // Fetch the income records for the given user ID
-            return Findtægt = await _context.Findtægter.Where(f => f.BrugerId == userId).ToListAsync();
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null)
+            {
+                throw new ArgumentException("User ID is missing.");
+            }
+
+            return await _findtægtRepo.GetByUserIdAsync(int.Parse(userIdClaim));
         }
 
         public async Task AddFindtægtAsync(Findtægt findtægt, ClaimsPrincipal user)

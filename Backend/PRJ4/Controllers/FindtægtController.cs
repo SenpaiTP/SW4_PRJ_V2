@@ -32,11 +32,11 @@ public class FindtægtController:ControllerBase
     }
 
 
-    [HttpGet("indtægt")]
+    [HttpGet]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<FindtægtResponseDTO>>> GetIndtægt(ClaimsPrincipal user)
+    public async Task<ActionResult<IEnumerable<FindtægtResponseDTO>>> GetIndtægt()
         {
-            var findtægter = await _findtægtservice.GetIndtægtAsync(findtægtDto, user);
+            var findtægter = await _findtægtservice.GetIndtægtAsync(User);
 
             if (findtægter == null || !findtægter.Any())
             {
