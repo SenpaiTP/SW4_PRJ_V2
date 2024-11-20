@@ -16,7 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen(); //Replace this with under lying AddSwaggerGenWithAuth when theres been made authorization (Sylvesterronn)
 builder.Services.AddSwaggerGenWithAuth();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -43,7 +42,8 @@ builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
 builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
 builder.Services.AddScoped<IKategori,KategoriRepo>();
 builder.Services.AddScoped<TokenProvider>();
-
+builder.Services.AddScoped<IFudgifterService,FudgifterService>();
+builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
