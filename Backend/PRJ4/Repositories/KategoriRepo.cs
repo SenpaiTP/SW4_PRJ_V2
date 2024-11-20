@@ -15,18 +15,27 @@ namespace PRJ4.Repositories
         {
            _context = context;
         }
-        public async Task<Kategori> NewKategori(string kategoriName)
+
+        public async Task<Kategori> SearchByName(string KategoriNavn)
         {
-            if (string.IsNullOrWhiteSpace(kategoriName))
+            if (string.IsNullOrWhiteSpace(KategoriNavn)) return null;
+            Console.WriteLine($"{KategoriNavn}, RepO Search by name");
+            return await _context.Kategorier
+                .FirstOrDefaultAsync(k => k.Navn.ToLower() == KategoriNavn.Trim().ToLower());
+        }
+
+        public async Task<Kategori> NyKategori(string KategoriNavn)
+        {
+            if (string.IsNullOrWhiteSpace(KategoriNavn))
             {
                 throw new ArgumentException("Kategori name cannot be null or whitespace.");
             }
-
+            Console.WriteLine($"{KategoriNavn}, Repo NyKategori");
             // Convert the name to lowercase after validation
-            kategoriName = kategoriName.Trim().ToLower();
+            KategoriNavn = KategoriNavn.Trim().ToLower();
 
             // Create a new Kategori instance with the validated and transformed name
-            Kategori kategori = new Kategori { Name = kategoriName };
+            Kategori kategori = new Kategori { Navn = KategoriNavn };
 
             // Add and save changes, allowing the database to generate the ID
             await AddAsync(kategori);
