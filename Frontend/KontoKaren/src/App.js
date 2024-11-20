@@ -1,9 +1,14 @@
   import React from 'react';
   import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
   import Homepage from './Pages/Homepage';
+
   //import Login from './Pages/Login/Login';
   import Header from './Components/Header/Header';
   import Indtægter from './Pages/Indtægter/Indtægter';
+
+  // Budget Page
+  import Budget from './Pages/Budget/Budget';
+
   // Login pages
   import Login from './Pages/Login/Login';
   import Register from './Pages/Login/Register';
@@ -26,6 +31,7 @@
             <Route path="/ForgotPassword" element={<ForgotPassword />} />
             <Route path="/ResetPassword" element={<ResetPassword />} />
             <Route path="/user-dashboard" element={<LoggedInPage />} />
+            <Route path="/Budget" element={<Budget />} />
           </Routes>
         </div>
       </Router>
