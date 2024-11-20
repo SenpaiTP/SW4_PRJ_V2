@@ -15,13 +15,22 @@ namespace PRJ4.Repositories
         {
            _context = context;
         }
+
+        public async Task<Kategori> SearchByName(string KategoriNavn)
+        {
+            if (string.IsNullOrWhiteSpace(KategoriNavn)) return null;
+            Console.WriteLine($"{KategoriNavn}, RepO Search by name");
+            return await _context.Kategorier
+                .FirstOrDefaultAsync(k => k.Navn.ToLower() == KategoriNavn.Trim().ToLower());
+        }
+
         public async Task<Kategori> NyKategori(string KategoriNavn)
         {
             if (string.IsNullOrWhiteSpace(KategoriNavn))
             {
                 throw new ArgumentException("Kategori name cannot be null or whitespace.");
             }
-
+            Console.WriteLine($"{KategoriNavn}, Repo NyKategori");
             // Convert the name to lowercase after validation
             KategoriNavn = KategoriNavn.Trim().ToLower();
 

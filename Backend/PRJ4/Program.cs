@@ -37,7 +37,8 @@ builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
 builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
 builder.Services.AddScoped<IKategori,KategoriRepo>();
 builder.Services.AddScoped<TokenProvider>();
-
+builder.Services.AddScoped<IFudgifterService,FudgifterService>();
+builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
