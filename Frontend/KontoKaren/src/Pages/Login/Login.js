@@ -1,7 +1,7 @@
 // LoginForm.js
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Checkbox, FormControlLabel } from '@mui/material';
-
+import { Link } from 'react-router-dom';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -70,10 +70,10 @@ function Login() {
         LOGIN NOW
       </Button>
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Not a member? <a href="/Register">Register Now</a>
+        Not a member? <Link to="/Register">Register Now</Link>
       </Typography>
       <Typography variant="body2">
-        <a href="/ForgotPassword">Forgot password?</a>
+        <Link to="/ForgotPassword">Forgot password?</Link>
       </Typography>
     </Box>
   );

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -45,7 +47,7 @@ function ForgotPassword() {
         Reset Password
       </Button>
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Remembered your password? <a href="/login">Login Now</a>
+        Remembered your password? <Link to="/login">Login Now</Link>
       </Typography>
     </Box>
   );

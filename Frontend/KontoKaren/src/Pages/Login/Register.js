@@ -1,6 +1,7 @@
 // SignupForm.js
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function Register() {
   const [firstName, setFirstName] = useState('');
@@ -98,7 +99,7 @@ function Register() {
         Sign Up Now
       </Button>
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Already have an account? <a href="/login">Login Here</a>
+        Already have an account? <Link to="/login">Login Here</Link>
       </Typography>
     </Box>
   );
