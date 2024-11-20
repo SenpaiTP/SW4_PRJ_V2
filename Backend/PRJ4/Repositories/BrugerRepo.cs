@@ -25,6 +25,16 @@ namespace PRJ4.Repositories
             }
             return bruger;
         }
+
+        // public async Task<Bruger> GetByEmailAsync(string email)
+        // {
+        //     var bruger = await _context.Brugers.FirstOrDefaultAsync(x => x.Email == email);
+        //     if (bruger == null)
+        //     {
+        //         return null;
+        //     }
+        //     return bruger;
+        // }
     
     }
 }
