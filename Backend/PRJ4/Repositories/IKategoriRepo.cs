@@ -10,6 +10,7 @@ namespace PRJ4.Repositories
 {
     public interface IKategori:ITemplateRepo<Kategori>
     {
-        Task<Kategori> NewKategori(string kategoriName);
+        Task<Kategori> NyKategori(string KategoriNavn);
+        Task<Kategori> SearchByName(string kategoriNavn);
     }
 }
