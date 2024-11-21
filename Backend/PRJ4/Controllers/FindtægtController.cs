@@ -18,6 +18,7 @@ namespace PRJ4.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class FindtægtController:ControllerBase
 {
     private readonly IFindtægtRepo _findtægtRepo;
@@ -43,7 +44,7 @@ public class FindtægtController:ControllerBase
 
 
     [HttpGet]
-    [Authorize]
+    
     public async Task<ActionResult<IEnumerable<FindtægtResponseDTO>>> GetIndtægt()
         {
             var findtægter = await _findtægtservice.GetIndtægtAsync(User);
@@ -66,7 +67,7 @@ public class FindtægtController:ControllerBase
         }
 
     [HttpPost]
-    [Authorize]
+   
     public async Task<IActionResult> AddFindtægtAsync(FindtægtDTO findtægtDto)
         {
             if (findtægtDto == null)
@@ -87,13 +88,13 @@ public class FindtægtController:ControllerBase
         }
 
     [HttpPut("{id}")]
-    [Authorize]
-        public async Task<IActionResult> UpdateFindtægtAsync(int id, [FromBody] FindtægtDTO findtægtDto)
+    
+        public async Task<IActionResult> UpdateFindtægtAsync(int id, [FromBody] FindtægtUpdateDTO findtægtDto)
         {
             try
             {
                 int brugerId = GetUserId();
-                await _findtægtservice.UpdateFindtægtAsync(id, findtægtDto, User);
+                await _findtægtservice.UpdateFindtægt(id, brugerId, findtægtDto);
                 return NoContent();
             }
             catch (Exception ex)

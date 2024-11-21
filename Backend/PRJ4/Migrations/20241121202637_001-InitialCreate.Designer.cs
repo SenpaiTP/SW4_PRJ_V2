@@ -12,8 +12,8 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241121093117_Add_IndtægerTabel")]
-    partial class Add_IndtægerTabel
+    [Migration("20241121202637_001-InitialCreate")]
+    partial class _001InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

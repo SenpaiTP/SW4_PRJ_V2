@@ -18,4 +18,6 @@ public partial class Findtægt
     public DateTime? Dato { get; set; }
 
     public virtual Bruger Bruger { get; set; } = null!;
+
+    //Dette er en tester...
 }

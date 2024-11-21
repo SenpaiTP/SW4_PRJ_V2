@@ -27,7 +27,7 @@ public partial class ApplicationDbContext : DbContext
 
   
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
-    // {
+    //     {
     //     modelBuilder.Entity<Bruger>().ToTable("Bruger");
     //     modelBuilder.Entity<Budget>().ToTable("Budget");
     //     modelBuilder.Entity<Findtægt>().ToTable("Findtægt");
@@ -37,6 +37,6 @@ public partial class ApplicationDbContext : DbContext
     //     modelBuilder.Entity<Kategori>().ToTable("Kategorier");
     //     modelBuilder.Entity<LoginModel>().ToTable("LoginModel");
     
-    //     base.OnModelCreating(modelBuilder);
-    // }
+    //      base.OnModelCreating(modelBuilder);
+    //  }
 }

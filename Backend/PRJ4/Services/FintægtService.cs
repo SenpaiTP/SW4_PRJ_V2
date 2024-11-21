@@ -48,34 +48,46 @@ namespace PRJ4.Services
             await _findtægtRepo.AddAsync(findtægt);
         }
 
-         public async Task<bool> UpdateFindtægtAsync(int id, FindtægtDTO findtægtDto, ClaimsPrincipal user)
+         public async Task UpdateFindtægt(int id, int brugerId, FindtægtUpdateDTO dto)
         {
-            // Get the existing income record
-            // Hent den eksisterende indtægt fra repoet
-            var existingFindtægt = await _findtægtRepo.GetByIdAsync(id);
-            if (existingFindtægt == null)
-            {
-                return false;  // Returner false, hvis indtægten ikke findes
-            }
+            // Get the existing Fudgifter
+            var Findtægt = await _findtægtRepo.GetByIdAsync(id) 
+                            ?? throw new KeyNotFoundException("Faste indtægter ikke fundet.");
 
-            var userId = int.Parse(user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value);
+            // Check if the logged-in user matches the one who created the Fudgifter
+            if (Findtægt.BrugerId != brugerId)
+                throw new UnauthorizedAccessException("Unauthorized.");
 
-            // Bekræft at indtægten tilhører den aktuelle bruger
-            if (existingFindtægt.BrugerId != userId)
-            {
-                return false;  // Returner false, hvis indtægten ikke tilhører brugeren
-            }
+            // Update fields if provided
+            if (dto.Indtægt.HasValue) Findtægt.Indtægt = dto.Indtægt.Value;
+            if (!string.IsNullOrWhiteSpace(dto.Tekst)) Findtægt.Tekst = dto.Tekst;
+            if (dto.Dato.HasValue) Findtægt.Dato = dto.Dato.Value;
 
-            // Opdater data
-            existingFindtægt.Tekst = findtægtDto.Tekst;
-            existingFindtægt.Indtægt = findtægtDto.Indtægt;
-            existingFindtægt.Dato = findtægtDto.Dato;
+            // Handle Kategori (either by ID or by name)
+            // if (dto.KategoriId.HasValue)
+            // {
+            //     // Check if KategoriId is valid
+            //     Findtægt.Kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId.Value)
+            //         ?? throw new KeyNotFoundException("Kategori not found.");
+            // }
+            // else if (!string.IsNullOrWhiteSpace(dto.KategoriNavn))
+            // {
+            //     // Search for the category by name
+            //     var kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
 
-            // Gem ændringerne i databasen
-            await _findtægtRepo.UpdateAsync(existingFindtægt);
+            //     // If Kategori not found, create a new one
+            //     if (kategori == null)
+            //     {
+            //         kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+            //     }
+
+            //     // Assign the found or newly created category
+            //     Fudgifter.Kategori = kategori;
+            // }
+
+            // Update the Fudgifter record
+            _findtægtRepo.Update(Findtægt);
             await _findtægtRepo.SaveChangesAsync();
-
-            return true;  // Returner true, når opdateringen er gennemført
         }
     }
 }

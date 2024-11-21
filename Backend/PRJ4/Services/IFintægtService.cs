@@ -10,7 +10,7 @@ namespace PRJ4.Services
     {
         Task AddFindtægtAsync(Findtægt findtægt, ClaimsPrincipal user);
         Task<IEnumerable<Findtægt>> GetIndtægtAsync(ClaimsPrincipal user);
-        Task<bool> UpdateFindtægtAsync(int id, FindtægtDTO findtægtDto, ClaimsPrincipal user);
+        Task UpdateFindtægt(int id, int brugerId, FindtægtUpdateDTO dto);
 
     }
 }
