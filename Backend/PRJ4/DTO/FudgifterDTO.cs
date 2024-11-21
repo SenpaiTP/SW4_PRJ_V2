@@ -5,7 +5,7 @@ using PRJ4.Models;
 
 namespace PRJ4.DTOs
     {
-        public class newFudgifterDTO
+        public class nyFudgifterDTO
         {
             public decimal Pris {get; set;}
             public int KategoriId {get; set;}

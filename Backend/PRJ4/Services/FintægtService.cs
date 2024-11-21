@@ -46,5 +46,35 @@ namespace PRJ4.Services
             findtægt.BrugerId = int.Parse(userIdClaim); // Hvis der er en BrugerId-kolonne i Findtægt
             await _findtægtRepo.AddAsync(findtægt);
         }
+
+         public async Task<bool> UpdateFindtægtAsync(int id, FindtægtDTO findtægtDto, ClaimsPrincipal user)
+        {
+            // Get the existing income record
+            // Hent den eksisterende indtægt fra repoet
+            var existingFindtægt = await _findtægtRepo.GetByIdAsync(id);
+            if (existingFindtægt == null)
+            {
+                return false;  // Returner false, hvis indtægten ikke findes
+            }
+
+            var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            // Bekræft at indtægten tilhører den aktuelle bruger
+            if (existingFindtægt.BrugerId != userId)
+            {
+                return false;  // Returner false, hvis indtægten ikke tilhører brugeren
+            }
+
+            // Opdater data
+            existingFindtægt.Tekst = findtægtDto.Tekst;
+            existingFindtægt.Indtægt = findtægtDto.Indtægt;
+            existingFindtægt.Dato = findtægtDto.Dato;
+
+            // Gem ændringerne i databasen
+            await _findtægtRepo.UpdateAsync(existingFindtægt);
+            await _findtægtRepo.SaveChangesAsync();
+
+            return true;  // Returner true, når opdateringen er gennemført
+        }
     }
 }

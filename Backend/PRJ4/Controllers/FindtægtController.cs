@@ -47,7 +47,8 @@ public class FindtægtController:ControllerBase
             {
                 Tekst = f.Tekst,
                 Indtægt = f.Indtægt,
-                Dato = f.Dato
+                Dato = f.Dato,
+                FindtægtId = f.FindtægtId
             });
             
 
@@ -57,23 +58,55 @@ public class FindtægtController:ControllerBase
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> AddFindtægtAsync(FindtægtDTO findtægtDto)
-    {
-        if (findtægtDto == null)
         {
-            return BadRequest("Fast Indtægt kan ikke være 0");
-        }
-        var findtægt = new Findtægt
-        {
-            Tekst = findtægtDto.Tekst,
-            Indtægt = findtægtDto.Indtægt,
-            Dato = findtægtDto.Dato
-        };
+            if (findtægtDto == null)
+            {
+                return BadRequest("Fast Indtægt kan ikke være 0");
+            }
+            var findtægt = new Findtægt
+            {
+                Tekst = findtægtDto.Tekst,
+                Indtægt = findtægtDto.Indtægt,
+                Dato = findtægtDto.Dato
+            };
 
-        var user = User;
-        await _findtægtservice.AddFindtægtAsync(findtægt,user);
-        await _findtægtRepo.SaveChangesAsync();
-        return Ok(findtægt);
-    }
+            var user = User;
+            await _findtægtservice.AddFindtægtAsync(findtægt,user);
+            await _findtægtRepo.SaveChangesAsync();
+            return Ok(findtægt);
+        }
+
+    [HttpPut("{id}")]
+    [Authorize]
+        public async Task<IActionResult> UpdateFindtægtAsync(int id, [FromBody] FindtægtDTO findtægtDto)
+        {
+            var findtægt = await _findtægtRepo.GetByIdAsync(id);
+            if (findtægt == null)
+            {
+                return NotFound();
+            }
+
+            if(findtægtDto.Indtægt.HasValue)
+            {
+                findtægt.Indtægt = findtægtDto.Indtægt.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(findtægtDto.Tekst))
+            {
+                findtægt.Tekst = findtægtDto.Tekst;
+            }
+            if (findtægtDto.Dato.HasValue)
+            {
+                findtægt.Dato = findtægtDto.Dato.Value;
+            }
+
+            await _findtægtRepo.UpdateAsync(findtægt);
+            await _findtægtRepo.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
 
     [HttpDelete("{id}")]
     [Authorize]
