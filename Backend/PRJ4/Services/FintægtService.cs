@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.Services;
@@ -24,7 +25,7 @@ namespace PRJ4.Services
 
         public async Task<IEnumerable<Findtægt>> GetIndtægtAsync(ClaimsPrincipal user)
         {
-            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
             if (userIdClaim == null)
             {
@@ -36,7 +37,7 @@ namespace PRJ4.Services
 
         public async Task AddFindtægtAsync(Findtægt findtægt, ClaimsPrincipal user)
         {
-            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
             if (userIdClaim == null)
             {
@@ -57,7 +58,7 @@ namespace PRJ4.Services
                 return false;  // Returner false, hvis indtægten ikke findes
             }
 
-            var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = int.Parse(user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value);
 
             // Bekræft at indtægten tilhører den aktuelle bruger
             if (existingFindtægt.BrugerId != userId)

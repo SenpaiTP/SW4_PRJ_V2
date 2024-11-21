@@ -12,8 +12,8 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241118192128_AddMissingMigrations_Nikolaj")]
-    partial class AddMissingMigrations_Nikolaj
+    [Migration("20241118151411_Add_bruger_paa_Udgifter")]
+    partial class Add_bruger_paa_Udgifter
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,31 @@ namespace PRJ4.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("PRJ4.Models.Bruger", b =>
+                {
+                    b.Property<int>("BrugerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BrugerId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Navn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BrugerId");
+
+                    b.ToTable("Brugers");
+                });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
@@ -50,6 +75,8 @@ namespace PRJ4.Migrations
 
                     b.HasKey("FudgiftId");
 
+                    b.HasIndex("BrugerId");
+
                     b.HasIndex("KategoriId");
 
                     b.ToTable("Fudgifters");
@@ -70,6 +97,27 @@ namespace PRJ4.Migrations
                     b.HasKey("KategoriId");
 
                     b.ToTable("Kategorier");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.LoginModel", b =>
+                {
+                    b.Property<int>("LoginId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LoginId");
+
+                    b.ToTable("LoginModels");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
@@ -97,6 +145,8 @@ namespace PRJ4.Migrations
 
                     b.HasKey("VudgiftId");
 
+                    b.HasIndex("BrugerId");
+
                     b.HasIndex("KategoriId");
 
                     b.ToTable("Vudgifters");
@@ -104,22 +154,45 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
+                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                        .WithMany("Fudgifters")
+                        .HasForeignKey("BrugerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PRJ4.Models.Kategori", "Kategori")
                         .WithMany()
                         .HasForeignKey("KategoriId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Bruger");
+
                     b.Navigation("Kategori");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
                 {
+                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                        .WithMany("Vudgifters")
+                        .HasForeignKey("BrugerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PRJ4.Models.Kategori", "Kategori")
                         .WithMany()
                         .HasForeignKey("KategoriId");
 
+                    b.Navigation("Bruger");
+
                     b.Navigation("Kategori");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.Bruger", b =>
+                {
+                    b.Navigation("Fudgifters");
+
+                    b.Navigation("Vudgifters");
                 });
 #pragma warning restore 612, 618
         }

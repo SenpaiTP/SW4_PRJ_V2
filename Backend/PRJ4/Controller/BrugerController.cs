@@ -52,7 +52,8 @@ namespace PRJ4.Controllers
             }
             var newBruger = new Bruger
             {
-                Navn = brugerDto.Navn,
+                Fornavn = brugerDto.Fornavn,
+                Efternavn = brugerDto.Efternavn,
                 Email = brugerDto.Email,
                 Password = brugerDto.Password
             };
@@ -80,13 +81,13 @@ namespace PRJ4.Controllers
             
         }
 
-        [HttpGet("name"),Authorize]
-        public async Task<ActionResult<string>> GetUserName()
+        [HttpGet("whoami"),Authorize]
+        public async Task<ActionResult<string>> GetUserInfo()
         {
             try
             {
-                var brugerName=await _brugerservice.GetBrugerNavnAsync(User);
-                return Ok(brugerName);
+                var bruger=await _brugerservice.GetBrugerAsync(User);
+                return Ok(bruger);
             }
             catch (KeyNotFoundException)
             {
@@ -98,22 +99,22 @@ namespace PRJ4.Controllers
             }
         }
 
-        [HttpGet("email"),Authorize]
-        public async Task<ActionResult<string>> GetUserEmail()
-        {
-            try
-            {
-                var brugerEmail=await _brugerservice.GetBrugerEmailAsync(User);
-                return Ok(brugerEmail);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("User not found");
-            }
-            catch (ArgumentException)
-            {
-                return BadRequest("Invalid user ID");
-            }
-        }
+        // [HttpPut("forgotPassword"),Authorize]
+        // public async Task<ActionResult<string>> ForgotPassword([FromBody]ForgotPasswordDTO forgotPasswordDTO)
+        // {
+        //     if (forgotPasswordDTO == null)
+        //     {
+        //         return BadRequest("Forgot password model cannot be null");
+        //     }
+        //     var bruger=await _brugerRepo.GetByEmailAsync(forgotPasswordDTO.Email);
+        //     if(bruger==null)
+        //     {
+        //         return NotFound("User not found");
+        //     }
+        //     var newPassword=forgotPasswordDTO.NewPassword;
+        //     bruger.Password=newPassword;
+        //     await _brugerRepo.SaveChangesAsync();
+        //     return Ok("Password changed successfully");
+        // }
     }
 }

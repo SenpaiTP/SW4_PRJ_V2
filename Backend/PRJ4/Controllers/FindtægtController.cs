@@ -31,6 +31,16 @@ public class FindtægtController:ControllerBase
         _findtægtservice = findtægtService;
     }
 
+     private int GetUserId()
+        {
+            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            {
+                throw new UnauthorizedAccessException("Invalid or missing user ID claim.");
+            }
+            return brugerId;
+        }
+
 
     [HttpGet]
     [Authorize]
@@ -80,30 +90,16 @@ public class FindtægtController:ControllerBase
     [Authorize]
         public async Task<IActionResult> UpdateFindtægtAsync(int id, [FromBody] FindtægtDTO findtægtDto)
         {
-            var findtægt = await _findtægtRepo.GetByIdAsync(id);
-            if (findtægt == null)
+            try
             {
-                return NotFound();
+                int brugerId = GetUserId();
+                await _findtægtservice.UpdateFindtægtAsync(id, findtægtDto, User);
+                return NoContent();
             }
-
-            if(findtægtDto.Indtægt.HasValue)
+            catch (Exception ex)
             {
-                findtægt.Indtægt = findtægtDto.Indtægt.Value;
+                return BadRequest(ex.Message);
             }
-
-            if (!string.IsNullOrWhiteSpace(findtægtDto.Tekst))
-            {
-                findtægt.Tekst = findtægtDto.Tekst;
-            }
-            if (findtægtDto.Dato.HasValue)
-            {
-                findtægt.Dato = findtægtDto.Dato.Value;
-            }
-
-            await _findtægtRepo.UpdateAsync(findtægt);
-            await _findtægtRepo.SaveChangesAsync();
-
-            return NoContent();
         }
 
 

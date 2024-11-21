@@ -16,20 +16,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen(); //Replace this with under lying AddSwaggerGenWithAuth when theres been made authorization (Sylvesterronn)
 builder.Services.AddSwaggerGenWithAuth();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
+    .AddJwtBearer(options =>
     {
-        o.RequireHttpsMetadata = false;
-        o.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] !)),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            ClockSkew = TimeSpan.Zero
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
         };
+
+        // Prevent default claim mapping
+        options.MapInboundClaims = false;
     });
 builder.Services.AddScoped<IBrugerRepo,BrugerRepo>(); // Add the BrugerRepo to the service container
 builder.Services.AddScoped<ITemplateRepo<Bruger>,BrugerRepo>(); // Add the BrugerRepo to the service container
@@ -40,7 +44,8 @@ builder.Services.AddScoped<IFindtægtRepo,FindtægtRepo>();
 builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IKategori,KategoriRepo>();
 builder.Services.AddScoped<TokenProvider>();
-
+builder.Services.AddScoped<IFudgifterService,FudgifterService>();
+builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);

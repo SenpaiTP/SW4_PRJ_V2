@@ -9,199 +9,93 @@ using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Authorization;
-//using PRJ4.Services;
+using PRJ4.Services;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Security.Claims;
+
 namespace PRJ4.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
-    public class FudgifterController:ControllerBase
+    [Authorize]
+    public class FudgifterController : ControllerBase
     {
-        private readonly IFudgifter _fudgifterRepo;
-        //private readonly IBrugerRepo _brugerRepo;
-        private readonly IKategori _kategoriRepo;
+        private readonly IFudgifterService _fudgifterService;
 
-        public FudgifterController(IFudgifter fudgifterRepo, IKategori kategoriRepo /*IBrugerRepo brugerRepo*/)
+        public FudgifterController(IFudgifterService fudgifterService)
         {
-           _fudgifterRepo = fudgifterRepo;
-           _kategoriRepo = kategoriRepo;
-            /*_brugerRepo = brugerRepo;*/
+            _fudgifterService = fudgifterService;
+        }
+
+        private int GetUserId()
+        {
+            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            {
+                throw new UnauthorizedAccessException("Invalid or missing user ID claim.");
+            }
+            return brugerId;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FudgifterResponseDTO>>> GetAllByUser()
         {
-            // Get the BrugerId (User ID) from the JWT token's "sub" claim
-            // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
-
-            // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
-            // {
-            //     return Unauthorized("User ID claim missing or invalid.");
-            // }
-
-            // Retrieve the user's Fudgifter records using the BrugerId
-            var fudgifter = await _fudgifterRepo.GetAllByUserId(1); // replace 1 with BrugerId
-
-            // Map to response DTO
-            var responseDTOs = fudgifter.Select(f => new FudgifterResponseDTO
+            try
             {
-                FudgiftId = f.FudgiftId,
-                Pris = f.Pris,
-                Tekst = f.Tekst,
-                KategoriNavn = f.Kategori?.Navn,
-                Dato = f.Dato
-            });
-
-            return Ok(responseDTOs);
+                int brugerId = GetUserId();
+                var fudgifter = await _fudgifterService.GetAllByUser(brugerId);
+                return Ok(fudgifter);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<Fudgifter>> Add(nyFudgifterDTO fudgifter)
+        public async Task<ActionResult<FudgifterResponseDTO>> Add(nyFudgifterDTO fudgifter)
         {
-            // Validate that the input data is not null
-            if (fudgifter == null)
+            try
             {
-                return BadRequest("Fudgifter data cannot be null");
+                int brugerId = GetUserId();
+                var response = await _fudgifterService.AddFudgifter(brugerId, fudgifter);
+                return CreatedAtAction(nameof(Add), new { id = response.FudgiftId }, response);
             }
-
-            // Extract BrugerId from the JWT token (the "sub" claim or NameIdentifier)
-            // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
-            // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int authenticatedBrugerId))
-            // {
-            //     return Unauthorized("Invalid token or missing BrugerId.");
-            // }
-
-            // Check if the user (Bruger) exists
-            // Bruger bruger = await _brugerRepo.GetByIdAsync(authenticatedBrugerId);
-            // if (bruger == null)
-            // {
-            //     return NotFound($"Bruger with ID {authenticatedBrugerId} not found.");
-            // }
-
-            Kategori kategori;
-            // Ensure Kategori exists or create a new one if KategoriId is not provide
-            if (fudgifter.KategoriId == 0)
+            catch (Exception ex)
             {
-                kategori = await _kategoriRepo.NyKategori(fudgifter.KategoriNavn);
+                return BadRequest(ex.Message);
             }
-            else
-            {
-                kategori = await _kategoriRepo.GetByIdAsync(fudgifter.KategoriId);
-                if (kategori == null)
-                {
-                    return NotFound($"Kategori with ID {fudgifter.KategoriId} not found.");
-                }
-            }
-
-            // Map DTO to Fudgifter model
-            Fudgifter nyFudgifter = new Fudgifter
-            {
-                Pris = fudgifter.Pris,
-                Tekst = fudgifter.Tekst,
-                Dato = fudgifter.Dato,
-                KategoriId = kategori.KategoriId, // Set the actual Kategori ID
-                BrugerId = 1,       // Use authenticated BrugerId
-                Kategori = kategori,              // Link the Kategori entity
-                //Bruger = bruger                   // Link the Bruger entity
-            };
-
-            // Save the new Fudgifter to the database
-            await _fudgifterRepo.AddAsync(nyFudgifter);
-            await _fudgifterRepo.SaveChangesAsync();
-
-            // Return the newly created Fudgifter object
-            return CreatedAtAction(nameof(Add), new { id = nyFudgifter.FudgiftId }, nyFudgifter);
         }
 
         [HttpPut("opdater/{id}")]
-        public async Task<ActionResult<Fudgifter>> Opdaterfudgifter(int id, [FromBody] FudgifterUpdateDTO updateDTO)
+        public async Task<IActionResult> Update(int id, [FromBody] FudgifterUpdateDTO updateDTO)
         {
-            // var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
-
-            // if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
-            // {
-            //     return Unauthorized("Bruger Id claim manglende or invalid.");
-            // }
-
-            // Step 1: Get the fudgifter entity from the database
-            var fudgifter = await _fudgifterRepo.GetByIdAsync(id);
-            if (fudgifter == null)
+            try
             {
-                return NotFound("fudgifter ikke fundet.");
+                int brugerId = GetUserId();
+                await _fudgifterService.UpdateFudgifter(brugerId, id, updateDTO);
+                return NoContent();
             }
-
-            // Ensure that the Vudgift belongs to the authenticated user
-            // if (fudgifter.BrugerId != brugerId)
-            // {
-            //     return Unauthorized("Du har ikke tilladelse til at ændre Vudgift.");
-            // }
-
-            // Step 2: Handle dynamic updates for each property only if it's provided in the DTO
-            if (updateDTO.Pris.HasValue)
+            catch (Exception ex)
             {
-                fudgifter.Pris = updateDTO.Pris.Value;
+                return BadRequest(ex.Message);
             }
-
-            if (!string.IsNullOrEmpty(updateDTO.Tekst))
-            {
-                fudgifter.Tekst = updateDTO.Tekst;
-            }
-
-            if (updateDTO.Dato.HasValue)
-            {
-                fudgifter.Dato = updateDTO.Dato.Value;
-            }
-
-            // Step 3: Handle the Kategori update
-           if (updateDTO.KategoriId.HasValue)
-            {
-                var kategori = await _kategoriRepo.GetByIdAsync(updateDTO.KategoriId.Value);
-                if (kategori == null)
-                {
-                    return BadRequest("Ingen kategori eksistere på denne id.");
-                }
-
-                fudgifter.KategoriId = kategori.KategoriId;
-                fudgifter.Kategori = kategori;
-            }
-            else if(!string.IsNullOrWhiteSpace(updateDTO.KategoriNavn))
-            {
-                var kategori = await _kategoriRepo.NyKategori(updateDTO.KategoriNavn);
-                if (kategori == null)
-                {
-                    return BadRequest("Ny Kategori er ikke skabt.");
-                }
-
-                fudgifter.KategoriId = kategori.KategoriId;
-                fudgifter.Kategori = kategori;
-            }
-
-            // Step 4: Save the updated entity
-            _fudgifterRepo.Update(fudgifter);
-            await _fudgifterRepo.SaveChangesAsync();
-
-            // Step 5: Return the updated entity
-            return Ok(fudgifter);
         }
 
         [HttpDelete("{id}/slet")]
-        public async Task<ActionResult<Fudgifter>> SletFudgiftVedId(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            
-            if (id <= 0)
+            try
             {
-                return NotFound("Fudigft id kan ikke være mindre eller ligmed 0.");
+                int brugerId = GetUserId();
+                await _fudgifterService.DeleteFudgifter(brugerId, id);
+                return NoContent();
             }
-            Fudgifter fudgifter = await _fudgifterRepo.GetByIdAsync(id);
-          
-            if(fudgifter == null){ return BadRequest($"Kan ikke finde fast udgift med id: {id}");}
-            
-            _fudgifterRepo.Delete(id);
-            await _fudgifterRepo.SaveChangesAsync();
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-
     }
+
 }
