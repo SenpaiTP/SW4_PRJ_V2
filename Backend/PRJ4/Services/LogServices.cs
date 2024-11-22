@@ -1,3 +1,4 @@
+using AutoMapper;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -6,32 +7,25 @@ using System.Threading.Tasks;
 using PRJ4.DTOs;
 using PRJ4.Models;
 
-
 namespace PRJ4.Services
 {
     public class LogQueryService : ILogQueryService
     {
         private readonly IMongoCollection<Log> _logs;
+        private readonly IMapper _mapper;
 
-        public LogQueryService(IMongoDatabase database)
+        public LogQueryService(IMongoDatabase database, IMapper mapper)
         {
             _logs = database.GetCollection<Log>("Logs"); // Replace with your actual collection name
+            _mapper = mapper;
         }
 
         // Get all logs
         public async Task<IEnumerable<LogDto>> GetAllLogsAsync()
         {
+            
             var logs = await _logs.Find(_ => true).ToListAsync(); // Get all logs from MongoDB
-            return logs.Select(log => new LogDto
-            {
-                Id = log.Id,
-                Level = log.Level,
-                Timestamp = log.Timestamp,
-                MessageTemplate = log.MessageTemplate,
-                Properties = log.Properties,
-                Exception = log.Exception
-                
-            });
+            return _mapper.Map<IEnumerable<LogDto>>(logs); // Use AutoMapper for mapping
         }
 
         // Get logs by level (Info, Warning, Error, etc.)
@@ -39,15 +33,7 @@ namespace PRJ4.Services
         {
             var filter = Builders<Log>.Filter.Eq(log => log.Level, level);
             var logs = await _logs.Find(filter).ToListAsync();
-            return logs.Select(log => new LogDto
-            {
-                Id = log.Id,
-                Level = log.Level,
-                Timestamp = log.Timestamp,
-                MessageTemplate = log.MessageTemplate,
-                Properties = log.Properties,
-                Exception = log.Exception
-            });
+            return _mapper.Map<IEnumerable<LogDto>>(logs); // Use AutoMapper for mapping
         }
 
         // Get logs by date range
@@ -58,22 +44,13 @@ namespace PRJ4.Services
                 Builders<Log>.Filter.Lte(log => log.Timestamp, endDate)
             );
             var logs = await _logs.Find(filter).ToListAsync();
-            return logs.Select(log => new LogDto
-            {
-                Id = log.Id,
-                Level = log.Level,
-                Timestamp = log.Timestamp,
-                MessageTemplate = log.MessageTemplate,
-                Properties = log.Properties,
-                Exception = log.Exception
-            });
+            return _mapper.Map<IEnumerable<LogDto>>(logs); // Use AutoMapper for mapping
         }
+
         public async Task<IEnumerable<LogDto>> GetLogsByRequest(string request)
         {
-            // Define filter to match HTTP methods in Properties.Method
             var methodFilter = Builders<Log>.Filter.In("Properties.Method", new[] { "DELETE", "PUT", "POST", "GET" });
 
-            // Additional filter if specific request method is provided
             if (!string.IsNullOrEmpty(request))
             {
                 methodFilter &= Builders<Log>.Filter.Eq("Properties.Method", request.ToUpper());
@@ -81,31 +58,13 @@ namespace PRJ4.Services
 
             try
             {
-                // Fetch logs from the collection
                 var logs = await _logs.Find(methodFilter).ToListAsync();
-
-                // Map logs to LogDto, accessing Properties safely
-                var logDtos = logs.Select(log =>
-                {
-                    var method = log.Properties.ContainsKey("Method") ? log.Properties["Method"]?.ToString() : null;
-
-                    return new LogDto
-                    {
-                        Id = log.Id,
-                        Method = method,
-                        Timestamp = log.Timestamp,
-                        MessageTemplate = log.MessageTemplate
-                    };
-                });
-
-                return logDtos;
+                return _mapper.Map<IEnumerable<LogDto>>(logs); // Use AutoMapper for mapping
             }
             catch (Exception ex)
             {
                 throw new Exception("Error fetching logs", ex);
             }
         }
-
-
     }
 }

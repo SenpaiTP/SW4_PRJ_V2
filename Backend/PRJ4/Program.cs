@@ -8,9 +8,11 @@ using PRJ4.Models;
 using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Services;
+using PRJ4.Mappings;
 using Serilog;
 using Serilog.Events;
 using MongoDB.Driver;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,18 +27,12 @@ if (string.IsNullOrEmpty(mongoConnectionString) || string.IsNullOrEmpty(mongoDat
 
 Serilog.Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    // Rule 1: Default minimum log level is Information
-    .MinimumLevel.Is(LogEventLevel.Information)
-    // Rule 2: For namespaces starting with "Microsoft", set minimum log level to Warning
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    // Rule 3: For the console sink, set minimum log level to Error
-    .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Error)
-    // MongoDB sink for all levels above Information
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)  // This reads from appsettings.json or user-secrets
     .WriteTo.MongoDB(
-        $"{mongoConnectionString}/{mongoDatabaseName}",
-        collectionName: "logs",
-        restrictedToMinimumLevel: LogEventLevel.Information // Ensures Information-level and above are logged to MongoDB
-    )
+        builder.Configuration["MongoDB:connectionString"] + "/" + builder.Configuration["MongoDB:databaseName"],
+        collectionName: "logs"
+        )
+    .WriteTo.Console() // Use connection string from configuration
     .CreateLogger();
 
 // Use Serilog for logging in the host
@@ -53,7 +49,10 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     var client = serviceProvider.GetRequiredService<IMongoClient>();
     return client.GetDatabase(mongoDatabaseName);
 });
-
+//Register mapping profiles
+builder.Services.AddAutoMapper(typeof(FudgifterProfile));
+builder.Services.AddAutoMapper(typeof(VudgifterProfile));
+builder.Services.AddAutoMapper(typeof(LogMappingProfile));
 // Add services to the container
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 builder.Services.AddEndpointsApiExplorer();
@@ -106,5 +105,4 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
