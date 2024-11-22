@@ -1,6 +1,7 @@
 using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.DTOs;
+using AutoMapper;
 
 namespace PRJ4.Services
 {
@@ -10,15 +11,23 @@ namespace PRJ4.Services
         private readonly IBrugerRepo _brugerRepo;
         private readonly IKategori _kategoriRepo;
         private readonly ILogger<FudgifterService> _logger;
+        private readonly IMapper _mapper; 
 
-        public FudgifterService(IFudgifter fudgifterRepo, IKategori kategoriRepo, IBrugerRepo brugerRepo, ILogger<FudgifterService> logger)
+        public FudgifterService(
+            IFudgifter fudgifterRepo,
+            IKategori kategoriRepo,
+            IBrugerRepo brugerRepo,
+            ILogger<FudgifterService> logger,
+            IMapper mapper)
         {
             _fudgifterRepo = fudgifterRepo;
             _kategoriRepo = kategoriRepo;
             _brugerRepo = brugerRepo;
             _logger = logger;
+            _mapper = mapper; 
         }
 
+        // Get all expenses for a user
         public async Task<IEnumerable<FudgifterResponseDTO>> GetAllByUser(int brugerId)
         {
             _logger.LogInformation("Fetching all expenses for user with ID: {BrugerId}", brugerId);
@@ -27,16 +36,11 @@ namespace PRJ4.Services
 
             _logger.LogInformation("Found {Count} expenses for user with ID: {BrugerId}", fudgifter.Count(), brugerId);
 
-            return fudgifter.Select(f => new FudgifterResponseDTO
-            {
-                FudgiftId = f.FudgiftId,
-                Pris = f.Pris,
-                Tekst = f.Tekst,
-                KategoriNavn = f.Kategori?.Navn,
-                Dato = f.Dato
-            });
+            // Use AutoMapper to map Fudgifter to FudgifterResponseDTO
+            return _mapper.Map<IEnumerable<FudgifterResponseDTO>>(fudgifter);
         }
 
+        // Add a new expense for a user
         public async Task<FudgifterResponseDTO> AddFudgifter(int brugerId, nyFudgifterDTO dto)
         {
             _logger.LogInformation("Adding new expense for user with ID: {BrugerId}", brugerId);
@@ -67,33 +71,23 @@ namespace PRJ4.Services
                 kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId)
                            ?? throw new KeyNotFoundException("Kategori not found.");
             }
-
-            var nyFudgifter = new Fudgifter
-            {
-                Pris = dto.Pris,
-                Tekst = dto.Tekst,
-                Dato = dto.Dato,
-                KategoriId = kategori.KategoriId,
-                BrugerId = brugerId,
-                Kategori = kategori,
-                Bruger = bruger
-            };
+            dto.KategoriId = kategori.KategoriId;
+            var nyFudgifter = _mapper.Map<Fudgifter>(dto);
+            // Set additional properties
+            nyFudgifter.BrugerId = brugerId;
+            nyFudgifter.Kategori = kategori;
+            nyFudgifter.Bruger = bruger;
 
             await _fudgifterRepo.AddAsync(nyFudgifter);
             await _fudgifterRepo.SaveChangesAsync();
 
             _logger.LogInformation("Successfully added expense with ID: {FudgiftId} for user with ID: {BrugerId}", nyFudgifter.FudgiftId, brugerId);
 
-            return new FudgifterResponseDTO
-            {
-                FudgiftId = nyFudgifter.FudgiftId,
-                Pris = nyFudgifter.Pris,
-                Tekst = nyFudgifter.Tekst,
-                Dato = nyFudgifter.Dato,
-                KategoriNavn = kategori.Navn
-            };
+            // Use AutoMapper to return the DTO
+            return _mapper.Map<FudgifterResponseDTO>(nyFudgifter);
         }
 
+        // Update an existing expense for a user
         public async Task UpdateFudgifter(int id, int brugerId, FudgifterUpdateDTO dto)
         {
             _logger.LogInformation("Updating expense with ID: {FudgiftId} for user with ID: {BrugerId}", id, brugerId);
@@ -106,7 +100,7 @@ namespace PRJ4.Services
                 _logger.LogWarning("Unauthorized update attempt for expense with ID: {FudgiftId} by user with ID: {BrugerId}", id, brugerId);
                 throw new UnauthorizedAccessException("Unauthorized.");
             }
-
+            //Check which things to update
             if (dto.Pris.HasValue) fudgifter.Pris = dto.Pris.Value;
             if (!string.IsNullOrWhiteSpace(dto.Tekst)) fudgifter.Tekst = dto.Tekst;
             if (dto.Dato.HasValue) fudgifter.Dato = dto.Dato.Value;
@@ -137,6 +131,7 @@ namespace PRJ4.Services
             _logger.LogInformation("Successfully updated expense with ID: {FudgiftId}", id);
         }
 
+        // Delete an expense for a user
         public async Task DeleteFudgifter(int brugerId, int id)
         {
             _logger.LogInformation("Deleting expense with ID: {FudgiftId} for user with ID: {BrugerId}", id, brugerId);

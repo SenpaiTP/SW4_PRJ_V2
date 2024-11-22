@@ -8,9 +8,11 @@ using PRJ4.Models;
 using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Services;
+using PRJ4.Mappings;
 using Serilog;
 using Serilog.Events;
 using MongoDB.Driver;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,7 +55,9 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     var client = serviceProvider.GetRequiredService<IMongoClient>();
     return client.GetDatabase(mongoDatabaseName);
 });
-
+//Register mapping profiles
+builder.Services.AddAutoMapper(typeof(FudgifterProfile));
+builder.Services.AddAutoMapper(typeof(VudgifterProfile));
 // Add services to the container
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 builder.Services.AddEndpointsApiExplorer();
