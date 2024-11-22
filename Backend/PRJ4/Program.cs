@@ -25,12 +25,18 @@ if (string.IsNullOrEmpty(mongoConnectionString) || string.IsNullOrEmpty(mongoDat
 
 Serilog.Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    // Rule 1: Default minimum log level is Information
+    .MinimumLevel.Is(LogEventLevel.Information)
+    // Rule 2: For namespaces starting with "Microsoft", set minimum log level to Warning
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    // Rule 3: For the console sink, set minimum log level to Error
+    .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Error)
+    // MongoDB sink for all levels above Information
     .WriteTo.MongoDB(
         $"{mongoConnectionString}/{mongoDatabaseName}",
-        collectionName: "logs"
+        collectionName: "logs",
+        restrictedToMinimumLevel: LogEventLevel.Information // Ensures Information-level and above are logged to MongoDB
     )
-    .WriteTo.Console()
     .CreateLogger();
 
 // Use Serilog for logging in the host
@@ -87,7 +93,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 var app = builder.Build();
-Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

@@ -2,8 +2,6 @@ using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.DTOs;
 
-
-
 namespace PRJ4.Services
 {
     public class VudgifterService : IVudgifterService
@@ -11,129 +9,155 @@ namespace PRJ4.Services
         private readonly IVudgifter _VudgifterRepo;
         private readonly IBrugerRepo _brugerRepo;
         private readonly IKategori _kategoriRepo;
+        private readonly ILogger<VudgifterService> _logger;
 
-        public VudgifterService(IVudgifter VudgifterRepo, IKategori kategoriRepo, IBrugerRepo brugerRepo)
+        public VudgifterService(IVudgifter VudgifterRepo, IKategori kategoriRepo, IBrugerRepo brugerRepo, ILogger<VudgifterService> logger)
         {
             _VudgifterRepo = VudgifterRepo;
             _kategoriRepo = kategoriRepo;
             _brugerRepo = brugerRepo;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(int brugerId)
         {
-            var Vudgifter = await _VudgifterRepo.GetAllByUserId(brugerId);
-            return Vudgifter.Select(f => new VudgifterResponseDTO
+            try
             {
-                VudgiftId = f.VudgiftId,
-                Pris = f.Pris,
-                Tekst = f.Tekst,
-                KategoriNavn = f.Kategori?.Navn,
-                Dato = f.Dato
-            });
+                _logger.LogInformation("Fetching all variable expenses for user {BrugerId}", brugerId);
+                var Vudgifter = await _VudgifterRepo.GetAllByUserId(brugerId);
+                _logger.LogInformation("Fetched {Count} variable expenses for user {BrugerId}", Vudgifter.Count(), brugerId);
+
+                return Vudgifter.Select(f => new VudgifterResponseDTO
+                {
+                    VudgiftId = f.VudgiftId,
+                    Pris = f.Pris,
+                    Tekst = f.Tekst,
+                    KategoriNavn = f.Kategori?.Navn,
+                    Dato = f.Dato
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching variable expenses for user {BrugerId}", brugerId);
+                throw;
+            }
         }
 
         public async Task<VudgifterResponseDTO> AddVudgifter(int brugerId, nyVudgifterDTO dto)
         {
-            Bruger bruger = await _brugerRepo.GetByIdAsync(brugerId);
-            if (bruger == null) throw new KeyNotFoundException("Bruger not found.");
-
-            Kategori kategori;
-
-            if (dto.KategoriId <= 0)
+            try
             {
-                // Search for Kategori by name
-                kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
-                Console.WriteLine($"{kategori.Navn}, {kategori.KategoriId}, Service Before create new");
-
-                // If Kategori not found, create a new one
-                if (kategori == null)
+                _logger.LogInformation("Adding new variable expense for user {BrugerId} with data {@Dto}", brugerId, dto);
+                var bruger = await _brugerRepo.GetByIdAsync(brugerId) 
+                            ?? throw new KeyNotFoundException("Bruger not found.");
+                
+                Kategori kategori;
+                if (dto.KategoriId <= 0)
                 {
-                     Console.WriteLine($"{kategori.Navn}, {kategori.KategoriId}, Service In create new");
-                    kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
+                    if (kategori == null)
+                    {
+                        _logger.LogInformation("Creating new category '{KategoriNavn}' for user {BrugerId}", dto.KategoriNavn, brugerId);
+                        kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    }
                 }
+                else
+                {
+                    kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId) 
+                              ?? throw new KeyNotFoundException("Kategori not found.");
+                }
+
+                var nyVudgifter = new Vudgifter
+                {
+                    Pris = dto.Pris,
+                    Tekst = dto.Tekst,
+                    Dato = dto.Dato,
+                    KategoriId = kategori.KategoriId,
+                    BrugerId = brugerId,
+                    Kategori = kategori,
+                    Bruger = bruger
+                };
+
+                await _VudgifterRepo.AddAsync(nyVudgifter);
+                await _VudgifterRepo.SaveChangesAsync();
+
+                _logger.LogInformation("Added variable expense {VudgiftId} for user {BrugerId}", nyVudgifter.VudgiftId, brugerId);
+                return new VudgifterResponseDTO
+                {
+                    VudgiftId = nyVudgifter.VudgiftId,
+                    Pris = nyVudgifter.Pris,
+                    Tekst = nyVudgifter.Tekst,
+                    Dato = nyVudgifter.Dato,
+                    KategoriNavn = kategori.Navn
+                };
             }
-            else
+            catch (Exception ex)
             {
-                // Find Kategori by ID or throw an exception
-                kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId)
-                        ?? throw new KeyNotFoundException("Kategori not found.");
+                _logger.LogError(ex, "Error occurred while adding variable expense for user {BrugerId}", brugerId);
+                throw;
             }
-
-            var nyVudgifter = new Vudgifter
-            {
-                Pris = dto.Pris,
-                Tekst = dto.Tekst,
-                Dato = dto.Dato,
-                KategoriId = kategori.KategoriId,
-                BrugerId = brugerId,
-                Kategori = kategori,
-                Bruger = bruger
-            };
-
-            await _VudgifterRepo.AddAsync(nyVudgifter);
-            await _VudgifterRepo.SaveChangesAsync();
-
-            return new VudgifterResponseDTO
-            {
-                VudgiftId = nyVudgifter.VudgiftId,
-                Pris = nyVudgifter.Pris,
-                Tekst = nyVudgifter.Tekst,
-                Dato = nyVudgifter.Dato,
-                KategoriNavn = kategori.Navn
-            };
         }
 
         public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO dto)
         {
-            // Get the existing Vudgifter
-            var Vudgifter = await _VudgifterRepo.GetByIdAsync(id) 
-                            ?? throw new KeyNotFoundException("Vudgifter not found.");
-
-            // Check if the logged-in user matches the one who created the Vudgifter
-            if (Vudgifter.BrugerId != brugerId)
-                throw new UnauthorizedAccessException("Unauthorized.");
-
-            // Update fields if provided
-            if (dto.Pris.HasValue) Vudgifter.Pris = dto.Pris.Value;
-            if (!string.IsNullOrWhiteSpace(dto.Tekst)) Vudgifter.Tekst = dto.Tekst;
-            if (dto.Dato.HasValue) Vudgifter.Dato = dto.Dato.Value;
-
-            // Handle Kategori (either by ID or by name)
-            if (dto.KategoriId.HasValue)
+            try
             {
-                // Check if KategoriId is valid
-                Vudgifter.Kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId.Value)
-                    ?? throw new KeyNotFoundException("Kategori not found.");
-            }
-            else if (!string.IsNullOrWhiteSpace(dto.KategoriNavn))
-            {
-                // Search for the category by name
-                var kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
+                _logger.LogInformation("Updating variable expense {VudgiftId} for user {BrugerId} with data {@Dto}", id, brugerId, dto);
+                var Vudgifter = await _VudgifterRepo.GetByIdAsync(id) 
+                                ?? throw new KeyNotFoundException("Vudgifter not found.");
 
-                // If Kategori not found, create a new one
-                if (kategori == null)
+                if (Vudgifter.BrugerId != brugerId)
+                    throw new UnauthorizedAccessException("Unauthorized.");
+
+                if (dto.Pris.HasValue) Vudgifter.Pris = dto.Pris.Value;
+                if (!string.IsNullOrWhiteSpace(dto.Tekst)) Vudgifter.Tekst = dto.Tekst;
+                if (dto.Dato.HasValue) Vudgifter.Dato = dto.Dato.Value;
+
+                if (dto.KategoriId.HasValue)
                 {
-                    kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    Vudgifter.Kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId.Value) 
+                                         ?? throw new KeyNotFoundException("Kategori not found.");
+                }
+                else if (!string.IsNullOrWhiteSpace(dto.KategoriNavn))
+                {
+                    var kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn) 
+                                  ?? await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    Vudgifter.Kategori = kategori;
                 }
 
-                // Assign the found or newly created category
-                Vudgifter.Kategori = kategori;
+                _VudgifterRepo.Update(Vudgifter);
+                await _VudgifterRepo.SaveChangesAsync();
+
+                _logger.LogInformation("Updated variable expense {VudgiftId} for user {BrugerId}", id, brugerId);
             }
-
-            // Update the Vudgifter record
-            _VudgifterRepo.Update(Vudgifter);
-            await _VudgifterRepo.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating variable expense {VudgiftId} for user {BrugerId}", id, brugerId);
+                throw;
+            }
         }
-
 
         public async Task DeleteVudgifter(int brugerId, int id)
         {
-            var Vudgifter = await _VudgifterRepo.GetByIdAsync(id) ?? throw new KeyNotFoundException("Vudgifter not found.");
-            if (Vudgifter.BrugerId != brugerId) throw new UnauthorizedAccessException("Unauthorized.");
+            try
+            {
+                _logger.LogInformation("Deleting variable expense {VudgiftId} for user {BrugerId}", id, brugerId);
+                var Vudgifter = await _VudgifterRepo.GetByIdAsync(id) 
+                                ?? throw new KeyNotFoundException("Vudgifter not found.");
 
-            _VudgifterRepo.Delete(id);
-            await _VudgifterRepo.SaveChangesAsync();
+                if (Vudgifter.BrugerId != brugerId)
+                    throw new UnauthorizedAccessException("Unauthorized.");
+
+                _VudgifterRepo.Delete(id);
+                await _VudgifterRepo.SaveChangesAsync();
+
+                _logger.LogInformation("Deleted variable expense {VudgiftId} for user {BrugerId}", id, brugerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting variable expense {VudgiftId} for user {BrugerId}", id, brugerId);
+                throw;
+            }
         }
     }
-
 }
