@@ -88,7 +88,7 @@ namespace PRJ4.Services
         }
 
         // Update an existing expense for a user
-        public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO dto)
+        public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO nydto)
         {
             _logger.LogInformation("Updating expense with ID: {VudgiftId} for user with ID: {BrugerId}", id, brugerId);
 
@@ -101,25 +101,25 @@ namespace PRJ4.Services
                 throw new UnauthorizedAccessException("Unauthorized.");
             }
             //Check which things to update
-            if (dto.Pris.HasValue) Vudgifter.Pris = dto.Pris.Value;
-            if (!string.IsNullOrWhiteSpace(dto.Tekst)) Vudgifter.Tekst = dto.Tekst;
-            if (dto.Dato.HasValue) Vudgifter.Dato = dto.Dato.Value;
+            if (nydto.Pris.HasValue) Vudgifter.Pris = nydto.Pris.Value;
+            if (!string.IsNullOrWhiteSpace(nydto.Tekst)) Vudgifter.Tekst = nydto.Tekst;
+            if (nydto.Dato.HasValue) Vudgifter.Dato = nydto.Dato.Value;
 
-            if (dto.KategoriId.HasValue)
+            if (nydto.KategoriId.HasValue)
             {
-                _logger.LogInformation("Updating category for expense ID: {VudgiftId} to category ID: {KategoriId}", id, dto.KategoriId.Value);
-                Vudgifter.Kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId.Value)
+                _logger.LogInformation("Updating category for expense ID: {VudgiftId} to category ID: {KategoriId}", id, nydto.KategoriId.Value);
+                Vudgifter.Kategori = await _kategoriRepo.GetByIdAsync(nydto.KategoriId.Value)
                              ?? throw new KeyNotFoundException("Kategori not found.");
             }
-            else if (!string.IsNullOrWhiteSpace(dto.KategoriNavn))
+            else if (!string.IsNullOrWhiteSpace(nydto.KategoriNavn))
             {
-                _logger.LogInformation("Searching for category by name: {KategoriNavn}", dto.KategoriNavn);
-                var kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
+                _logger.LogInformation("Searching for category by name: {KategoriNavn}", nydto.KategoriNavn);
+                var kategori = await _kategoriRepo.SearchByName(nydto.KategoriNavn);
 
                 if (kategori == null)
                 {
-                    _logger.LogInformation("Category not found. Creating new category: {KategoriNavn}", dto.KategoriNavn);
-                    kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    _logger.LogInformation("Category not found. Creating new category: {KategoriNavn}", nydto.KategoriNavn);
+                    kategori = await _kategoriRepo.NyKategori(nydto.KategoriNavn);
                 }
 
                 Vudgifter.Kategori = kategori;

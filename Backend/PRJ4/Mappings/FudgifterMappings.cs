@@ -15,12 +15,13 @@ namespace PRJ4.Mappings
                 .ForMember(dest => dest.Pris, opt => opt.MapFrom(src => src.Pris))
                 .ForMember(dest => dest.Dato, opt => opt.MapFrom(src => src.Dato));
 
-            // Map from Fudgifter to FudgifterResponseDTO
+            //Map from Fudgifter to FudgifterResponseDTO
             CreateMap<Fudgifter, FudgifterResponseDTO>()
                 .ForMember(dest => dest.FudgiftId, opt => opt.MapFrom(src => src.FudgiftId))
                 .ForMember(dest => dest.Pris, opt => opt.MapFrom(src => src.Pris))
                 .ForMember(dest => dest.Tekst, opt => opt.MapFrom(src => src.Tekst))
-                .ForMember(dest => dest.KategoriNavn, opt => opt.MapFrom(src => src.Kategori.Navn)) // Assuming Kategori has a 'Navn' property
+                .ForMember(dest => dest.KategoriNavn, opt => opt.MapFrom(src =>
+                    src.Kategori != null ? src.Kategori.Navn : null))  // Null check instead of null-conditional operator
                 .ForMember(dest => dest.Dato, opt => opt.MapFrom(src => src.Dato));
 
             // Map for updating Fudgifter from FudgifterUpdateDTO (optional, for future updates)
@@ -30,6 +31,7 @@ namespace PRJ4.Mappings
                 .ForMember(dest => dest.Dato, opt => opt.MapFrom(src => src.Dato))
                 .ForMember(dest => dest.KategoriId, opt => opt.MapFrom(src => src.KategoriId));
 
+            // Map from Fudgifter to nyFudgifterDTO
             CreateMap<Fudgifter, nyFudgifterDTO>()
                 .ForMember(dest => dest.Pris, opt => opt.MapFrom(src => src.Pris))
                 .ForMember(dest => dest.Tekst, opt => opt.MapFrom(src => src.Tekst))

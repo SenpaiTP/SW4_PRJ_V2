@@ -41,7 +41,7 @@ namespace PRJ4.Services
         }
 
         // Add a new expense for a user
-        public async Task<FudgifterResponseDTO> AddFudgifter(int brugerId, nyFudgifterDTO dto)
+        public async Task<FudgifterResponseDTO> AddFudgifter(int brugerId, nyFudgifterDTO nydto)
         {
             _logger.LogInformation("Adding new expense for user with ID: {BrugerId}", brugerId);
 
@@ -54,25 +54,25 @@ namespace PRJ4.Services
 
             Kategori kategori;
 
-            if (dto.KategoriId <= 0)
+            if (nydto.KategoriId <= 0)
             {
-                _logger.LogInformation("Searching for category by name: {KategoriNavn}", dto.KategoriNavn);
-                kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
+                _logger.LogInformation("Searching for category by name: {KategoriNavn}", nydto.KategoriNavn);
+                kategori = await _kategoriRepo.SearchByName(nydto.KategoriNavn);
 
                 if (kategori == null)
                 {
-                    _logger.LogInformation("Category not found. Creating new category: {KategoriNavn}", dto.KategoriNavn);
-                    kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    _logger.LogInformation("Category not found. Creating new category: {KategoriNavn}", nydto.KategoriNavn);
+                    kategori = await _kategoriRepo.NyKategori(nydto.KategoriNavn);
                 }
             }
             else
             {
-                _logger.LogInformation("Fetching category by ID: {KategoriId}", dto.KategoriId);
-                kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId)
+                _logger.LogInformation("Fetching category by ID: {KategoriId}", nydto.KategoriId);
+                kategori = await _kategoriRepo.GetByIdAsync(nydto.KategoriId)
                            ?? throw new KeyNotFoundException("Kategori not found.");
             }
-            dto.KategoriId = kategori.KategoriId;
-            var nyFudgifter = _mapper.Map<Fudgifter>(dto);
+            nydto.KategoriId = kategori.KategoriId;
+            var nyFudgifter = _mapper.Map<Fudgifter>(nydto);
             // Set additional properties
             nyFudgifter.BrugerId = brugerId;
             nyFudgifter.Kategori = kategori;
