@@ -30,8 +30,6 @@ namespace PRJ4.Services
         // Get all expenses for a user
         public async Task<IEnumerable<FudgifterResponseDTO>> GetAllByUser(int brugerId)
         {
-            _logger.LogInformation("Fetching all expenses for user with ID: {BrugerId}", brugerId);
-
             var fudgifter = await _fudgifterRepo.GetAllByUserId(brugerId);
 
             _logger.LogInformation("Found {Count} expenses for user with ID: {BrugerId}", fudgifter.Count(), brugerId);
@@ -43,8 +41,6 @@ namespace PRJ4.Services
         // Add a new expense for a user
         public async Task<FudgifterResponseDTO> AddFudgifter(int brugerId, nyFudgifterDTO nydto)
         {
-            _logger.LogInformation("Adding new expense for user with ID: {BrugerId}", brugerId);
-
             var bruger = await _brugerRepo.GetByIdAsync(brugerId);
             if (bruger == null)
             {
@@ -80,9 +76,6 @@ namespace PRJ4.Services
 
             await _fudgifterRepo.AddAsync(nyFudgifter);
             await _fudgifterRepo.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully added expense with ID: {FudgiftId} for user with ID: {BrugerId}", nyFudgifter.FudgiftId, brugerId);
-
             // Use AutoMapper to return the DTO
             return _mapper.Map<FudgifterResponseDTO>(nyFudgifter);
         }
@@ -90,7 +83,6 @@ namespace PRJ4.Services
         // Update an existing expense for a user
         public async Task UpdateFudgifter(int id, int brugerId, FudgifterUpdateDTO dto)
         {
-            _logger.LogInformation("Updating expense with ID: {FudgiftId} for user with ID: {BrugerId}", id, brugerId);
 
             var fudgifter = await _fudgifterRepo.GetByIdAsync(id)
                            ?? throw new KeyNotFoundException("Fudgifter not found.");
@@ -127,14 +119,11 @@ namespace PRJ4.Services
 
             _fudgifterRepo.Update(fudgifter);
             await _fudgifterRepo.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully updated expense with ID: {FudgiftId}", id);
         }
 
         // Delete an expense for a user
         public async Task DeleteFudgifter(int brugerId, int id)
         {
-            _logger.LogInformation("Deleting expense with ID: {FudgiftId} for user with ID: {BrugerId}", id, brugerId);
 
             var fudgifter = await _fudgifterRepo.GetByIdAsync(id)
                            ?? throw new KeyNotFoundException("Fudgifter not found.");
@@ -147,8 +136,6 @@ namespace PRJ4.Services
 
             _fudgifterRepo.Delete(id);
             await _fudgifterRepo.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully deleted expense with ID: {FudgiftId} for user with ID: {BrugerId}", id, brugerId);
         }
     }
 }
