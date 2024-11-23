@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PRJ4.Data;
-using PRJ4.Models;  
+using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -47,80 +47,89 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Fetching all fixed expenses for user {BrugerId}", brugerId);
-
-                var Vudgifter = await _VudgifterService.GetAllByUser(brugerId);
-
-                _logger.LogInformation("Successfully retrieved {Count} fixed expenses for user {BrugerId}", Vudgifter.Count(), brugerId);
-                return Ok(Vudgifter);
+                _logger.LogInformation("Fetching all variable expenses for user with ID: {BrugerId} {Method}", brugerId, HttpContext.Request.Method);
+                var response = await _VudgifterService.GetAllByUser(brugerId);
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while fetching fixed expenses for user");
+                _logger.LogError(ex, "An error occurred while fetching variable expenses for user");
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<VudgifterResponseDTO>> Add(nyVudgifterDTO Vudgifter)
+        public async Task<ActionResult<VudgifterResponseDTO>> AddVudgifter(nyVudgifterDTO dto)
         {
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Attempting to add a new fixed expense for user {BrugerId}. Request: {@Vudgifter}", brugerId, Vudgifter);
-
-                var response = await _VudgifterService.AddVudgifter(brugerId, Vudgifter);
-
-                _logger.LogInformation("Successfully added new fixed expense with ID {VudgiftId} for user {BrugerId}", response.VudgiftId, brugerId);
-                return CreatedAtAction(nameof(Add), new { id = response.VudgiftId }, response);
+                _logger.LogInformation("Posting variable expense for user with ID {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
+                var response = await _VudgifterService.AddVudgifter(brugerId, dto);
+                return CreatedAtAction(nameof(GetAllByUser), new { id = response.VudgiftId }, response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while adding a new fixed expense for user");
+                _logger.LogError("An error occurred while adding variable expense for user {ex}", ex.Message);
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
 
-        [HttpPut("opdater/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] VudgifterUpdateDTO updateDTO)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateVudgifter(int id, VudgifterUpdateDTO updateDTO)
         {
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Attempting to update fixed expense {Id} for user {BrugerId}. Update: {@UpdateDTO}", id, brugerId, updateDTO);
+                _logger.LogInformation("Updating  variable expense for user with ID {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
+                // If the updateDTO is empty, return a BadRequest response with a log
+                if (updateDTO == null || 
+                    (!updateDTO.Pris.HasValue && string.IsNullOrWhiteSpace(updateDTO.Tekst) && !updateDTO.Dato.HasValue && !updateDTO.KategoriId.HasValue && string.IsNullOrWhiteSpace(updateDTO.KategoriNavn)))
+                {
+                    _logger.LogWarning("Update request for variable expense ID {VudgiftId} is empty or invalid.", id);
+                    return BadRequest("No valid data provided for update.");
+                }
 
                 await _VudgifterService.UpdateVudgifter(id, brugerId, updateDTO);
-
-                _logger.LogInformation("Successfully updated fixed expense {Id} for user {BrugerId}", id, brugerId);
                 return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid data provided for variable expense update.");
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "variable expense not found for update.");
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while updating fixed expense {Id} for user", id);
+                _logger.LogError(ex, "An error occurred while updating variable expense");
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
 
-        [HttpDelete("{id}/slet")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteVudgifter(int id)
         {
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Attempting to delete fixed expense {Id} for user {BrugerId}", id, brugerId);
-
+                _logger.LogInformation("Trying to delete variable expense {id} on UserId{brugerId}. {Method}", id, brugerId,HttpContext.Request.Method);
                 await _VudgifterService.DeleteVudgifter(brugerId, id);
-
-                _logger.LogInformation("Successfully deleted fixed expense {Id} for user {BrugerId}", id, brugerId);
                 return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "variable expense not found for deletion.");
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while deleting fixed expense {Id} for user", id);
+                _logger.LogError(ex, "An error occurred while deleting variable expense");
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
     }
-
-
 }

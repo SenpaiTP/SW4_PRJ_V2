@@ -11,7 +11,7 @@ namespace PRJ4.Services
         private readonly IBrugerRepo _brugerRepo;
         private readonly IKategori _kategoriRepo;
         private readonly ILogger<VudgifterService> _logger;
-        private readonly IMapper _mapper; 
+        private readonly IMapper _mapper;
 
         public VudgifterService(
             IVudgifter VudgifterRepo,
@@ -24,13 +24,12 @@ namespace PRJ4.Services
             _kategoriRepo = kategoriRepo;
             _brugerRepo = brugerRepo;
             _logger = logger;
-            _mapper = mapper; 
+            _mapper = mapper;
         }
 
         // Get all expenses for a user
         public async Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(int brugerId)
         {
-            _logger.LogInformation("Fetching all expenses for user with ID: {BrugerId}", brugerId);
 
             var Vudgifter = await _VudgifterRepo.GetAllByUserId(brugerId);
 
@@ -43,7 +42,6 @@ namespace PRJ4.Services
         // Add a new expense for a user
         public async Task<VudgifterResponseDTO> AddVudgifter(int brugerId, nyVudgifterDTO dto)
         {
-            _logger.LogInformation("Adding new expense for user with ID: {BrugerId}", brugerId);
 
             var bruger = await _brugerRepo.GetByIdAsync(brugerId);
             if (bruger == null)
@@ -81,8 +79,6 @@ namespace PRJ4.Services
             await _VudgifterRepo.AddAsync(nyVudgifter);
             await _VudgifterRepo.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully added expense with ID: {VudgiftId} for user with ID: {BrugerId}", nyVudgifter.VudgiftId, brugerId);
-
             // Use AutoMapper to return the DTO
             return _mapper.Map<VudgifterResponseDTO>(nyVudgifter);
         }
@@ -90,7 +86,6 @@ namespace PRJ4.Services
         // Update an existing expense for a user
         public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO nydto)
         {
-            _logger.LogInformation("Updating expense with ID: {VudgiftId} for user with ID: {BrugerId}", id, brugerId);
 
             var Vudgifter = await _VudgifterRepo.GetByIdAsync(id)
                            ?? throw new KeyNotFoundException("Vudgifter not found.");
@@ -100,7 +95,15 @@ namespace PRJ4.Services
                 _logger.LogWarning("Unauthorized update attempt for expense with ID: {VudgiftId} by user with ID: {BrugerId}", id, brugerId);
                 throw new UnauthorizedAccessException("Unauthorized.");
             }
-            //Check which things to update
+            // Check if the updateDTO is empty
+            if (nydto == null || 
+                (!nydto.Pris.HasValue && string.IsNullOrWhiteSpace(nydto.Tekst) && !nydto.Dato.HasValue && !nydto.KategoriId.HasValue && string.IsNullOrWhiteSpace(nydto.KategoriNavn)))
+            {
+                _logger.LogWarning("Update request for expense ID {VudgiftId} is empty or invalid.", id);
+                throw new ArgumentException("No valid data provided for update.");
+            }
+
+            // Check which properties to update
             if (nydto.Pris.HasValue) Vudgifter.Pris = nydto.Pris.Value;
             if (!string.IsNullOrWhiteSpace(nydto.Tekst)) Vudgifter.Tekst = nydto.Tekst;
             if (nydto.Dato.HasValue) Vudgifter.Dato = nydto.Dato.Value;
@@ -127,15 +130,11 @@ namespace PRJ4.Services
 
             _VudgifterRepo.Update(Vudgifter);
             await _VudgifterRepo.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully updated expense with ID: {VudgiftId}", id);
         }
 
         // Delete an expense for a user
         public async Task DeleteVudgifter(int brugerId, int id)
         {
-            _logger.LogInformation("Deleting expense with ID: {VudgiftId} for user with ID: {BrugerId}", id, brugerId);
-
             var Vudgifter = await _VudgifterRepo.GetByIdAsync(id)
                            ?? throw new KeyNotFoundException("Vudgifter not found.");
 
@@ -147,8 +146,6 @@ namespace PRJ4.Services
 
             _VudgifterRepo.Delete(id);
             await _VudgifterRepo.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully deleted expense with ID: {VudgiftId} for user with ID: {BrugerId}", id, brugerId);
         }
     }
 }
