@@ -11,7 +11,7 @@ namespace PRJ4.Services
         private readonly IBrugerRepo _brugerRepo;
         private readonly IKategori _kategoriRepo;
         private readonly ILogger<VudgifterService> _logger;
-        private readonly IMapper _mapper; 
+        private readonly IMapper _mapper;
 
         public VudgifterService(
             IVudgifter VudgifterRepo,
@@ -24,7 +24,7 @@ namespace PRJ4.Services
             _kategoriRepo = kategoriRepo;
             _brugerRepo = brugerRepo;
             _logger = logger;
-            _mapper = mapper; 
+            _mapper = mapper;
         }
 
         // Get all expenses for a user
@@ -100,7 +100,15 @@ namespace PRJ4.Services
                 _logger.LogWarning("Unauthorized update attempt for expense with ID: {VudgiftId} by user with ID: {BrugerId}", id, brugerId);
                 throw new UnauthorizedAccessException("Unauthorized.");
             }
-            //Check which things to update
+            // Check if the updateDTO is empty
+            if (nydto == null || 
+                (!nydto.Pris.HasValue && string.IsNullOrWhiteSpace(nydto.Tekst) && !nydto.Dato.HasValue && !nydto.KategoriId.HasValue && string.IsNullOrWhiteSpace(nydto.KategoriNavn)))
+            {
+                _logger.LogWarning("Update request for expense ID {VudgiftId} is empty or invalid.", id);
+                throw new ArgumentException("No valid data provided for update.");
+            }
+
+            // Check which properties to update
             if (nydto.Pris.HasValue) Vudgifter.Pris = nydto.Pris.Value;
             if (!string.IsNullOrWhiteSpace(nydto.Tekst)) Vudgifter.Tekst = nydto.Tekst;
             if (nydto.Dato.HasValue) Vudgifter.Dato = nydto.Dato.Value;

@@ -16,7 +16,7 @@ namespace PRJ4.Services
 
         public LogQueryService(IMongoDatabase database, IMapper mapper)
         {
-            _logs = database.GetCollection<Log>("Logs"); // Replace with your actual collection name
+            _logs = database.GetCollection<Log>("logs"); // Replace with your actual collection name
             _mapper = mapper;
         }
 

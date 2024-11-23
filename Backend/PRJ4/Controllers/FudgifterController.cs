@@ -37,11 +37,11 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Fetching all fixed expenses for user {BrugerId}.", brugerId);
+                _logger.LogInformation("Fetching all fixed expenses for user {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
 
                 var fudgifter = await _fudgifterService.GetAllByUser(brugerId);
 
-                _logger.LogInformation("Successfully retrieved {Count} fixed expenses for user {BrugerId}.", fudgifter.Count(), brugerId);
+                _logger.LogInformation("Successfully retrieved {Count} fixed expenses for user {BrugerId}. {Method}", fudgifter.Count(), brugerId, HttpContext.Request.Method);
                 return Ok(fudgifter);
             }
             catch (Exception ex)
@@ -57,11 +57,11 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Adding a new fixed expense for user {BrugerId}.", brugerId);
+                _logger.LogInformation("Adding a new fixed expense for user {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
 
                 var response = await _fudgifterService.AddFudgifter(brugerId, fudgifter);
 
-                _logger.LogInformation("Successfully added fixed expense {FudgiftId} for user {BrugerId}.", response.FudgiftId, brugerId);
+                _logger.LogInformation("Successfully added fixed expense {FudgiftId} for user {BrugerId}. {Method}", response.FudgiftId, brugerId, HttpContext.Request.Method);
                 return CreatedAtAction(nameof(Add), new { id = response.FudgiftId }, response);
             }
             catch (Exception ex)
@@ -77,11 +77,11 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Updating fixed expense {Id} for user {BrugerId} with data: {@UpdateDTO}.", id, brugerId, updateDTO);
+                _logger.LogInformation("Updating fixed expense {Id} for user {BrugerId} with data: {@UpdateDTO}. {Method}", id, brugerId, updateDTO, HttpContext.Request.Method);
 
                 await _fudgifterService.UpdateFudgifter(brugerId, id, updateDTO);
 
-                _logger.LogInformation("Successfully updated fixed expense {Id} for user {BrugerId}.", id, brugerId);
+                _logger.LogInformation("Successfully updated fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
                 return NoContent();
             }
             catch (Exception ex)
@@ -97,11 +97,11 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
-                _logger.LogInformation("Deleting fixed expense {Id} for user {BrugerId}.", id, brugerId);
+                _logger.LogInformation("Deleting fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
 
                 await _fudgifterService.DeleteFudgifter(brugerId, id);
 
-                _logger.LogInformation("Successfully deleted fixed expense {Id} for user {BrugerId}.", id, brugerId);
+                _logger.LogInformation("Successfully deleted fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
                 return NoContent();
             }
             catch (Exception ex)

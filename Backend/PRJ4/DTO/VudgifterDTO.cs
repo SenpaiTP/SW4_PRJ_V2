@@ -9,7 +9,7 @@ namespace PRJ4.DTOs
         {
             public decimal Pris {get; set;}
             public int KategoriId {get; set;}
-            public string KategoriNavn {get; set;}
+            public string ?KategoriNavn {get; set;}
             public DateTime Dato {get;set;}
             public string? Tekst { get; set; }
         }
