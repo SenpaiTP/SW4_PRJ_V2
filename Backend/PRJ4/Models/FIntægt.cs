@@ -13,11 +13,10 @@ public partial class Findtægt
 
     public string Tekst { get; set; } = null!;
 
-    public decimal Indtægt { get; set; }
+    public decimal? Indtægt { get; set; }
 
     public DateTime? Dato { get; set; }
 
     public virtual Bruger Bruger { get; set; } = null!;
 
-    //Dette er en tester...
 }
