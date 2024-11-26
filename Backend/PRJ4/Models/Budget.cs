@@ -8,11 +8,11 @@ public partial class Budget
 {
     [Key]
     public int BudgetId { get; set; }
-    public int? BrugerId { get; set; }
+    public string BudgetName { get; set; }
+    public int BrugerId { get; set; }
     public int SavingsGoal { get; set; }
     public DateOnly BudgetStart { get; set; }
     public DateOnly BudgetSlut { get; set; }
-
     
     [ForeignKey(nameof(BrugerId))]
     public Bruger? Bruger { get; set; }
