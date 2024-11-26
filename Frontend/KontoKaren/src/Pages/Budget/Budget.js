@@ -1,3 +1,5 @@
+// Mangler at implementere styles
+
 import { Container, Typography, TextField, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import React, { useState } from "react";
@@ -290,5 +292,4 @@ function Budget() {
     </Container>
   );
 }
-
 export default Budget;
