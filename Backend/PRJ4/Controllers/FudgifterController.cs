@@ -1,16 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using PRJ4.Data;
-using PRJ4.Models;  
-using PRJ4.Repositories;
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Authorization;
 using PRJ4.Services;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Security.Claims;
 
 namespace PRJ4.Controllers
@@ -21,10 +12,12 @@ namespace PRJ4.Controllers
     public class FudgifterController : ControllerBase
     {
         private readonly IFudgifterService _fudgifterService;
+        private readonly ILogger<FudgifterController> _logger;
 
-        public FudgifterController(IFudgifterService fudgifterService)
+        public FudgifterController(IFudgifterService fudgifterService, ILogger<FudgifterController> logger)
         {
             _fudgifterService = fudgifterService;
+            _logger = logger;
         }
 
         private int GetUserId()
@@ -32,6 +25,7 @@ namespace PRJ4.Controllers
             var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
             if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
             {
+                _logger.LogError("Invalid or missing user ID claim. {IdClaim}", brugerIdClaim);
                 throw new UnauthorizedAccessException("Invalid or missing user ID claim.");
             }
             return brugerId;
@@ -43,11 +37,16 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
+                _logger.LogInformation("Fetching all fixed expenses for user {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
+
                 var fudgifter = await _fudgifterService.GetAllByUser(brugerId);
+
+                _logger.LogInformation("Successfully retrieved {Count} fixed expenses for user {BrugerId}. {Method}", fudgifter.Count(), brugerId, HttpContext.Request.Method);
                 return Ok(fudgifter);
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error fetching fixed expenses for user: {Message}.", ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -58,11 +57,16 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
+                _logger.LogInformation("Adding a new fixed expense for user {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
+
                 var response = await _fudgifterService.AddFudgifter(brugerId, fudgifter);
+
+                _logger.LogInformation("Successfully added fixed expense {FudgiftId} for user {BrugerId}. {Method}", response.FudgiftId, brugerId, HttpContext.Request.Method);
                 return CreatedAtAction(nameof(Add), new { id = response.FudgiftId }, response);
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error adding fixed expense: {Message}.", ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -73,11 +77,16 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
+                _logger.LogInformation("Updating fixed expense {Id} for user {BrugerId} with data: {@UpdateDTO}. {Method}", id, brugerId, updateDTO, HttpContext.Request.Method);
+
                 await _fudgifterService.UpdateFudgifter(brugerId, id, updateDTO);
+
+                _logger.LogInformation("Successfully updated fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
                 return NoContent();
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error updating fixed expense {Id}: {Message}.", id, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -88,14 +97,18 @@ namespace PRJ4.Controllers
             try
             {
                 int brugerId = GetUserId();
+                _logger.LogInformation("Deleting fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
+
                 await _fudgifterService.DeleteFudgifter(brugerId, id);
+
+                _logger.LogInformation("Successfully deleted fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
                 return NoContent();
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error deleting fixed expense {Id}: {Message}.", id, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
     }
-
 }
