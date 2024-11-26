@@ -5,11 +5,11 @@ using PRJ4.Models;
 
 namespace PRJ4.DTOs
     {
-        public class newVudgifterDTO
+        public class nyVudgifterDTO
         {
             public decimal Pris {get; set;}
             public int KategoriId {get; set;}
-            public string KategoriName {get; set;}
+            public string ?KategoriNavn {get; set;}
             public DateTime Dato {get;set;}
             public string? Tekst { get; set; }
         }
@@ -18,7 +18,7 @@ namespace PRJ4.DTOs
             public int VudgiftId { get; set; }
             public decimal Pris { get; set; }
             public string? Tekst { get; set; }
-            public string? KategoriName { get; set; }
+            public string? KategoriNavn { get; set; }
             public DateTime? Dato { get; set; }
         }
         public class VudgifterUpdateDTO
@@ -27,7 +27,7 @@ namespace PRJ4.DTOs
             public string? Tekst { get; set; }
             public DateTime? Dato { get; set; }
             public int? KategoriId { get; set; }
-            public string? KategoriName { get; set; }
+            public string? KategoriNavn { get; set; }
             // Optionally, you can include BrugerId, but it's probably better to use the authenticated user's ID in the backend
         }
     }

@@ -20,36 +20,31 @@ namespace PRJ4.Infrastructure
 
         public string Create(Bruger bruger)
         {
-
+            // Define the claims
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, bruger.BrugerId.ToString()),
-                new Claim("Navn", bruger.Navn),
-                new Claim(JwtRegisteredClaimNames.Email, bruger.Email)
+                new Claim(JwtRegisteredClaimNames.Sub, bruger.BrugerId.ToString()), // User ID
+                new Claim(JwtRegisteredClaimNames.Email, bruger.Email)              // User Email
             };
 
-            var ClaimsIdentity=new ClaimsIdentity(claims);
-            
+            // Get secret key from configuration
             string secretKey = _configuration["Jwt:SecretKey"];
-            var secruityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var credentials = new SigningCredentials(secruityKey, SecurityAlgorithms.HmacSha256);
+            // Create token descriptor
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(
-                [
-                    new Claim(JwtRegisteredClaimNames.Sub, bruger.BrugerId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, bruger.Email)
-                ]),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:ExpirationInMinutes")),
                 SigningCredentials = credentials,
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"]
             };
 
-            var handler=new JsonWebTokenHandler();
-
-            string token = handler.CreateToken(tokenDescriptor);
+            // Create and return the token
+            var handler = new JsonWebTokenHandler();
+            var token= handler.CreateToken(tokenDescriptor);
 
             return token;
 

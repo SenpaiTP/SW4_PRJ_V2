@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRJ4.Data;
 
@@ -11,9 +12,11 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241118151411_Add_bruger_paa_Udgifter")]
+    partial class Add_bruger_paa_Udgifter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,15 +33,11 @@ namespace PRJ4.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BrugerId"));
 
-                    b.Property<string>("Efternavn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Fornavn")
+                    b.Property<string>("Navn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -49,33 +48,6 @@ namespace PRJ4.Migrations
                     b.HasKey("BrugerId");
 
                     b.ToTable("Brugers");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Budget", b =>
-                {
-                    b.Property<int>("BudgetId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
-
-                    b.Property<int?>("BrugerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("BudgetSlut")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly>("BudgetStart")
-                        .HasColumnType("date");
-
-                    b.Property<int>("SavingsGoal")
-                        .HasColumnType("int");
-
-                    b.HasKey("BudgetId");
-
-                    b.HasIndex("BrugerId");
-
-                    b.ToTable("Budgets");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
@@ -178,15 +150,6 @@ namespace PRJ4.Migrations
                     b.HasIndex("KategoriId");
 
                     b.ToTable("Vudgifters");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Budget", b =>
-                {
-                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
-                        .WithMany()
-                        .HasForeignKey("BrugerId");
-
-                    b.Navigation("Bruger");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
