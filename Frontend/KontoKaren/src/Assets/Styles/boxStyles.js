@@ -4,6 +4,7 @@ const boxSizes = {
         padding: 1,
         maxWidth: 200,
     },
+    
     medium: {
         padding: 2,
         maxWidth: 400,

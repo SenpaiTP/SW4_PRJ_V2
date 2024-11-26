@@ -1,8 +1,7 @@
-using PRJ4.Models;  
+using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.DTOs;
-
-
+using AutoMapper;
 
 namespace PRJ4.Services
 {
@@ -11,129 +10,142 @@ namespace PRJ4.Services
         private readonly IVudgifter _VudgifterRepo;
         private readonly IBrugerRepo _brugerRepo;
         private readonly IKategori _kategoriRepo;
+        private readonly ILogger<VudgifterService> _logger;
+        private readonly IMapper _mapper;
 
-        public VudgifterService(IVudgifter VudgifterRepo, IKategori kategoriRepo, IBrugerRepo brugerRepo)
+        public VudgifterService(
+            IVudgifter VudgifterRepo,
+            IKategori kategoriRepo,
+            IBrugerRepo brugerRepo,
+            ILogger<VudgifterService> logger,
+            IMapper mapper)
         {
             _VudgifterRepo = VudgifterRepo;
             _kategoriRepo = kategoriRepo;
             _brugerRepo = brugerRepo;
+            _logger = logger;
+            _mapper = mapper;
         }
 
+        // Get all expenses for a user
         public async Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(int brugerId)
         {
+
             var Vudgifter = await _VudgifterRepo.GetAllByUserId(brugerId);
-            return Vudgifter.Select(f => new VudgifterResponseDTO
-            {
-                VudgiftId = f.VudgiftId,
-                Pris = f.Pris,
-                Tekst = f.Tekst,
-                KategoriNavn = f.Kategori?.Navn,
-                Dato = f.Dato
-            });
+
+            _logger.LogInformation("Found {Count} expenses for user with ID: {BrugerId}", Vudgifter.Count(), brugerId);
+
+            // Use AutoMapper to map Vudgifter to VudgifterResponseDTO
+            return _mapper.Map<IEnumerable<VudgifterResponseDTO>>(Vudgifter);
         }
 
+        // Add a new expense for a user
         public async Task<VudgifterResponseDTO> AddVudgifter(int brugerId, nyVudgifterDTO dto)
         {
-            Bruger bruger = await _brugerRepo.GetByIdAsync(brugerId);
-            if (bruger == null) throw new KeyNotFoundException("Bruger not found.");
+
+            var bruger = await _brugerRepo.GetByIdAsync(brugerId);
+            if (bruger == null)
+            {
+                _logger.LogWarning("User with ID {BrugerId} not found", brugerId);
+                throw new KeyNotFoundException("Bruger not found.");
+            }
 
             Kategori kategori;
 
             if (dto.KategoriId <= 0)
             {
-                // Search for Kategori by name
+                _logger.LogInformation("Searching for category by name: {KategoriNavn}", dto.KategoriNavn);
                 kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
-                
 
-                // If Kategori not found, create a new one
                 if (kategori == null)
                 {
-                     
+                    _logger.LogInformation("Category not found. Creating new category: {KategoriNavn}", dto.KategoriNavn);
                     kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
                 }
             }
             else
             {
-                // Find Kategori by ID or throw an exception
+                _logger.LogInformation("Fetching category by ID: {KategoriId}", dto.KategoriId);
                 kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId)
-                        ?? throw new KeyNotFoundException("Kategori not found.");
+                           ?? throw new KeyNotFoundException("Kategori not found.");
             }
-
-            var nyVudgifter = new Vudgifter
-            {
-                Pris = dto.Pris,
-                Tekst = dto.Tekst,
-                Dato = dto.Dato,
-                KategoriId = kategori.KategoriId,
-                BrugerId = brugerId,
-                Kategori = kategori,
-                Bruger = bruger
-            };
+            dto.KategoriId = kategori.KategoriId;
+            var nyVudgifter = _mapper.Map<Vudgifter>(dto);
+            // Set additional properties
+            nyVudgifter.BrugerId = brugerId;
+            nyVudgifter.Kategori = kategori;
+            nyVudgifter.Bruger = bruger;
 
             await _VudgifterRepo.AddAsync(nyVudgifter);
             await _VudgifterRepo.SaveChangesAsync();
 
-            return new VudgifterResponseDTO
-            {
-                VudgiftId = nyVudgifter.VudgiftId,
-                Pris = nyVudgifter.Pris,
-                Tekst = nyVudgifter.Tekst,
-                Dato = nyVudgifter.Dato,
-                KategoriNavn = kategori.Navn
-            };
+            // Use AutoMapper to return the DTO
+            return _mapper.Map<VudgifterResponseDTO>(nyVudgifter);
         }
 
-        public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO dto)
+        // Update an existing expense for a user
+        public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO nydto)
         {
-            // Get the existing Vudgifter
-            var Vudgifter = await _VudgifterRepo.GetByIdAsync(id) 
-                            ?? throw new KeyNotFoundException("Vudgifter not found.");
 
-            // Check if the logged-in user matches the one who created the Vudgifter
+            var Vudgifter = await _VudgifterRepo.GetByIdAsync(id)
+                           ?? throw new KeyNotFoundException("Vudgifter not found.");
+
             if (Vudgifter.BrugerId != brugerId)
+            {
+                _logger.LogWarning("Unauthorized update attempt for expense with ID: {VudgiftId} by user with ID: {BrugerId}", id, brugerId);
                 throw new UnauthorizedAccessException("Unauthorized.");
-
-            // Update fields if provided
-            if (dto.Pris.HasValue) Vudgifter.Pris = dto.Pris.Value;
-            if (!string.IsNullOrWhiteSpace(dto.Tekst)) Vudgifter.Tekst = dto.Tekst;
-            if (dto.Dato.HasValue) Vudgifter.Dato = dto.Dato.Value;
-
-            // Handle Kategori (either by ID or by name)
-            if (dto.KategoriId.HasValue)
-            {
-                // Check if KategoriId is valid
-                Vudgifter.Kategori = await _kategoriRepo.GetByIdAsync(dto.KategoriId.Value)
-                    ?? throw new KeyNotFoundException("Kategori not found.");
             }
-            else if (!string.IsNullOrWhiteSpace(dto.KategoriNavn))
+            // Check if the updateDTO is empty
+            if (nydto == null || 
+                (!nydto.Pris.HasValue && string.IsNullOrWhiteSpace(nydto.Tekst) && !nydto.Dato.HasValue && !nydto.KategoriId.HasValue && string.IsNullOrWhiteSpace(nydto.KategoriNavn)))
             {
-                // Search for the category by name
-                var kategori = await _kategoriRepo.SearchByName(dto.KategoriNavn);
+                _logger.LogWarning("Update request for expense ID {VudgiftId} is empty or invalid.", id);
+                throw new ArgumentException("No valid data provided for update.");
+            }
 
-                // If Kategori not found, create a new one
+            // Check which properties to update
+            if (nydto.Pris.HasValue) Vudgifter.Pris = nydto.Pris.Value;
+            if (!string.IsNullOrWhiteSpace(nydto.Tekst)) Vudgifter.Tekst = nydto.Tekst;
+            if (nydto.Dato.HasValue) Vudgifter.Dato = nydto.Dato.Value;
+
+            if (nydto.KategoriId.HasValue)
+            {
+                _logger.LogInformation("Updating category for expense ID: {VudgiftId} to category ID: {KategoriId}", id, nydto.KategoriId.Value);
+                Vudgifter.Kategori = await _kategoriRepo.GetByIdAsync(nydto.KategoriId.Value)
+                             ?? throw new KeyNotFoundException("Kategori not found.");
+            }
+            else if (!string.IsNullOrWhiteSpace(nydto.KategoriNavn))
+            {
+                _logger.LogInformation("Searching for category by name: {KategoriNavn}", nydto.KategoriNavn);
+                var kategori = await _kategoriRepo.SearchByName(nydto.KategoriNavn);
+
                 if (kategori == null)
                 {
-                    kategori = await _kategoriRepo.NyKategori(dto.KategoriNavn);
+                    _logger.LogInformation("Category not found. Creating new category: {KategoriNavn}", nydto.KategoriNavn);
+                    kategori = await _kategoriRepo.NyKategori(nydto.KategoriNavn);
                 }
 
-                // Assign the found or newly created category
                 Vudgifter.Kategori = kategori;
             }
 
-            // Update the Vudgifter record
             _VudgifterRepo.Update(Vudgifter);
             await _VudgifterRepo.SaveChangesAsync();
         }
 
-
+        // Delete an expense for a user
         public async Task DeleteVudgifter(int brugerId, int id)
         {
-            var Vudgifter = await _VudgifterRepo.GetByIdAsync(id) ?? throw new KeyNotFoundException("Vudgifter not found.");
-            if (Vudgifter.BrugerId != brugerId) throw new UnauthorizedAccessException("Unauthorized.");
+            var Vudgifter = await _VudgifterRepo.GetByIdAsync(id)
+                           ?? throw new KeyNotFoundException("Vudgifter not found.");
+
+            if (Vudgifter.BrugerId != brugerId)
+            {
+                _logger.LogWarning("Unauthorized delete attempt for expense with ID: {VudgiftId} by user with ID: {BrugerId}", id, brugerId);
+                throw new UnauthorizedAccessException("Unauthorized.");
+            }
 
             _VudgifterRepo.Delete(id);
             await _VudgifterRepo.SaveChangesAsync();
         }
     }
-
 }

@@ -18,6 +18,10 @@ function Header() {
         <Button color="inherit" component={Link} to="/login">
           Login
         </Button>
+
+        <Button color="inherit" component={Link} to="/Budget">
+          Budget
+        </Button>
       </Toolbar>
     </AppBar>
   );
