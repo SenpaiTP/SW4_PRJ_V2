@@ -8,6 +8,8 @@ namespace PRJ4.Repositories
 {
     public interface IBudgetRepo:ITemplateRepo<Budget>
     {
+        Task<List<Budget>> GetBudgetsForUserAsync(int userId);
+        Task<List<Fudgifter>> GetExspencesByKategori(int brugerId, string savingName);
 
     }
 }

@@ -40,7 +40,7 @@ builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
-builder.Services.AddScoped<IBudgetAmountService,BudgetAmountService>();
+builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
 
 builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
 builder.Services.AddScoped<IKategori,KategoriRepo>();
