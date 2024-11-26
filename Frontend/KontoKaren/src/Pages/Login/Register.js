@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { TextField, Button, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { getBoxStyles } from '../../Assets/Styles/boxStyles';
 import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // Import textFieldStyles
 
@@ -10,6 +10,7 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
@@ -17,8 +18,10 @@ function Register() {
     password: '',
     confirmPassword: '',
   });
+  const [loading, setLoading] = useState(false); // Loading state for button
+  const navigate = useNavigate(); // Hook to redirect the user
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     let formErrors = { ...errors };
@@ -63,12 +66,33 @@ function Register() {
     if (!formValid) return;
 
     // If all validations pass, handle form submission
-    console.log('First Name:', firstName);
-    console.log('Last Name:', lastName);
-    console.log('Email:', email);
-    console.log('Password:', password);
+    setLoading(true); // Start loading
+    try {
+      // Make a POST request to your backend for registration
+      const response = await fetch('http://localhost:5168/api/Bruger', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ firstName, lastName, email, password }),
+      });
 
-    // Here you would send the form data to your backend
+      const data = await response.json();
+
+      // Check if registration is successful (you can adjust this check based on your backend response)
+      if (response.ok) {
+        // If registration is successful, redirect to login page
+        navigate('/login');
+      } else {
+        // If registration fails, show error message (you can adjust based on your backend response)
+        setErrors({ ...errors, email: data.message || 'Registration failed' });
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
+      setErrors({ ...errors, email: 'An error occurred. Please try again.' });
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   return (
@@ -116,7 +140,7 @@ function Register() {
       {/* Password */}
       <TextField
         label="Password"
-        type="password"
+        type={showPassword ? 'text' : 'password'} // Toggle between text and password
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         {...getTextFieldStyles()} // Apply the shared styles here
@@ -132,7 +156,7 @@ function Register() {
       {/* Confirm Password */}
       <TextField
         label="Confirm Password"
-        type="password"
+        type={showPassword ? 'text' : 'password'} // Toggle between text and password
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
         {...getTextFieldStyles()} // Apply the shared styles here
@@ -140,8 +164,20 @@ function Register() {
         helperText={errors.confirmPassword}
       />
 
-      <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
-        Sign Up Now
+      {/* Show Password Checkbox */}
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={showPassword}
+            onChange={(e) => setShowPassword(e.target.checked)}
+            color="primary"
+          />
+        }
+        label="Show Password"
+      />
+
+      <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }} disabled={loading}>
+        {loading ? 'Signing Up...' : 'Sign Up Now'}
       </Button>
 
       <Typography variant="body2" sx={{ mt: 2 }}>
