@@ -18,7 +18,7 @@ function Budget() {
   const [editMode, setEditMode] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [savingsAmount, setSavingsAmount] = useState('');
-  const [savingsDate, setSavingsDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [savingsDate, setSavingsDate] = useState(dayjs().format('DD-MM-YYYY'));
   const [savingsHistory, setSavingsHistory] = useState([]);
 
   const handleChange = (e) => {
@@ -30,6 +30,14 @@ function Budget() {
   };
 
   const handleAddRow = () => {
+    const today = dayjs();
+    const endDate = dayjs(newRow.goalEndDate);
+  
+    if (!endDate.isValid() || endDate.isBefore(today, 'day')) {
+      alert("Please choose a future date for the saving goal.");
+      return;
+    }
+  
     if (editMode) {
       setRows((prevRows) =>
         prevRows.map((row) =>
@@ -39,10 +47,12 @@ function Budget() {
     } else {
       setRows((prevRows) => [...prevRows, { ...newRow, id: prevRows.length + 1 }]);
     }
+  
     setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
     setOpen(false);
     setEditMode(false);
   };
+  
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -99,7 +109,7 @@ function Budget() {
       );
       setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
       setSavingsAmount('');
-      setSavingsDate(dayjs().format('YYYY-MM-DD'));
+      setSavingsDate(dayjs().format('DD-MM-YYYY'));
     }
   };
 
@@ -115,7 +125,7 @@ function Budget() {
       );
       setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
       setSavingsAmount('');
-      setSavingsDate(dayjs().format('YYYY-MM-DD'));
+      setSavingsDate(dayjs().format('DD-MM-YYYY'));
     }
   };
 
@@ -145,7 +155,8 @@ function Budget() {
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.price}</TableCell>
-                    <TableCell>{row.goalEndDate}</TableCell>
+                    <TableCell>{dayjs(row.goalEndDate).format('DD/MM/YYYY')}</TableCell>
+
                     <TableCell>
                       <IconButton onClick={() => handleEditGoal(row)}><Edit /></IconButton>
                       <IconButton onClick={() => handleDeleteGoal(row.id)}><Delete /></IconButton>
@@ -278,7 +289,11 @@ function Budget() {
             InputLabelProps={{
               shrink: true,
             }}
-          />
+            inputProps={{
+              min: dayjs().format('YYYY-MM-DD'), // Restrict to today's date and future dates
+            }}
+        />
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
