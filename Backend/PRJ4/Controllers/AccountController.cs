@@ -12,6 +12,7 @@ using PRJ4.Data;
 using PRJ4.Models;
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using PRJ4.Repositories;
 
 
 namespace PRJ4.Controllers;
@@ -25,7 +26,6 @@ public class AccountController : ControllerBase
     private readonly UserManager<ApiUser> _userManager;
     private readonly IConfiguration _config;
     private readonly SignInManager<ApiUser> _signInManager;
-
     public AccountController(ApplicationDbContext context, ILogger<AccountController> logger, 
             UserManager<ApiUser> userManager, IConfiguration config, SignInManager<ApiUser> signInManager)
     {
@@ -40,37 +40,36 @@ public class AccountController : ControllerBase
     [Route("Register")]
     public async Task<ActionResult> Register(RegisterDTO registerDTO)
     {
+        Console.WriteLine("Registering user");
+        Console.WriteLine("Model state is invalid");
+        foreach (var entry in ModelState)
+        {
+            Console.WriteLine($"Key: {entry.Key}, Errors: {string.Join(", ", entry.Value.Errors.Select(e => e.ErrorMessage))}");
+        }
+
+        Console.WriteLine($"Register DTO: {registerDTO}");
+
         try
         {
-            if (ModelState.IsValid)
-            {
-                var newUser=new ApiUser();
-                newUser.UserName=registerDTO.Email;
-                newUser.Email=registerDTO.Email;
-                newUser.FullName=registerDTO.Fornavn+" "+registerDTO.Efternavn;
+            Console.WriteLine("Model state is valid");
+            var newUser=new ApiUser();
+            newUser.UserName=registerDTO.Email;
+            newUser.Email=registerDTO.Email;
+            newUser.FullName=registerDTO.Fornavn+" "+registerDTO.Efternavn;
 
-                var result=await _userManager.CreateAsync(newUser,registerDTO.Password);
-                
-                if(result.Succeeded)
-                {
-                    _logger.LogInformation("User created a new account with password.",
-                    newUser.UserName,newUser.Email);
-                    return StatusCode(201,
-                    $"User {newUser.UserName} created successfully");
-                }
-               else
-                    throw new Exception(
-                    string.Format("Error: {0}", string.Join(" ",
-                    result.Errors.Select(e => e.Description))));       
+            var result=await _userManager.CreateAsync(newUser,registerDTO.Password);
+            if(result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.",
+                newUser.UserName,newUser.Email);
+                return StatusCode(201, 
+                new { message = $"User {newUser.UserName} created successfully" });
+
             }
             else
-            {
-                var details = new ValidationProblemDetails(ModelState);
-                details.Type =
-                "https:/ /tools.ietf.org/html/rfc7231#section-6.5.1";
-                details.Status = StatusCodes.Status400BadRequest;
-                return new BadRequestObjectResult(details);
-            }
+                throw new Exception(
+                string.Format("Error: {0}", string.Join(" ",
+                result.Errors.Select(e => e.Description))));       
         }
         catch (Exception e)
         {
@@ -137,7 +136,7 @@ public class AccountController : ControllerBase
                     );
                     var jwtString=new JwtSecurityTokenHandler()
                     .WriteToken(jwtObject);
-                    return StatusCode(StatusCodes.Status200OK,jwtString);
+                    return Ok(new { token = jwtString });
                 }
             }
             else
@@ -198,4 +197,26 @@ public class AccountController : ControllerBase
                 StatusCodes.Status500InternalServerError, exceptionDetails);
         }
     }
+
+    // [HttpDelete]
+    // [Route("Delete/{id}")]
+    // //could be admin only
+    // public async Task<IActionResult> Delete(string id)
+    // {
+    //     try
+    //     {
+    //         _logger.LogInformation("Deleting Bruger");
+                
+    //         _context.Remove(id);
+    //         await _context.SaveChangesAsync();
+
+    //         _logger.LogInformation("Successfully deleted");
+    //         return NoContent();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError("Error deleting ");
+    //         return BadRequest(ex.Message);
+    //     }
+    // }
 }

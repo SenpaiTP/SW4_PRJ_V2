@@ -10,6 +10,7 @@ namespace PRJ4.DTOs
     {
         [Required]
         public string? Fornavn{ get; set; }
+        [Required]
         public string? Efternavn{ get; set; }
 
         [Required]
