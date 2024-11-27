@@ -139,10 +139,11 @@ builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
 builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
-
+builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
 builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
 builder.Services.AddScoped<IKategori, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<IVindtægtService, VindtægtService>();    
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
