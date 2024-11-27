@@ -16,8 +16,12 @@ import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { visuallyHidden } from "@mui/utils";
 
+// Funktion til at oprette data
 function createData(id, name, price, category) {
   return {
     id,
@@ -27,12 +31,14 @@ function createData(id, name, price, category) {
   };
 }
 
-const rows = [
+// Eksempeldata
+const initialRows = [
   createData(1, "SU", 305, "1"),
   createData(2, "Løn", 452, "2"),
   createData(3, "Sort arbejde", 452, "hej"),
 ];
 
+// Helper-funktioner til at sortere tabel
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -49,6 +55,7 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// Hoved celler i tabellen
 const headCells = [
   {
     id: "name",
@@ -70,6 +77,7 @@ const headCells = [
   },
 ];
 
+// Tabel Header komponent
 function EnhancedTableHead(props) {
   const {
     onSelectAllClick,
@@ -178,144 +186,195 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function IndtægterTabel() {
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("price");
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false); // Tilføj 'dense' her
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
+    const [order, setOrder] = React.useState("asc");
+    const [orderBy, setOrderBy] = React.useState("price");
+    const [selected, setSelected] = React.useState([]);
+    const [page, setPage] = React.useState(0);
+    const [dense, setDense] = React.useState(false);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rows, setRows] = React.useState(initialRows);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+  
+    const emptyRows =
+      page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  
+    const handleRequestSort = (event, property) => {
+      const isAsc = orderBy === property && order === "asc";
+      setOrder(isAsc ? "desc" : "asc");
+      setOrderBy(property);
+    };
+  
+    const handleSelectAllClick = (event) => {
+      if (event.target.checked) {
+        const newSelected = rows.map((n) => n.id);
+        setSelected(newSelected);
+        return;
+      }
+      setSelected([]);
+    };
+  
+    const handleClick = (event, id) => {
+      const selectedIndex = selected.indexOf(id);
+      let newSelected = [];
+  
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1)
+        );
+      }
       setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
+    };
+  
+    const handleChangePage = (event, newPage) => {
+      setPage(newPage);
+    };
+  
+    const handleChangeRowsPerPage = (event) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+    };
+  
+    const handleChangeDense = (event) => {
+      setDense(event.target.checked);
+    };
+  
+    const handleClickMenu = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const handleCloseMenu = () => {
+      setAnchorEl(null);
+    };
+  
+    const handleAddRow = () => {
+      const newRow = createData(
+        rows.length + 1,
+        prompt("Indtægtsnavn:"),
+        prompt("Pris:"),
+        prompt("Kategori:")
       );
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
-  const visibleRows = React.useMemo(
-    () =>
-      [...rows]
-        .sort(getComparator(order, orderBy))
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage]
-  );
-
-  return (
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"} // Brug af 'dense'
-          >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const isItemSelected = selected.includes(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
-
-                return (
+      setRows([...rows, newRow]);
+      handleCloseMenu();
+    };
+  
+    const handleEditRow = () => {
+      const updatedRows = rows.map((row) =>
+        row.id === selected[0] // Use the first selected row
+          ? {
+              ...row,
+              name: prompt("Indtægtsnavn:", row.name),
+              price: prompt("Pris:", row.price),
+              category: prompt("Kategori:", row.category),
+            }
+          : row
+      );
+      setRows(updatedRows);
+      handleCloseMenu();
+    };
+  
+    const handleDeleteRow = () => {
+      setRows(rows.filter((row) => row.id !== selected[0])); // Use the first selected row
+      setSelected([]);
+      handleCloseMenu();
+    };
+  
+    return (
+      <Box sx={{ width: "100%" }}>
+        <Paper sx={{ width: "100%", mb: 2 }}>
+          <Box sx={{ position: "relative" }}>
+            <IconButton
+              onClick={handleClickMenu}
+              sx={{ position: "absolute", zIndex: 1, top: 10, right: 10 }}
+              >
+              <MoreVertIcon />
+            </IconButton>
+  
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+            >
+              <MenuItem onClick={handleAddRow}>Tilføj</MenuItem>
+              <MenuItem onClick={handleEditRow}>Rediger</MenuItem>
+              <MenuItem onClick={handleDeleteRow}>Slet</MenuItem>
+            </Menu>
+          </Box>
+  
+          <EnhancedTableToolbar numSelected={selected.length} />
+      
+          <TableContainer>
+            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
+              <EnhancedTableHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={rows.length}
+              />
+              <TableBody>
+                {rows
+                  .sort(getComparator(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => {
+                    const isItemSelected = selected.indexOf(row.id) !== -1;
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              "aria-labelledby": row.id,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell component="th" id={row.id} scope="row" padding="none">
+                          {row.name}
+                        </TableCell>
+                        <TableCell align="right">{row.price}</TableCell>
+                        <TableCell align="right">{row.category}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                {emptyRows > 0 && (
                   <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: "pointer" }}
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell component="th" scope="row" padding="none">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="right">{row.price}</TableCell>
-                    <TableCell align="right">{row.category}</TableCell>
+                    <TableCell colSpan={6} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows, // Håndter tomme rækker
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-    </Box>
-  );
-}
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      </Box>
+    );
+  }
+  

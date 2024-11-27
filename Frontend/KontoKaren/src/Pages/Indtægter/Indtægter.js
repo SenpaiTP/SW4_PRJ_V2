@@ -6,7 +6,7 @@ import IndtægterTabel from "./IndtægterTabel"; // Importer tabellen
 // Eksempeldata til tabellen
 const initialRows = [
   { id: 1, name: "SU", price: 305, category: "1" },
-  { id: 2, name: "Løn", price: 452, category: "2" },
+  { id: 2, name: "Løn", price: 120, category: "2" },
   { id: 3, name: "Sort arbejde", price: 452, category: "hej" },
 ];
 
