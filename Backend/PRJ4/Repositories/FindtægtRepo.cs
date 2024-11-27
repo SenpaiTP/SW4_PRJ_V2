@@ -16,10 +16,10 @@ public class FindtægtRepo : IFindtægtRepo
         _context = context;
     }
 
-    public async Task<IEnumerable<FindtægtDTO>> GetFindtægterByUserIdAsync(string userId)
+    public async Task<IEnumerable<FindtægtDTO>> GetFindtægterByUserIdAsync(int userId)
     {
         return await _context.Findtægter
-            .Where(f => f.UserId == userId)
+            .Where(f => f.FindtægtId == userId)
             .Select(f => new FindtægtDTO
             {
                 // Map properties here
@@ -27,11 +27,11 @@ public class FindtægtRepo : IFindtægtRepo
             .ToListAsync();
     }
 
-    public async Task<Findtægt> CreateFindtægtAsync(string userId, FindtægtCreateDTO findtægtCreateDTO)
+    public async Task<Findtægt> CreateFindtægtAsync(int userId, FindtægtCreateDTO findtægtCreateDTO)
     {
         var findtægt = new Findtægt
         {
-            UserId = userId,
+            FindtægtId = userId,
             // Map properties from findtægtCreateDTO
         };
         _context.Findtægter.Add(findtægt);
@@ -39,10 +39,10 @@ public class FindtægtRepo : IFindtægtRepo
         return findtægt;
     }
 
-    public async Task<bool> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
+    public async Task<bool> UpdateFindtægtAsync(int userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
     {
         var findtægt = await _context.Findtægter
-            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.UserId == userId);
+            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.FindtægtId == userId);
         if (findtægt == null)
         {
             return false;
@@ -52,10 +52,10 @@ public class FindtægtRepo : IFindtægtRepo
         return true;
     }
 
-    public async Task<bool> DeleteFindtægtAsync(string userId, int id)
+    public async Task<bool> DeleteFindtægtAsync(int userId, int id)
     {
         var findtægt = await _context.Findtægter
-            .FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
+            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.FindtægtId == userId);
         if (findtægt == null)
         {
             return false;
