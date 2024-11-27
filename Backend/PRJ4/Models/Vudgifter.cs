@@ -20,5 +20,5 @@ public partial class Vudgifter
     [ForeignKey(nameof(KategoriId))]
     public Kategori Kategori {get; set;}
     [ForeignKey(nameof(BrugerId))]
-    public virtual Bruger Bruger { get; set; } = null!;
+    public virtual ApiUser Bruger { get; set; } = null!;
 }
