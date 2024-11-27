@@ -31,7 +31,7 @@ namespace PRJ4.Services.BudgetService
             foreach (var budget in budgetListe)
             {
                 int monthlysaving = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut);
-                decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
+                //decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
 
                 var budgetReturn = new BudgetResponseDTO
                 {
@@ -41,7 +41,7 @@ namespace PRJ4.Services.BudgetService
                     SavingsGoal = budget.SavingsGoal,
                     BudgetSlut = budget.BudgetSlut,
                     MonthlySavingsAmount = monthlysaving,
-                    MoneySaved = moneysaved
+                    MoneySaved = 200
                 };
 
                 budgetReturnListe.Add(budgetReturn);
@@ -59,7 +59,7 @@ namespace PRJ4.Services.BudgetService
             }
 
             int monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
-            decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
+            //decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
 
             var budgetReturn = new BudgetResponseDTO
             {
@@ -69,7 +69,7 @@ namespace PRJ4.Services.BudgetService
                 SavingsGoal = budget.SavingsGoal,
                 BudgetSlut = budget.BudgetSlut,
                 MonthlySavingsAmount = monthlysaving,
-                MoneySaved = moneysaved
+                MoneySaved = 200
             };
 
             return budgetReturn;
@@ -88,7 +88,7 @@ namespace PRJ4.Services.BudgetService
             foreach (var budget in budgetListe)
             {
                 int monthlysaving = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut);
-                decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
+                //decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
 
                 var budgetReturn = new BudgetResponseDTO
                 {
@@ -98,7 +98,7 @@ namespace PRJ4.Services.BudgetService
                     SavingsGoal = budget.SavingsGoal,
                     BudgetSlut = budget.BudgetSlut,
                     MonthlySavingsAmount = monthlysaving,
-                    MoneySaved = moneysaved
+                    MoneySaved = 200
                 };
 
                 budgetReturnListe.Add(budgetReturn);
@@ -230,14 +230,14 @@ namespace PRJ4.Services.BudgetService
             return 0;
         }
 
-        public async Task<decimal> CalculateMoneySaved(int brugerId, string savingName)
-        {
-            // Hent udgifterne for opsparingen
-            var fudgifter = await _budgetRepository.GetExspencesByKategori(brugerId, savingName);
+        // public async Task<decimal> CalculateMoneySaved(int brugerId, string savingName)
+        // {
+        //     // Hent udgifterne for opsparingen
+        //     var fudgifter = await _budgetRepository.GetExspencesByKategori(brugerId, savingName);
 
-            // Beregn summen af opsparingsbeløbet
-            return fudgifter.Sum(f => f.Pris);
-        }
+        //     // Beregn summen af opsparingsbeløbet
+        //     return fudgifter.Sum(f => f.Pris);
+        // }
 
 
 

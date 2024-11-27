@@ -19,11 +19,14 @@ public class BudgetRepo: TemplateRepo<Budget>, IBudgetRepo
             .ToListAsync();
     }
 
-    public async Task<List<Fudgifter>> GetExspencesByKategori(int brugerId, string savingName)
-    {
-        // Hent alle udgifter for en bruger med den specifikke kategori
-        return await _context.Fudgifters
-            .Where(f => f.BrugerId == brugerId && f.Kategori.Name == savingName)
-            .ToListAsync();
-    }
+    // public async Task<List<Fudgifter>> GetExspencesByKategori(int brugerId, string savingName)
+    // {
+    //     // Hent alle udgifter for en bruger med den specifikke kategori
+    //     return await _context.Fudgifters
+    //         .Where(f => f.BrugerId == brugerId && f.Kategori.Navn == savingName)
+    //         .ToListAsync();
+    // }
+
+
+    
 }
