@@ -12,6 +12,7 @@ using PRJ4.Mappings;
 using Serilog;
 using Serilog.Events;
 using MongoDB.Driver;
+using PRJ4.Servies;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,8 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     var client = serviceProvider.GetRequiredService<IMongoClient>();
     return client.GetDatabase(mongoDatabaseName);
 });
+
+
 //Register mapping profiles
 builder.Services.AddAutoMapper(typeof(FudgifterProfile));
 builder.Services.AddAutoMapper(typeof(VudgifterProfile));
@@ -87,7 +90,10 @@ builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
 builder.Services.AddControllers();
 string openAiKey = builder.Configuration["OpenAI:ApiKey"];
-builder.Services.AddSingleton(new OpenAIClient(openAiKey));
+//builder.Services.AddSingleton(new OpenAIClient(openAiKey));
+builder.Services.AddSingleton(new CategorizerSuggester());
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);

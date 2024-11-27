@@ -19,7 +19,7 @@ namespace PRJ4.Repositories
         }
 
         // Calculate fuzzy match score using multiple algorithms and return the best match
-        public async Task<Kategori> SearchByBestFuzzyMatch(string SuggestedKategoriNavn)
+        public async Task<Kategori> SearchByBestFuzzyMatch(string suggestedKategoriNavn)
         {
             // Get all categories from the database
             var categories = await _context.Kategorier.ToListAsync();
@@ -30,25 +30,38 @@ namespace PRJ4.Repositories
             // Iterate through each category to calculate the match score
             foreach (var category in categories)
             {
-                var levenshteinScore = category.Navn.RatcliffObershelpSimilarity(SuggestedKategoriNavn);
+                // Calculate scores from different algorithms
+                double levenshteinDistance = category.Navn.LevenshteinDistance(suggestedKategoriNavn);
+                double normalizedLevenshtein = 1 - (levenshteinDistance / Math.Max(category.Navn.Length, suggestedKategoriNavn.Length));
+                
+                double ratcliffObershelpScore = category.Navn.RatcliffObershelpSimilarity(suggestedKategoriNavn); // Already between 0 and 1
+                
+                double jaroWinklerScore = category.Navn.JaroWinklerDistance(suggestedKategoriNavn); // Already between 0 and 1
 
-                var jaroWinklerScore = category.Navn.LevenshteinDistance(SuggestedKategoriNavn);
+                // Calculate the combined score (average of all three)
+                double combinedScore = (normalizedLevenshtein + ratcliffObershelpScore + jaroWinklerScore) / 3;
 
-                var ratcliffObershelpScore = category.Navn.JaroWinklerDistance(SuggestedKategoriNavn);
+                // Add the category and its score to the list
+                categoryScores.Add((category, combinedScore));
 
-                // Find the highest score among the three algorithms
-                var bestScore = Math.Max(levenshteinScore, Math.Max(jaroWinklerScore, ratcliffObershelpScore));
-
-                // Add the category and its best score to the list
-                categoryScores.Add((category, bestScore));
+                // Log for debugging
+                Console.WriteLine($"{category.Navn} - Combined Score: {combinedScore:F2}");
             }
 
-            // Get the category with the highest score
-            var bestMatch = categoryScores.OrderBy(x => x.score).FirstOrDefault();
+            // Find the category with the highest combined score
+            var bestMatch = categoryScores.OrderByDescending(x => x.score).FirstOrDefault();
+
+            // Define a similarity threshold (e.g., 0.7)
+            double similarityThreshold = 0.9;
+            if (bestMatch.score < similarityThreshold)
+            {
+                return null; // Reject if below threshold
+            }
 
             // Return the category with the highest match score
             return bestMatch.category;
         }
+
         public async Task<Kategori> SearchByName(string kategoriNavn)
         {
             if (string.IsNullOrWhiteSpace(kategoriNavn)) return null;
