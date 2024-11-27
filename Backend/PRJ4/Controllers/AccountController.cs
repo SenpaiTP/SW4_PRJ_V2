@@ -162,6 +162,8 @@ public class AccountController : ControllerBase
         }
     }
 
+    
+
     [HttpGet]
     [Route("WhoAmI")]
     [Authorize]
