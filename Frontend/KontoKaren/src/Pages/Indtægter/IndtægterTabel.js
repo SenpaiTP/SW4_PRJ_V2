@@ -1,76 +1,92 @@
 import * as React from "react";
-import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+  IconButton,
+  Menu,
+  MenuItem,
+  TablePagination,
+} from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { visuallyHidden } from "@mui/utils";
 import PieChart from "./PieChart";
 
 // Funktion til at oprette data
-function createData(id, name, price, category) {
-  return { id, name, price, category };
+function createData(id, name, price, date) {
+  return { id, name, price, date };
 }
 
 // Eksempeldata
 const initialRows = [
-  createData(1, "SU", 305, "1"),
-  createData(2, "Løn", 452, "2"),
-  createData(3, "Sort arbejde", 452, "hej"),
+  createData(1, "SU", 305, "2022-12-01"),
+  createData(2, "Løn", 452, "2022-12-01"),
+  createData(3, "Sort arbejde", 250, "2022-12-01"),
 ];
 
 export default function IndtægterTabel() {
   const [rows, setRows] = React.useState(initialRows);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selected, setSelected] = React.useState([]);
+  const [selectedRow, setSelectedRow] = React.useState(null); // Gemmer den valgte række
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const handleClickMenu = (event) => {
-    setAnchorEl(event.currentTarget); // Åbner menuen ved at sætte anchorEl
+  const handleClickMenu = (event, row) => {
+    setAnchorEl(event.currentTarget); // Åbner menuen
+    setSelectedRow(row); // Gem den række, der er knyttet til denne menu
   };
 
   const handleCloseMenu = () => {
     setAnchorEl(null); // Lukker menuen
+    setSelectedRow(null); // Rydder valgt række
   };
 
-  const chartData = rows.map((row) => ({
-    name: row.name,
-    price: row.price,
-  }));
-  
   const handleAddRow = () => {
     const newRow = createData(
       rows.length + 1,
       prompt("Indtægtsnavn:"),
       prompt("Pris:"),
-      prompt("Kategori:")
+      prompt("Dato (YYYY-MM-DD):")
     );
     setRows([...rows, newRow]); // Tilføjer en ny række
-    handleCloseMenu(); // Lukker menuen efter tilføjelsen
+    handleCloseMenu(); // Lukker menuen
+  };
+
+  const handleEditRow = () => {
+    if (selectedRow) {
+      const newName = prompt("Rediger navn:", selectedRow.name);
+      const newPrice = prompt("Rediger pris:", selectedRow.price);
+      const newDate = prompt("Rediger dato (YYYY-MM-DD):", selectedRow.date);
+
+      if (newName && newPrice && newDate) {
+        setRows((prevRows) =>
+          prevRows.map((row) =>
+            row.id === selectedRow.id
+              ? {
+                  ...row,
+                  name: newName,
+                  price: parseFloat(newPrice),
+                  date: newDate,
+                }
+              : row
+          )
+        );
+      }
+    }
+    handleCloseMenu(); // Lukker menuen
   };
 
   const handleDeleteRow = () => {
-    if (selected.length > 0) {
-      setRows(rows.filter((row) => !selected.includes(row.id))); // Sletter valgte rækker
-      setSelected([]); // Rydder den valgte række
+    if (selectedRow) {
+      setRows(rows.filter((row) => row.id !== selectedRow.id)); // Slet den valgte række
     }
-    handleCloseMenu(); // Lukker menuen efter sletning
+    handleCloseMenu(); // Lukker menuen
   };
 
   const handleSelectAllClick = (event) => {
@@ -109,31 +125,26 @@ export default function IndtægterTabel() {
     setPage(0);
   };
 
+  const chartData = rows.map((row) => ({
+    name: row.name,
+    price: row.price,
+  }));
+
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <Box sx={{ position: "relative" }}>
-          {/* Menu knap */}
-          <IconButton
-            onClick={handleClickMenu}
-            sx={{ position: "absolute", zIndex: 1, top: 10, right: 10 }}
-          >
-            <MoreVertIcon />
-          </IconButton>
+      <Paper sx={{ width: "100%", mb: 2, position: "relative" }}>
+        <IconButton
+          onClick={handleClickMenu}
+          sx={{
+            position: "absolute", // Placeres absolut i forhold til Paper
+            zIndex: 1,
+            top: 10, // Afstand fra toppen af Paper
+            right: 10, // Afstand fra højre side af Paper
+          }}
+        >
+          <MoreVertIcon />
+        </IconButton>
 
-          {/* Menuen */}
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)} // Menuen vises, hvis anchorEl ikke er null
-            onClose={handleCloseMenu} // Lukker menuen, når der klikkes udenfor
-          >
-            <MenuItem onClick={handleAddRow}>Tilføj indtægt</MenuItem>
-            <MenuItem onClick={handleDeleteRow}>Slet indtægt</MenuItem>
-            <MenuItem onClick={handleCloseMenu}>Luk menu</MenuItem>
-          </Menu>
-        </Box>
-
-        {/* Tabel header */}
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
             <TableHead>
@@ -141,16 +152,19 @@ export default function IndtægterTabel() {
                 <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
-                    indeterminate={selected.length > 0 && selected.length < rows.length}
+                    indeterminate={
+                      selected.length > 0 && selected.length < rows.length
+                    }
                     checked={rows.length > 0 && selected.length === rows.length}
                     onChange={handleSelectAllClick}
                   />
                 </TableCell>
                 <TableCell>Indtægtsnavn</TableCell>
                 <TableCell align="right">Pris</TableCell>
-                <TableCell align="right">Kategori</TableCell>
+                <TableCell align="right">Dato</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -167,21 +181,29 @@ export default function IndtægterTabel() {
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                        />
+                        <Checkbox color="primary" checked={isItemSelected} />
                       </TableCell>
                       <TableCell>{row.name}</TableCell>
                       <TableCell align="right">{row.price}</TableCell>
-                      <TableCell align="right">{row.category}</TableCell>
+                      <TableCell align="right">{row.date}</TableCell>
+                      <TableCell align="center"></TableCell>
                     </TableRow>
                   );
                 })}
             </TableBody>
           </Table>
         </TableContainer>
-        {/* Tabel pagination */}
+
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+        >
+          <MenuItem onClick={handleAddRow}>Tilføj indtægt</MenuItem>
+          <MenuItem onClick={handleEditRow}>Rediger indtægt</MenuItem>
+          <MenuItem onClick={handleDeleteRow}>Slet indtægt</MenuItem>
+        </Menu>
+
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -190,8 +212,10 @@ export default function IndtægterTabel() {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Rækker per side"
         />
       </Paper>
+
       <PieChart chartData={chartData} />
     </Box>
   );

@@ -2,12 +2,13 @@ import React, { useState } from "react"; // Sørg for at importere useState
 import { Container, Typography } from "@mui/material";
 import PieChart from "./PieChart";
 import IndtægterTabel from "./IndtægterTabel"; // Importer tabellen
+import { DateRange } from "@mui/icons-material";
 
 // Eksempeldata til tabellen
 const initialRows = [
-  { id: 1, name: "SU", price: 305, category: "1" },
-  { id: 2, name: "Løn", price: 120, category: "2" },
-  { id: 3, name: "Sort arbejde", price: 452, category: "hej" },
+  { id: 1, name: "SU", price: 305, date: "2022-12-01" },
+  { id: 2, name: "Løn", price: 120, date: "2022-12-01" },
+  { id: 3, name: "Sort arbejde", price: 452, date: "2022-12-01" },
 ];
 
 function Indtægter() {
