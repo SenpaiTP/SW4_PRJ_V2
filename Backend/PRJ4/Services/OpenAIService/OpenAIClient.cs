@@ -25,6 +25,10 @@ namespace PRJ4.Services
             // Create a request for chat completion
             var chatRequest = _client.CompleteChat("{promt}",prompt);
             var repsonsechat = chatRequest.Value.Content[0].Text;
+            if(repsonsechat == null)
+            {
+                return null;
+            }
             return repsonsechat;
         }
     }
