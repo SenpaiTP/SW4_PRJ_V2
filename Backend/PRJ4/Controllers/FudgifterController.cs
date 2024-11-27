@@ -20,15 +20,15 @@ namespace PRJ4.Controllers
             _logger = logger;
         }
 
-        private int GetUserId()
+        private string GetUserId()
         {
-            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
-            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            var claims = Request.HttpContext.User.Claims;
+            var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last() == "nameidentifier");
+            if(userIdClaim.Value != null)
             {
-                _logger.LogError("Invalid or missing user ID claim. {IdClaim}", brugerIdClaim);
-                throw new UnauthorizedAccessException("Invalid or missing user ID claim.");
+                return userIdClaim.Value;
             }
-            return brugerId;
+            return null;
         }
 
         [HttpGet]
@@ -36,7 +36,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Fetching all fixed expenses for user {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
 
                 var fudgifter = await _fudgifterService.GetAllByUser(brugerId);
@@ -56,7 +56,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Adding a new fixed expense for user {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
 
                 var response = await _fudgifterService.AddFudgifter(brugerId, fudgifter);
@@ -76,7 +76,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Updating fixed expense {Id} for user {BrugerId} with data: {@UpdateDTO}. {Method}", id, brugerId, updateDTO, HttpContext.Request.Method);
 
                 await _fudgifterService.UpdateFudgifter(brugerId, id, updateDTO);
@@ -96,7 +96,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Deleting fixed expense {Id} for user {BrugerId}. {Method}", id, brugerId, HttpContext.Request.Method);
 
                 await _fudgifterService.DeleteFudgifter(brugerId, id);

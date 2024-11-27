@@ -26,7 +26,7 @@ namespace PRJ4.Repositories
             return Fudgifter;
         }
 
-        public async Task<IEnumerable<Fudgifter>> GetAllByUserId(int brugerId)
+        public async Task<IEnumerable<Fudgifter>> GetAllByUserId(string brugerId)
         {
             return await _context.Fudgifters
                 .Where(f => f.BrugerId == brugerId)

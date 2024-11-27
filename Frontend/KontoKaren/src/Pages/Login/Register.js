@@ -67,23 +67,32 @@ function Register() {
 
     // If all validations pass, handle form submission
     setLoading(true); // Start loading
-    try {
-      // Make a POST request to your backend for registration
-      const response = await fetch('http://localhost:5168/api/Bruger', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName, lastName, email, password }),
-      });
+  try {
+    const response = await fetch('http://localhost:5168/Account/Register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+          Fornavn: firstName,
+          Efternavn: lastName,
+          Email: email,
+          Password: password
+      }),
+    });
+
+      console.log('API response:', response.status);
 
       const data = await response.json();
 
+      
       // Check if registration is successful (you can adjust this check based on your backend response)
       if (response.ok) {
         // If registration is successful, redirect to login page
+        console.log('Registration successful:', data);
         navigate('/login');
       } else {
+        console.error('Registration failed:', data);
         // If registration fails, show error message (you can adjust based on your backend response)
         setErrors({ ...errors, email: data.message || 'Registration failed' });
       }

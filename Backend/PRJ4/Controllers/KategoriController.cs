@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PRJ4.DTOs;
 using PRJ4.Repositories;
-using PRJ4.Servies;
+using PRJ4.Services;
 
 namespace PRJ4.Controllers
 {
@@ -11,13 +11,13 @@ namespace PRJ4.Controllers
     {
         private readonly IKategori _kategorirepo;
         //private readonly OpenAIClient _openAIClient;
-        private readonly CategorizerSuggester _suggester;
+        private readonly OpenAIClient _openAi;
 
-        public KategoriController(IKategori kategorirepo, CategorizerSuggester suggester )//OpenAIClient openAIClient)
+        public KategoriController(IKategori kategorirepo, OpenAIClient openAI )//OpenAIClient openAIClient)
         {
             _kategorirepo = kategorirepo;
             //_openAIClient = openAIClient;
-            _suggester = suggester;
+            _openAi = openAI;
         }
 
         // POST: api/Kategori/Suggest
@@ -30,11 +30,11 @@ namespace PRJ4.Controllers
             }
             //string suggestedCategory = descriptionInput.Description;
             // Step 1: Get category suggestion from OpenAI
-            var suggestedCategory = _suggester.PredictCategory(descriptionInput.Description);
+            var suggestedCategory = await _openAi.GetCategorySuggestion(descriptionInput.Description);
             Console.WriteLine(suggestedCategory);
 
             // Step 2: Find the best matching category using fuzzy matching
-            suggestedCategory = suggestedCategory.ToLower();
+            suggestedCategory = suggestedCategory;
             var bestMatchCategory = await _kategorirepo.SearchByBestFuzzyMatch(suggestedCategory);
 
             if (bestMatchCategory == null)
