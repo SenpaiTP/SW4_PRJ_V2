@@ -12,16 +12,13 @@ const initialRows = [
 
 function Indtægter() {
   // Brug useState for at definere rows i komponentens tilstand
-  const [rows, setRows] = useState(initialRows); // initialRows er dataene, der bruges som startværdi
+  const [rows, setRows] = useState(initialRows);
 
   return (
     <Container>
       <Typography variant="h1" component="h2">
         Welcome to Indtægter
       </Typography>
-      
-      {/* Send rows data som prop til PieChart */}
-      <PieChart chartData={rows} />
 
       {/* Send rows data og setRows funktion som props til IndtægterTabel */}
       <IndtægterTabel data={rows} setData={setRows} />

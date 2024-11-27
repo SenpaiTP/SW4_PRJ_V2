@@ -1,63 +1,170 @@
 using Microsoft.EntityFrameworkCore;
-//using Microsoft.AspNetCore.Authentication.JwtBearer;
-//using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Serilog;
+using Serilog.Events;
+using MongoDB.Driver;
 using PRJ4.Repositories;
 using PRJ4.Data;
 using PRJ4.Models;
-//using PRJ4.Infrastructure;
-//using PRJ4.ServiceCollectionExtension;
-//using PRJ4.Services;
+using PRJ4.Services;
+using PRJ4.Infrastructure;
+using PRJ4.ServiceCollectionExtension;
+using PRJ4.Mappings;
+using Microsoft.AspNetCore.Identity;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
+// Configure Serilog for logging
+var mongoConnectionString = builder.Configuration["MongoDB:connectionString"];
+var mongoDatabaseName = builder.Configuration["MongoDB:databaseName"];
+
+if (string.IsNullOrEmpty(mongoConnectionString) || string.IsNullOrEmpty(mongoDatabaseName))
+{
+    throw new Exception("MongoDB connection string or database name is not found in configuration or user secrets.");
+}
+
+Serilog.Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)  // This reads from appsettings.json or user-secrets
+    .WriteTo.MongoDB(
+        builder.Configuration["MongoDB:connectionString"] + "/" + builder.Configuration["MongoDB:databaseName"],
+        collectionName: "logs"
+        )
+    .WriteTo.Console() // Use connection string from configuration
+    .CreateLogger();
+
+// Use Serilog for logging in the host
+builder.Host.UseSerilog();
+
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); //Replace this with under lying AddSwaggerGenWithAuth when theres been made authorization (Sylvesterronn)
-//builder.Services.AddSwaggerGenWithAuth();
+builder.Services.AddSwaggerGenWithAuth();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
-//builder.Services.AddAuthorization();
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(o =>
-//     {
-//         o.RequireHttpsMetadata = false;
-//         o.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] !)),
-//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//             ValidAudience = builder.Configuration["Jwt:Audience"],
-//             ClockSkew = TimeSpan.Zero
-//         };
-//     });
-//builder.Services.AddScoped<IBrugerRepo,BrugerRepo>(); // Add the BrugerRepo to the service container
-//builder.Services.AddScoped<ITemplateRepo<Bruger>,BrugerRepo>(); // Add the BrugerRepo to the service container
-//builder.Services.AddScoped<IBrugerService,BrugerService>();
-builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
-builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
-builder.Services.AddScoped<IKategori,KategoriRepo>();
-//builder.Services.AddScoped<TokenProvider>();
+// Register MongoDB client and database
+builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
+{
+    return new MongoClient(mongoConnectionString);
+});
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    {options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
+builder.Services.AddIdentity<ApiUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 2;
+        })
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthentication(options=>
+    {
+    options.DefaultAuthenticateScheme =
+    options.DefaultChallengeScheme = 
+    options.DefaultForbidScheme =
+    options.DefaultScheme=
+    options.DefaultSignInScheme=
+    options.DefaultSignOutScheme= JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>{
+        options.TokenValidationParameters=new TokenValidationParameters
+        {
+            ValidateIssuer=true,
+            ValidIssuer=builder.Configuration["JWT:Issuer"],
+            ValidateAudience=true,
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidateIssuerSigningKey=true,
+            IssuerSigningKey=new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])),
+        };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
+            foreach (var claim in claims)
+            {
+                Console.WriteLine(claim);  // Log claims to verify them
+            }
+            return Task.CompletedTask;
+        }
+    };
     });
 
-var app = builder.Build();
-Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
+{
+    var client = serviceProvider.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(mongoDatabaseName);
+});
+//Register mapping profiles
+builder.Services.AddAutoMapper(typeof(FudgifterProfile));
+builder.Services.AddAutoMapper(typeof(VudgifterProfile));
+builder.Services.AddAutoMapper(typeof(LogMappingProfile));
+// Add services to the container
+var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
-// Configure the HTTP request pipeline.
+builder.Services.AddAuthorization();
+
+//Old code
+
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//             ValidAudience = builder.Configuration["Jwt:Audience"],
+//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+//         };
+
+//         // Prevent default claim mapping
+//         options.MapInboundClaims = false;
+//     });
+builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
+builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
+//builder.Services.AddScoped<IBrugerService, BrugerService>();
+builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
+
+//Build Budgets
+builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
+builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
+builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
+
+builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+builder.Services.AddScoped<IKategori, KategoriRepo>();
+//builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<IFudgifterService,FudgifterService>();
+builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+builder.Services.AddScoped<ILogQueryService, LogQueryService>();
+builder.Services.AddControllers();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
+});
+
+var app = builder.Build();
+
+
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

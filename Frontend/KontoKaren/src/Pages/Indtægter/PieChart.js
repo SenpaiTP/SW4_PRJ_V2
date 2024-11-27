@@ -5,17 +5,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function PieChart({ chartData }) {
+  const colors = chartData.map(() => 
+    `hsl(${Math.random() * 360}, 70%, 50%)`
+  );
   const data = {
     labels: chartData.map((row) => row.name), // Labels fra tabellen (indtægtsnavne)
     datasets: [
       {
         label: "Indtægter",
         data: chartData.map((row) => row.price), // Værdier fra tabellen (beløb)
-        backgroundColor: [
-          "rgb(255, 99, 132)",
-          "rgb(54, 162, 235)",
-          "rgb(255, 205, 86)",
-        ],
+        backgroundColor: colors,
         hoverOffset: 4,
       },
     ],
