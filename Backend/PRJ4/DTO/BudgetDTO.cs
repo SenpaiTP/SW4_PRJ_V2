@@ -4,9 +4,7 @@ namespace PRJ4.DTOs;
 public class BudgetCreateDTO
 {
     public string BudgetName { get; set; }
-
     public int SavingsGoal { get; set; }
-
     public DateOnly BudgetSlut { get; set; }
 }
 

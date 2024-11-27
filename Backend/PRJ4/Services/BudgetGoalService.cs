@@ -2,7 +2,7 @@ using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.DTOs;
 
-namespace PRJ4.Services.BudgetService
+namespace PRJ4.Services
 {
     public class BudgetGoalService: IBudgetGoalService
     {

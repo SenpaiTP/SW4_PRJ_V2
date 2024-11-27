@@ -15,6 +15,6 @@ public partial class Budget
     public DateOnly BudgetSlut { get; set; }
     
     [ForeignKey(nameof(BrugerId))]
-    public Bruger? Bruger { get; set; }
+    public Bruger Bruger { get; set; }
 
 }
