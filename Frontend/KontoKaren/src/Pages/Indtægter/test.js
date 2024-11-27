@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   TablePagination,
+  TableSortLabel,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PieChart from "./PieChart";
@@ -29,17 +30,41 @@ const initialRows = [
   createData(3, "Sort arbejde", 250, "2022-12-01"),
 ];
 
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
 export default function IndtægterTabel() {
   const [rows, setRows] = React.useState(initialRows);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selected, setSelected] = React.useState([]);
   const [selectedRow, setSelectedRow] = React.useState(null); // Gemmer den valgte række
+  const [order, setOrder] = React.useState("asc"); // Default sortering
+  const [orderBy, setOrderBy] = React.useState("name"); // Default kolonne
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleClickMenu = (event, row) => {
     setAnchorEl(event.currentTarget); // Åbner menuen
     setSelectedRow(row); // Gem den række, der er knyttet til denne menu
+  };
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
   };
 
   const handleCloseMenu = () => {
@@ -60,10 +85,12 @@ export default function IndtægterTabel() {
 
   const handleEditRow = () => {
     if (selectedRow) {
+      // Prompt for redigering af række
       const newName = prompt("Rediger navn:", selectedRow.name);
       const newPrice = prompt("Rediger pris:", selectedRow.price);
       const newDate = prompt("Rediger dato (YYYY-MM-DD):", selectedRow.date);
 
+      // Hvis alle felter er udfyldt, opdater rækken
       if (newName && newPrice && newDate) {
         setRows((prevRows) =>
           prevRows.map((row) =>
@@ -84,7 +111,9 @@ export default function IndtægterTabel() {
 
   const handleDeleteRow = () => {
     if (selectedRow) {
-      setRows(rows.filter((row) => row.id !== selectedRow.id)); // Slet den valgte række
+      setRows((prevRows) =>
+        prevRows.filter((row) => row.id !== selectedRow.id)
+      );
     }
     handleCloseMenu(); // Lukker menuen
   };
@@ -130,6 +159,9 @@ export default function IndtægterTabel() {
     price: row.price,
   }));
 
+  // Sort rows based on the order and orderBy state
+  const sortedRows = rows.slice().sort(getComparator(order, orderBy));
+
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2, position: "relative" }}>
@@ -159,14 +191,40 @@ export default function IndtægterTabel() {
                     onChange={handleSelectAllClick}
                   />
                 </TableCell>
-                <TableCell>Indtægtsnavn</TableCell>
-                <TableCell align="right">Pris</TableCell>
-                <TableCell align="right">Dato</TableCell>
+                <TableCell sortDirection={orderBy === "name" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "name"}
+                    direction={orderBy === "name" ? order : "asc"}
+                    onClick={(event) => handleRequestSort(event, "name")}
+                  >
+                    Indtægtsnavn
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "price" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "price"}
+                    direction={orderBy === "price" ? order : "asc"}
+                    onClick={(event) => handleRequestSort(event, "price")}
+                  >
+                    Pris
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "date" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "date"}
+                    direction={orderBy === "date" ? order : "asc"}
+                    onClick={(event) => handleRequestSort(event, "date")}
+                  >
+                    Dato
+                  </TableSortLabel>
+                </TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {rows
+              {sortedRows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   const isItemSelected = selected.indexOf(row.id) !== -1;
@@ -185,10 +243,7 @@ export default function IndtægterTabel() {
                       </TableCell>
                       <TableCell>{row.name}</TableCell>
                       <TableCell align="right">{row.price}</TableCell>
-                      <TableCell align="right">
-                        {/* Formater datoen til DD-MM-YYYY */}
-                        {new Date(row.date).toLocaleDateString("da-DK")}
-                      </TableCell>
+                      <TableCell align="right">{row.date}</TableCell>
                       <TableCell align="center"></TableCell>
                     </TableRow>
                   );
