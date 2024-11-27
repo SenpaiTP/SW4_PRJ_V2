@@ -2,17 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Serilog;
+using Serilog.Events;
+using MongoDB.Driver;
 using PRJ4.Repositories;
 using PRJ4.Data;
 using PRJ4.Models;
-using PRJ4.Services.BudgetService;
+//using PRJ4.Services.BudgetService;
 using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Services;
 using PRJ4.Mappings;
-using Serilog;
-using Serilog.Events;
-using MongoDB.Driver;
+using Microsoft.AspNetCore.Identity;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,11 +41,62 @@ Serilog.Log.Logger = new LoggerConfiguration()
 // Use Serilog for logging in the host
 builder.Host.UseSerilog();
 
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGenWithAuth();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 // Register MongoDB client and database
 builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
 {
     return new MongoClient(mongoConnectionString);
 });
+
+builder.Services.AddIdentity<ApiUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 2;
+        })
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthentication(options=>
+    {
+    options.DefaultAuthenticateScheme =
+    options.DefaultChallengeScheme = 
+    options.DefaultForbidScheme =
+    options.DefaultScheme=
+    options.DefaultSignInScheme=
+    options.DefaultSignOutScheme= JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>{
+        options.TokenValidationParameters=new TokenValidationParameters
+        {
+            ValidateIssuer=true,
+            ValidIssuer=builder.Configuration["JWT:Issuer"],
+            ValidateAudience=true,
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidateIssuerSigningKey=true,
+            IssuerSigningKey=new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])),
+        };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
+            foreach (var claim in claims)
+            {
+                Console.WriteLine(claim);  // Log claims to verify them
+            }
+            return Task.CompletedTask;
+        }
+    };
+    });
 
 builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
 {
@@ -56,29 +109,31 @@ builder.Services.AddAutoMapper(typeof(VudgifterProfile));
 builder.Services.AddAutoMapper(typeof(LogMappingProfile));
 // Add services to the container
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGenWithAuth();
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-        };
 
-        // Prevent default claim mapping
-        options.MapInboundClaims = false;
-    });
+builder.Services.AddAuthorization();
+
+//Old code
+
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//             ValidAudience = builder.Configuration["Jwt:Audience"],
+//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+//         };
+
+//         // Prevent default claim mapping
+//         options.MapInboundClaims = false;
+//     });
 builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
 builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
-builder.Services.AddScoped<IBrugerService, BrugerService>();
+//builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
 
 //Build Budgets
@@ -88,7 +143,7 @@ builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
 
 builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
 builder.Services.AddScoped<IKategori, KategoriRepo>();
-builder.Services.AddScoped<TokenProvider>();
+//builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
@@ -108,6 +163,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
