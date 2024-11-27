@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRJ4.Data;
 
@@ -11,9 +12,11 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241126094947_Add_Inheritance_to_IdentityDB")]
+    partial class Add_Inheritance_to_IdentityDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,34 +256,6 @@ namespace PRJ4.Migrations
                     b.ToTable("Brugers");
                 });
 
-            modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
-                {
-                    b.Property<int>("FindtægtId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FindtægtId"));
-
-                    b.Property<int>("BrugerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("Dato")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Indtægt")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Tekst")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("FindtægtId");
-
-                    b.HasIndex("BrugerId");
-
-                    b.ToTable("Findtægter");
-                });
-
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
                     b.Property<int>("FudgiftId")
@@ -383,17 +358,6 @@ namespace PRJ4.Migrations
                     b.ToTable("Vudgifters");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
-                {
-                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
-                        .WithMany()
-                        .HasForeignKey("BrugerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bruger");
-=======
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -443,7 +407,6 @@ namespace PRJ4.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
->>>>>>> feature/bruger_add_validator
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
