@@ -5,7 +5,7 @@
 namespace PRJ4.Migrations
 {
     /// <inheritdoc />
-    public partial class _003MadeChangesForIdentity : Migration
+    public partial class _002UpdatedFindtægterTekstToNotNull : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

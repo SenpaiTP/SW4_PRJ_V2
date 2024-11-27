@@ -9,6 +9,7 @@ namespace PRJ4.Models
         public string? FullName { get; set; }
 
         // Add more properties to get different user information
+        public ICollection<Findtægt> Findtægter { get; set; }
 
     }
 }

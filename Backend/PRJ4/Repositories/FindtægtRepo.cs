@@ -16,33 +16,40 @@ public class FindtægtRepo : IFindtægtRepo
         _context = context;
     }
 
-    public async Task<IEnumerable<FindtægtDTO>> GetFindtægterByUserIdAsync(int userId)
+    public async Task<IEnumerable<FindtægtResponseDTO>> GetFindtægterByUserIdAsync(string userId)
     {
         return await _context.Findtægter
-            .Where(f => f.FindtægtId == userId)
-            .Select(f => new FindtægtDTO
+            .Where(f => f.BrugerId == userId)
+            .Select(f => new FindtægtResponseDTO
             {
                 // Map properties here
+                FindtægtId = f.FindtægtId,
+                Indtægt = f.Indtægt,
+                Tekst = f.Tekst,
+                Dato = f.Dato
             })
             .ToListAsync();
     }
 
-    public async Task<Findtægt> CreateFindtægtAsync(int userId, FindtægtCreateDTO findtægtCreateDTO)
+    public async Task<Findtægt> CreateFindtægtAsync(string userId, FindtægtCreateDTO findtægtCreateDTO)
     {
         var findtægt = new Findtægt
         {
-            FindtægtId = userId,
+            BrugerId = userId,
             // Map properties from findtægtCreateDTO
+            Indtægt = findtægtCreateDTO.Indtægt,
+            Tekst = findtægtCreateDTO.Tekst,
+            Dato = findtægtCreateDTO.Dato
         };
         _context.Findtægter.Add(findtægt);
         await _context.SaveChangesAsync();
         return findtægt;
     }
 
-    public async Task<bool> UpdateFindtægtAsync(int userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
+    public async Task<bool> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
     {
         var findtægt = await _context.Findtægter
-            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.FindtægtId == userId);
+            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.BrugerId == userId);
         if (findtægt == null)
         {
             return false;
@@ -52,10 +59,10 @@ public class FindtægtRepo : IFindtægtRepo
         return true;
     }
 
-    public async Task<bool> DeleteFindtægtAsync(int userId, int id)
+    public async Task<bool> DeleteFindtægtAsync(string userId, int id)
     {
         var findtægt = await _context.Findtægter
-            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.FindtægtId == userId);
+            .FirstOrDefaultAsync(f => f.FindtægtId == id && f.BrugerId == userId);
         if (findtægt == null)
         {
             return false;

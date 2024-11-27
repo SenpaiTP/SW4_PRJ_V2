@@ -15,17 +15,17 @@ public class FindtægtService : IFindtægtService
         _findtægtRepo = findtægtRepo;
     }
 
-    public async Task<Findtægt> CreateFindtægtAsync(int userId, FindtægtCreateDTO findtægtCreateDTO)
+    public async Task<Findtægt> CreateFindtægtAsync(string userId, FindtægtCreateDTO findtægtCreateDTO)
     {
         return await _findtægtRepo.CreateFindtægtAsync(userId, findtægtCreateDTO);
     }
 
-    public async Task<bool> UpdateFindtægtAsync(int userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
+    public async Task<bool> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
     {
         return await _findtægtRepo.UpdateFindtægtAsync(userId, id, findtægtUpdateDTO);
     }
 
-    public async Task<bool> DeleteFindtægtAsync(int userId, int id)
+    public async Task<bool> DeleteFindtægtAsync(string userId, int id)
     {
         return await _findtægtRepo.DeleteFindtægtAsync(userId, id);
     }

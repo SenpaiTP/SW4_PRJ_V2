@@ -8,8 +8,8 @@ namespace PRJ4.Services
 {
     public interface IFindtægtService
     {
-        Task<Findtægt> CreateFindtægtAsync(int userId, FindtægtCreateDTO findtægtCreateDTO);
-        Task<bool> UpdateFindtægtAsync(int userId, int id, FindtægtUpdateDTO findtægtUpdateDTO);
-        Task<bool> DeleteFindtægtAsync(int userId, int id);
+        Task<Findtægt> CreateFindtægtAsync(string userId, FindtægtCreateDTO findtægtCreateDTO);
+        Task<bool> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO);
+        Task<bool> DeleteFindtægtAsync(string userId, int id);
     }
 }

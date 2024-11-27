@@ -96,17 +96,6 @@ builder.Services.AddAuthentication(options=>
         }
     };
     });
-<<<<<<< HEAD
-builder.Services.AddScoped<IBrugerRepo,BrugerRepo>(); // Add the BrugerRepo to the service container
-builder.Services.AddScoped<ITemplateRepo<Bruger>,BrugerRepo>(); // Add the BrugerRepo to the service container
-builder.Services.AddScoped<IBrugerService,BrugerService>();
-builder.Services.AddScoped<IFudgifter,FudgifterRepo>();
-builder.Services.AddScoped<IVudgifter,VudgifterRepo>();
-builder.Services.AddScoped<IFindtægtRepo,FindtægtRepo>();
-builder.Services.AddScoped<IFindtægtService, FindtægtService>();
-builder.Services.AddScoped<IKategori,KategoriRepo>();
-builder.Services.AddScoped<TokenProvider>();
-=======
 
 builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
 {
@@ -114,8 +103,8 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     return client.GetDatabase(mongoDatabaseName);
 });
 //Register mapping profiles
-builder.Services.AddAutoMapper(typeof(FudgifterProfile));
-builder.Services.AddAutoMapper(typeof(VudgifterProfile));
+//builder.Services.AddAutoMapper(typeof(FudgifterProfile));
+//builder.Services.AddAutoMapper(typeof(VudgifterProfile));
 builder.Services.AddAutoMapper(typeof(LogMappingProfile));
 // Add services to the container
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
@@ -144,13 +133,14 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
 builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
 //builder.Services.AddScoped<IBrugerService, BrugerService>();
-builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
-builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
+//builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
+//builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
 builder.Services.AddScoped<IKategori, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
->>>>>>> feature/bruger_add_validator
-builder.Services.AddScoped<IFudgifterService,FudgifterService>();
-builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+builder.Services.AddScoped<IFindtægtService, FindtægtService>();
+//builder.Services.AddScoped<IFudgifterService,FudgifterService>();
+//builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
