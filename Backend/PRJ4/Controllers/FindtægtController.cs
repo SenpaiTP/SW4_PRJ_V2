@@ -77,8 +77,8 @@ public class FindtægtController:ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteFindtægt(int id)
+    [HttpDelete()]
+    public async Task<IActionResult> DeleteFindtægt([FromQuery]int id)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
