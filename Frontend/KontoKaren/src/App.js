@@ -15,6 +15,9 @@
   import ForgotPassword from './Pages/Login/ForgotPassword';
   import ResetPassword from './Pages/Login/ResetPassword';
 
+  // Indstillinger page
+  import Indstillinger from './Pages/Indstillinger/Indstillinger';
+
   // Logged In Test
   import LoggedInPage from './Pages/LoggedInPage/test';
 
@@ -32,6 +35,7 @@
             <Route path="/ResetPassword" element={<ResetPassword />} />
             <Route path="/user-dashboard" element={<LoggedInPage />} />
             <Route path="/Budget" element={<Budget />} />
+            <Route path="/Indstillinger" element={<Indstillinger />} />
           </Routes>
         </div>
       </Router>
