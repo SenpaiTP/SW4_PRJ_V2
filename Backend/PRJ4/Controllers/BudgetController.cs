@@ -2,14 +2,27 @@ using PRJ4.Models;
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using PRJ4.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace PRJ4.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class budgetController : ControllerBase
 {
+    private string GetUserId()
+    {
+        var claims = Request.HttpContext.User.Claims;
+        var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last() == "nameidentifier");
+        if(userIdClaim.Value != null)
+        {
+            return userIdClaim.Value;
+        }
+        return null;
+    }
     private readonly IBudgetGoalService _budgetGoalService;
     public budgetController(IBudgetGoalService budgetService)
     {
@@ -33,18 +46,21 @@ public class budgetController : ControllerBase
     }
 
     // GET: api/budget/{userId}
-    [HttpGet("user/{userId}")]
-    public async Task<List<BudgetResponseDTO>> GetBudgetsByUserId(int userId)
+    [HttpGet("user")]
+    public async Task<List<BudgetResponseDTO>> GetBudgetsByUserId()
     {
-        var budget = await _budgetGoalService.GetByUserIdBudgetGoalAsync(userId); 
+        var user = GetUserId();
+        var budget = await _budgetGoalService.GetByUserIdBudgetGoalAsync(user); 
         return budget; 
     }
 
     // POST
     [HttpPost] 
-    public async Task<BudgetCreateDTO> AddBudget(int brugerId, BudgetCreateDTO budgetDTO) 
+    public async Task<BudgetCreateDTO> AddBudget(BudgetCreateDTO budgetDTO) 
     {
-        var budget = await _budgetGoalService.AddBudgetGoalAsync(brugerId, budgetDTO); 
+        var user = GetUserId();
+    
+        var budget = await _budgetGoalService.AddBudgetGoalAsync(user, budgetDTO); 
         
         return budget;
     }

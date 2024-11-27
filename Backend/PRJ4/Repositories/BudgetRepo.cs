@@ -12,7 +12,7 @@ public class BudgetRepo: TemplateRepo<Budget>, IBudgetRepo
         _context = context;
     }
 
-    public async Task<List<Budget>> GetBudgetsForUserAsync(int userId)
+    public async Task<List<Budget>> GetBudgetsForUserAsync(string userId)
     {
         return await _context.Budgets
             .Where(b => b.BrugerId == userId)

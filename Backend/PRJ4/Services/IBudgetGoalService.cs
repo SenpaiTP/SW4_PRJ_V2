@@ -8,8 +8,8 @@ namespace PRJ4.Services
     {
         Task<List<BudgetResponseDTO>> GetAllBudgetGoalsAsync();
         Task<BudgetResponseDTO> GetByIdBudgetGoalAsync(int id);
-        Task<List<BudgetResponseDTO>> GetByUserIdBudgetGoalAsync(int userId);
-        Task<BudgetCreateDTO> AddBudgetGoalAsync(int brugerId, BudgetCreateDTO budgetDTO);
+        Task<List<BudgetResponseDTO>> GetByUserIdBudgetGoalAsync(string userId);
+        Task<BudgetCreateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateDTO budgetDTO);
         Task<BudgetCreateDTO> UpdateBudgetGoalAsync(int id, BudgetCreateDTO budgetDTO);
         Task<BudgetCreateDTO> DeleteBudgetAsync(int id);
     }

@@ -11,7 +11,7 @@ public class BudgetCreateDTO
 public class BudgetResponseDTO
 {
     public int BudgetId { get; set; }
-    public int BrugerId { get; set; }
+    public string BrugerId { get; set; }
     public string BudgetName { get; set; }
     public int SavingsGoal { get; set; }
     public DateOnly BudgetSlut { get; set; }

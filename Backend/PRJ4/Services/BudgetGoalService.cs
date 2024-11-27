@@ -75,7 +75,7 @@ namespace PRJ4.Services
             return budgetReturn;
         }
 
-        public async Task<List<BudgetResponseDTO>> GetByUserIdBudgetGoalAsync(int userId)
+        public async Task<List<BudgetResponseDTO>> GetByUserIdBudgetGoalAsync(string userId)
         {
             var budgetListe = await _budgetRepository.GetBudgetsForUserAsync(userId);
             if (budgetListe == null || !budgetListe.Any())
@@ -110,13 +110,13 @@ namespace PRJ4.Services
         }
 
 
-        public async Task<BudgetCreateDTO> AddBudgetGoalAsync(int brugerId, BudgetCreateDTO budgetDTO)
+        public async Task<BudgetCreateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateDTO budgetDTO)
         {
             //Check if user exists
-            var bruger = await _brugerRepository.GetByIdAsync(brugerId);
+            //var bruger = await _brugerRepository.GetByIdAsync(brugerId);
             
-            if(bruger == null) 
-            {throw new ArgumentException($"Bruger med id {brugerId} findes ikke. ");}
+           // if(bruger == null) 
+           // {throw new ArgumentException($"Bruger med id {brugerId} findes ikke. ");}
             
             //Check budgetDTO
             if (budgetDTO == null) {throw new ArgumentException($"Budget med id {budgetDTO} findes ikke. ");}
