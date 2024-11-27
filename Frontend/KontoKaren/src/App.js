@@ -16,7 +16,7 @@
   import ResetPassword from './Pages/Login/ResetPassword';
 
   // Indstillinger page
-  import Indstillinger from './Pages/Indstillinger/ChangePassword';
+  import Indstillinger from './Pages/Indstillinger/Indstillinger';
 
   // Logged In Test
   import LoggedInPage from './Pages/LoggedInPage/test';
