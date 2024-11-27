@@ -29,24 +29,25 @@ namespace PRJ4.Controllers
             _logger = logger;
         }
 
-        private int GetUserId()
+        private string GetUserId()
         {
-            var brugerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
-            if (string.IsNullOrEmpty(brugerIdClaim) || !int.TryParse(brugerIdClaim, out int brugerId))
+            var claims = Request.HttpContext.User.Claims;
+            var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last() == "nameidentifier");
+            if(userIdClaim.Value != null)
             {
-                _logger.LogError("Invalid or missing user ID claim. ClaimValue: {BrugerIdClaim}", brugerIdClaim);
-                throw new UnauthorizedAccessException("Invalid or missing user ID claim.");
+                return userIdClaim.Value;
             }
-            _logger.LogDebug("Retrieved user ID: {BrugerId}", brugerId);
-            return brugerId;
+            return null;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VudgifterResponseDTO>>> GetAllByUser()
         {
+
+             string brugerId = GetUserId();
             try
             {
-                int brugerId = GetUserId();
+                //int brugerId = GetUserId();
                 _logger.LogInformation("Fetching all variable expenses for user with ID: {BrugerId} {Method}", brugerId, HttpContext.Request.Method);
                 var response = await _VudgifterService.GetAllByUser(brugerId);
                 return Ok(response);
@@ -63,7 +64,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Posting variable expense for user with ID {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
                 var response = await _VudgifterService.AddVudgifter(brugerId, dto);
                 return CreatedAtAction(nameof(GetAllByUser), new { id = response.VudgiftId }, response);
@@ -80,7 +81,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Updating  variable expense for user with ID {BrugerId}. {Method}", brugerId, HttpContext.Request.Method);
                 // If the updateDTO is empty, return a BadRequest response with a log
                 if (updateDTO == null || 
@@ -90,7 +91,7 @@ namespace PRJ4.Controllers
                     return BadRequest("No valid data provided for update.");
                 }
 
-                await _VudgifterService.UpdateVudgifter(id, brugerId, updateDTO);
+                await _VudgifterService.UpdateVudgifter( brugerId,id, updateDTO);
                 return NoContent();
             }
             catch (ArgumentException ex)
@@ -115,7 +116,7 @@ namespace PRJ4.Controllers
         {
             try
             {
-                int brugerId = GetUserId();
+                string brugerId = GetUserId();
                 _logger.LogInformation("Trying to delete variable expense {id} on UserId{brugerId}. {Method}", id, brugerId,HttpContext.Request.Method);
                 await _VudgifterService.DeleteVudgifter(brugerId, id);
                 return NoContent();

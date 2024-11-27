@@ -7,9 +7,9 @@ namespace PRJ4.Services
     public interface IVudgifterService
     {
         // Define methods related to "Fudgifter"
-        Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(int brugerId);
-        Task<VudgifterResponseDTO> AddVudgifter(int brugerId, nyVudgifterDTO dto);
-        Task UpdateVudgifter(int brugerId, int id, VudgifterUpdateDTO dto);
-        Task DeleteVudgifter(int brugerId, int id);
+        Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(string brugerId);
+        Task<VudgifterResponseDTO> AddVudgifter(string brugerId, nyVudgifterDTO dto);
+        Task UpdateVudgifter(string brugerId, int id, VudgifterUpdateDTO dto);
+        Task DeleteVudgifter(string brugerId, int id);
     }
 }
