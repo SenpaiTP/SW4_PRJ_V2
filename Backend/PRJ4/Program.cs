@@ -8,9 +8,9 @@ using MongoDB.Driver;
 using PRJ4.Repositories;
 using PRJ4.Data;
 using PRJ4.Models;
-//using PRJ4.Infrastructure;
-using PRJ4.ServiceCollectionExtension;
 using PRJ4.Services;
+using PRJ4.Infrastructure;
+using PRJ4.ServiceCollectionExtension;
 using PRJ4.Mappings;
 using Serilog;
 using Serilog.Events;
@@ -140,6 +140,12 @@ builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
 builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
 //builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
+
+//Build Budgets
+builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
+builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
+builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
+
 builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
 builder.Services.AddScoped<IKategori, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();

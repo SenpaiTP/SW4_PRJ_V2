@@ -11,6 +11,6 @@ namespace PRJ4.Models
         // Add more properties to get different user information
         public virtual ICollection<Vudgifter> Vudgifters { get; set; } = new List<Vudgifter>();
         public virtual ICollection<Fudgifter> Fudgifters { get; set; } = new List<Fudgifter>();
-
+        public ICollection<Budget>? Budgets { get; set; }
     }
 }
