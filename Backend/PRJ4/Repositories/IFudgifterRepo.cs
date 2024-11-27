@@ -10,6 +10,6 @@ namespace PRJ4.Repositories
 {
     public interface IFudgifter:ITemplateRepo<Fudgifter>
     {
-        Task<IEnumerable<Fudgifter>> GetAllByUserId(int brugerId);
+        Task<IEnumerable<Fudgifter>> GetAllByUserId(string brugerId);
     }
 }
