@@ -20,12 +20,12 @@ public class FindtægtService : IFindtægtService
         return await _findtægtRepo.CreateFindtægtAsync(userId, findtægtCreateDTO);
     }
 
-    public async Task<bool> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
+    public async Task<Findtægt> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
     {
         return await _findtægtRepo.UpdateFindtægtAsync(userId, id, findtægtUpdateDTO);
     }
 
-    public async Task<bool> DeleteFindtægtAsync(string userId, int id)
+    public async Task<Findtægt> DeleteFindtægtAsync(string userId, int id)
     {
         return await _findtægtRepo.DeleteFindtægtAsync(userId, id);
     }

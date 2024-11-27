@@ -2,10 +2,16 @@
 using PRJ4.Data;
 using PRJ4.Models;
 using PRJ4.DTOs;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
+using System.Net.NetworkInformation;
 
 public class FindtægtRepo : IFindtægtRepo
 {
@@ -46,29 +52,32 @@ public class FindtægtRepo : IFindtægtRepo
         return findtægt;
     }
 
-    public async Task<bool> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
+    public async Task<Findtægt> UpdateFindtægtAsync(string userId, int id, FindtægtUpdateDTO findtægtUpdateDTO)
     {
         var findtægt = await _context.Findtægter
             .FirstOrDefaultAsync(f => f.FindtægtId == id && f.BrugerId == userId);
         if (findtægt == null)
         {
-            return false;
+            throw new KeyNotFoundException("Findtægt not found");
         }
         // Update properties from findtægtUpdateDTO
+        findtægt.Indtægt = findtægtUpdateDTO.Indtægt;
+        findtægt.Tekst = findtægtUpdateDTO.Tekst;
+        findtægt.Dato = findtægtUpdateDTO.Dato;
         await _context.SaveChangesAsync();
-        return true;
+        return findtægt;
     }
 
-    public async Task<bool> DeleteFindtægtAsync(string userId, int id)
+    public async Task<Findtægt> DeleteFindtægtAsync(string userId, int id)
     {
         var findtægt = await _context.Findtægter
             .FirstOrDefaultAsync(f => f.FindtægtId == id && f.BrugerId == userId);
         if (findtægt == null)
         {
-            return false;
+            throw new KeyNotFoundException("Findtægt not found");
         }
         _context.Findtægter.Remove(findtægt);
         await _context.SaveChangesAsync();
-        return true;
+        return findtægt;
     }
 }

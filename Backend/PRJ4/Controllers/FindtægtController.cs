@@ -59,8 +59,9 @@ public class FindtægtController:ControllerBase
         return CreatedAtAction(nameof(GetFindtægter), new { id = findtægt.FindtægtId }, findtægt);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateFindtægt(int id, FindtægtUpdateDTO findtægtUpdateDTO)
+    [HttpPut]
+    
+    public async Task<IActionResult> UpdateFindtægt([FromQuery] int findid, FindtægtUpdateDTO findtægtUpdateDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
@@ -68,8 +69,8 @@ public class FindtægtController:ControllerBase
         {
             return BadRequest("Invalid user ID");
         }
-        var result = await _findtægtservice.UpdateFindtægtAsync(userIdClaim.Value, id, findtægtUpdateDTO);
-        if (!result)
+        var result = await _findtægtservice.UpdateFindtægtAsync(userIdClaim.Value, findid, findtægtUpdateDTO);
+        if (result == null)
         {
             return NotFound();
         }
@@ -86,7 +87,7 @@ public class FindtægtController:ControllerBase
             return BadRequest("Invalid user ID");
         }
         var result = await _findtægtservice.DeleteFindtægtAsync(userIdClaim.Value, id);
-        if (!result)
+        if (result == null)
         {
             return NotFound();
         }
