@@ -261,7 +261,11 @@ namespace PRJ4.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FudgiftId"));
 
-                    b.Property<int>("BrugerId")
+                    b.Property<string>("BrugerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("BrugerId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("Dato")
@@ -279,6 +283,8 @@ namespace PRJ4.Migrations
                     b.HasKey("FudgiftId");
 
                     b.HasIndex("BrugerId");
+
+                    b.HasIndex("BrugerId1");
 
                     b.HasIndex("KategoriId");
 
@@ -331,7 +337,11 @@ namespace PRJ4.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VudgiftId"));
 
-                    b.Property<int>("BrugerId")
+                    b.Property<string>("BrugerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("BrugerId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("Dato")
@@ -349,6 +359,8 @@ namespace PRJ4.Migrations
                     b.HasKey("VudgiftId");
 
                     b.HasIndex("BrugerId");
+
+                    b.HasIndex("BrugerId1");
 
                     b.HasIndex("KategoriId");
 
@@ -408,11 +420,15 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
-                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
                         .WithMany("Fudgifters")
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PRJ4.Models.Bruger", null)
+                        .WithMany("Fudgifters")
+                        .HasForeignKey("BrugerId1");
 
                     b.HasOne("PRJ4.Models.Kategori", "Kategori")
                         .WithMany()
@@ -427,11 +443,15 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
                 {
-                    b.HasOne("PRJ4.Models.Bruger", "Bruger")
+                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
                         .WithMany("Vudgifters")
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PRJ4.Models.Bruger", null)
+                        .WithMany("Vudgifters")
+                        .HasForeignKey("BrugerId1");
 
                     b.HasOne("PRJ4.Models.Kategori", "Kategori")
                         .WithMany()
@@ -440,6 +460,13 @@ namespace PRJ4.Migrations
                     b.Navigation("Bruger");
 
                     b.Navigation("Kategori");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.ApiUser", b =>
+                {
+                    b.Navigation("Fudgifters");
+
+                    b.Navigation("Vudgifters");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Bruger", b =>
