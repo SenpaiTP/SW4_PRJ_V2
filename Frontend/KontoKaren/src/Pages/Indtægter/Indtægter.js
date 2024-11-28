@@ -1,7 +1,7 @@
 import React, { useState } from "react"; // Sørg for at importere useState
 import { Container, Typography } from "@mui/material";
-import PieChart from "./PieChart";
-import IndtægterTabel from "./IndtægterTabel"; // Importer tabellen
+import PieChart from "../../Components/IndtægterComponents/PieChart/PieChart";
+import IndtægterTabel from "../../Components/IndtægterComponents/IndtægterTabel"; // Importer tabellen
 import { DateRange } from "@mui/icons-material";
 
 // Eksempeldata til tabellen

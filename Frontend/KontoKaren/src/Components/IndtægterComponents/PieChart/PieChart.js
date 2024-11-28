@@ -20,6 +20,8 @@ export default function PieChart({ chartData }) {
     ],
   };
 
+
+
   return (
     <div>
       <Pie data={data} />

@@ -3,7 +3,7 @@
   import Homepage from './Pages/Homepage';
 
   //import Login from './Pages/Login/Login';
-  import Header from './Components/Header/Header';
+  import Header from './Components/HeaderComponents/Header';
   import Indtægter from './Pages/Indtægter/Indtægter';
 
   // Budget Page
