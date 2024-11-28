@@ -12,12 +12,13 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.NetworkInformation;
+using PRJ4.Repositories;
 
-public class FindtægtRepo : IFindtægtRepo
+public class FindtægtRepo : TemplateRepo<Findtægt>, IFindtægtRepo
 {
     private readonly ApplicationDbContext _context;
 
-    public FindtægtRepo(ApplicationDbContext context)
+    public FindtægtRepo(ApplicationDbContext context) : base(context)
     {
         _context = context;
     }
@@ -26,13 +27,16 @@ public class FindtægtRepo : IFindtægtRepo
     {
         return await _context.Findtægter
             .Where(f => f.BrugerId == userId)
+            .Include(f => f.Kategori)
             .Select(f => new FindtægtResponseDTO
             {
                 // Map properties here
                 FindtægtId = f.FindtægtId,
                 Indtægt = f.Indtægt,
                 Tekst = f.Tekst,
-                Dato = f.Dato
+                Dato = f.Dato,
+                KategoriNavn = f.Kategori.KategoriNavn,
+                KategoriId = f.KategoriId
             })
             .ToListAsync();
     }
@@ -45,6 +49,8 @@ public class FindtægtRepo : IFindtægtRepo
             // Map properties from findtægtCreateDTO
             Indtægt = findtægtCreateDTO.Indtægt,
             Tekst = findtægtCreateDTO.Tekst,
+            Kategori = await _context.Kategorier.FirstOrDefaultAsync(k => k.KategoriNavn == findtægtCreateDTO.KategoriNavn),
+            KategoriId = findtægtCreateDTO.KategoriId,
             Dato = findtægtCreateDTO.Dato
         };
         _context.Findtægter.Add(findtægt);
@@ -64,6 +70,8 @@ public class FindtægtRepo : IFindtægtRepo
         findtægt.Indtægt = findtægtUpdateDTO.Indtægt;
         findtægt.Tekst = findtægtUpdateDTO.Tekst;
         findtægt.Dato = findtægtUpdateDTO.Dato;
+        findtægt.Kategori = await _context.Kategorier.FirstOrDefaultAsync(k => k.KategoriNavn == findtægtUpdateDTO.KategoriNavn);
+        findtægt.KategoriId = findtægtUpdateDTO.KategoriId;
         await _context.SaveChangesAsync();
         return findtægt;
     }

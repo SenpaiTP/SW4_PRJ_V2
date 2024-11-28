@@ -3,8 +3,9 @@ using PRJ4.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PRJ4.DTOs;
+using PRJ4.Repositories;
 
-public interface IFindtægtRepo
+public interface IFindtægtRepo: ITemplateRepo<Findtægt>
 {
     // ...existing code...
     Task<IEnumerable<FindtægtResponseDTO>> GetFindtægterByUserIdAsync(string userId);
