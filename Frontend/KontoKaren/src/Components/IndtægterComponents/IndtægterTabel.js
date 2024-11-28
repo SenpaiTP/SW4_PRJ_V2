@@ -15,30 +15,22 @@ import TableHeader from "./PieChart/TableHeader";
 import PieChart from "./PieChart/PieChart";
 import { createData, initialRows } from "./Table/TableData";
 
+import AddIncomeDialog from "./AddIncomeDialog";
+
 // useIntægterHooks hooken
 function useIntægterHooks(initialRows) {
   const [rows, setRows] = useState(initialRows);
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [newRow, setNewRow] = useState({
-    id: "",
-    name: "",
-    price: "",
-    date: "",
-  });
 
-  const chartData = rows.map((row) => ({
-    name: row.name,
-    price: row.price,
-  }));
-
-  const handleAddRow = () => {
+  // Tilføj ny række med data fra dialogen
+  const handleAddRow = (newIncome) => {
     const newRow = createData(
       rows.length + 1,
-      prompt("Indtægtsnavn:"),
-      prompt("Pris:"),
-      prompt("Dato (YYYY-MM-DD):")
+      newIncome.name,
+      newIncome.price,
+      newIncome.date
     );
     setRows([...rows, newRow]);
   };
@@ -109,10 +101,10 @@ function useIntægterHooks(initialRows) {
     handleClick,
     handleChangePage,
     handleChangeRowsPerPage,
-    handleAddRow,
     handleEditRow,
     handleDeleteRow,
     handleSave,
+    handleAddRow, // vi eksponerer handleAddRow her
   };
 }
 
@@ -135,6 +127,16 @@ export default function IndtægterTabel() {
     name: row.name,
     price: row.price,
   }));
+
+  const [open, setOpen] = useState(false); // Styre om dialogen er åben
+
+  const handleClickOpen = () => setOpen(true); // Åbn dialogen
+  const handleClose = () => setOpen(false); // Luk dialogen
+
+  const handleAddIncome = (newIncome) => {
+    handleAddRow(newIncome); // Tilføj den nye indtægt til tabellen
+    setOpen(false); // Luk dialogen
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -166,7 +168,7 @@ export default function IndtægterTabel() {
       <Button
         variant="contained"
         aligned="right"
-        onClick={handleAddRow}
+        onClick={handleClickOpen} // Åbn dialogen
         sx={{ marginTop: 2, marginRight: 2 }}
       >
         Tilføj ny Indtægt
@@ -180,6 +182,12 @@ export default function IndtægterTabel() {
       >
         Gem
       </Button>
+
+      <AddIncomeDialog
+        open={open}
+        handleClose={handleClose}
+        handleSave={handleAddIncome} // Når brugeren gemmer, send data til handleAddRow
+      />
 
       <PieChart chartData={chartData} />
     </Box>
