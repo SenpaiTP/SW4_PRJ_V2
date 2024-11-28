@@ -1,10 +1,17 @@
 import React, { useState } from "react";
-import { Box, Paper, Table, TableContainer, IconButton } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {
+  Box,
+  Paper,
+  Table,
+  TableContainer,
+  IconButton,
+  Button,
+  TableCell,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
 
 import TableBody from "./Table/TableBody";
 import TableHeader from "./PieChart/TableHeader";
-import TableActionMenu from "./Table/TableActionMenu";
 import TablePage from "./Table/TablePage";
 import PieChart from "./PieChart/PieChart";
 import { createData, initialRows } from "./Table/TableData";
@@ -12,26 +19,20 @@ import { createData, initialRows } from "./Table/TableData";
 // useIntægterHooks hooken
 function useIntægterHooks(initialRows) {
   const [rows, setRows] = useState(initialRows);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selected, setSelected] = useState([]);
-  const [selectedRow, setSelectedRow] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [newRow, setNewRow] = useState({
+    id: "",
+    name: "",
+    price: "",
+    date: "",
+  });
 
   const chartData = rows.map((row) => ({
     name: row.name,
     price: row.price,
   }));
-
-  const handleClickMenu = (event, row) => {
-    setAnchorEl(event.currentTarget); // Åbner menuen
-    setSelectedRow(row); // Gem den række, der er knyttet til denne menu
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null); // Lukker menuen
-    setSelectedRow(null); // Rydder valgt række
-  };
 
   const handleAddRow = () => {
     const newRow = createData(
@@ -40,46 +41,34 @@ function useIntægterHooks(initialRows) {
       prompt("Pris:"),
       prompt("Dato (YYYY-MM-DD):")
     );
-    setRows([...rows, newRow]); // Tilføjer en ny række
-    handleCloseMenu(); // Lukker menuen
+    setRows([...rows, newRow]);
   };
 
-  const handleEditRow = () => {
-    if (selectedRow) {
-      const newName = prompt("Rediger navn:", selectedRow.name);
-      const newPrice = prompt("Rediger pris:", selectedRow.price);
-      const newDate = prompt("Rediger dato (YYYY-MM-DD):", selectedRow.date);
+  const handleEditRow = (row) => {
+    const updatedName = prompt("Rediger navn:", row.name);
+    const updatedPrice = prompt("Rediger pris:", row.price);
+    const updatedDate = prompt("Rediger dato (YYYY-MM-DD):", row.date);
 
-      if (newName && newPrice && newDate) {
-        setRows((prevRows) =>
-          prevRows.map((row) =>
-            row.id === selectedRow.id
-              ? {
-                  ...row,
-                  name: newName,
-                  price: parseFloat(newPrice),
-                  date: newDate,
-                }
-              : row
-          )
-        );
-      }
+    if (updatedName && updatedPrice && updatedDate) {
+      setRows((prevRows) =>
+        prevRows.map((r) =>
+          r.id === row.id
+            ? { ...r, name: updatedName, price: updatedPrice, date: updatedDate }
+            : r
+        )
+      );
     }
-    handleCloseMenu(); // Lukker menuen
   };
 
-  const handleDeleteRow = () => {
-    if (selectedRow) {
-      setRows(rows.filter((row) => row.id !== selectedRow.id)); // Slet den valgte række
-    }
-    handleCloseMenu(); // Lukker menuen
+  const handleDeleteRow = (id) => {
+    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      setSelected(rows.map((n) => n.id)); // Vælg alle rækker
+      setSelected(rows.map((n) => n.id));
     } else {
-      setSelected([]); // Fjern markeringen af alle rækker
+      setSelected([]);
     }
   };
 
@@ -89,37 +78,31 @@ function useIntægterHooks(initialRows) {
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
+    } else {
+      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
-    setSelected(newSelected); // Opdaterer de valgte rækker
+    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage); // Opdaterer den aktuelle side i pagineringen
+    setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10)); // Ændrer antallet af rækker pr. side
-    setPage(0); // Nulstiller siden til 0
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSave = () => {
+    localStorage.setItem("rows", JSON.stringify(rows));
+    alert("Ændringerne er gemt!");
   };
 
   return {
     rows,
     setRows,
-    anchorEl,
-    setAnchorEl,
     selected,
     setSelected,
-    selectedRow,
-    setSelectedRow,
     page,
     setPage,
     rowsPerPage,
@@ -131,24 +114,16 @@ function useIntægterHooks(initialRows) {
     handleAddRow,
     handleEditRow,
     handleDeleteRow,
+    handleSave,
   };
 }
 
-// IndtægterTabel komponenten
 export default function IndtægterTabel() {
   const {
     rows,
-    setRows,
-    anchorEl,
-    setAnchorEl,
     selected,
-    setSelected,
-    selectedRow,
-    setSelectedRow,
     page,
-    setPage,
     rowsPerPage,
-    setRowsPerPage,
     handleSelectAllClick,
     handleClick,
     handleChangePage,
@@ -156,6 +131,7 @@ export default function IndtægterTabel() {
     handleAddRow,
     handleEditRow,
     handleDeleteRow,
+    handleSave,
   } = useIntægterHooks(initialRows);
 
   const chartData = rows.map((row) => ({
@@ -163,26 +139,9 @@ export default function IndtægterTabel() {
     price: row.price,
   }));
 
-  const handleClickMenu = (event, row) => {
-    setAnchorEl(event.currentTarget); // Åbner menuen
-    setSelectedRow(row); // Gem den række, der er knyttet til denne menu
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null); // Lukker menuen
-    setSelectedRow(null); // Rydder valgt række
-  };
-
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2, position: "relative" }}>
-        <IconButton
-          onClick={(e) => setAnchorEl(e.currentTarget)}
-          sx={{ position: "absolute", zIndex: 1, top: 10, right: 10 }}
-        >
-          <MoreVertIcon />
-        </IconButton>
-
         <TableContainer>
           <Table>
             <TableHeader
@@ -196,17 +155,19 @@ export default function IndtægterTabel() {
               page={page}
               rowsPerPage={rowsPerPage}
               onRowClick={handleClick}
+              renderActions={(row) => (
+                <TableCell>
+                  <IconButton onClick={() => handleEditRow(row)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDeleteRow(row.id)}>
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              )}
             />
           </Table>
         </TableContainer>
-
-        <TableActionMenu
-          anchorEl={anchorEl}
-          onCloseMenu={handleCloseMenu}
-          onAddRow={handleAddRow}
-          onEditRow={handleEditRow}
-          onDeleteRow={handleDeleteRow}
-        />
 
         <TablePage
           count={rows.length}
@@ -215,6 +176,10 @@ export default function IndtægterTabel() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+
+        <Button variant="contained" onClick={handleSave} sx={{ marginTop: 2 }}>
+          Gem
+        </Button>
       </Paper>
       <PieChart chartData={chartData} />
     </Box>

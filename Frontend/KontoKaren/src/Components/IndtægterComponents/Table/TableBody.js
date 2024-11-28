@@ -1,38 +1,33 @@
-import React from "react";
-import { TableRow, TableCell, Checkbox } from "@mui/material";
+// Inside TableBody.js
+import React from 'react';
+import { TableRow, TableCell } from '@mui/material';
 
-export default function TableBody({
-  rows,
-  selected,
-  page,
-  rowsPerPage,
-  onRowClick,
-}) {
+const TableBody = ({ rows, selected, page, rowsPerPage, onRowClick, renderActions }) => {
+  const rowsToDisplay = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
   return (
     <>
-      {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-        const isSelected = selected.includes(row.id);
-        return (
-          <TableRow
-            hover
-            onClick={(event) => onRowClick(event, row.id)}
-            role="checkbox"
-            aria-checked={isSelected}
-            tabIndex={-1}
-            key={row.id}
-            selected={isSelected}
-          >
-            <TableCell padding="checkbox">
-              <Checkbox color="primary" checked={isSelected} />
-            </TableCell>
-            <TableCell>{row.name}</TableCell>
-            <TableCell align="right">{row.price}</TableCell>
-            <TableCell align="right">
-              {new Date(row.date).toLocaleDateString("da-DK")}
-            </TableCell>
-          </TableRow>
-        );
-      })}
+      {rowsToDisplay.map((row) => (
+        <TableRow
+          key={row.id}
+          selected={selected.indexOf(row.id) !== -1}
+          onClick={(e) => onRowClick(e, row.id)}
+        >
+          <TableCell padding="checkbox">
+            <input
+              type="checkbox"
+              checked={selected.indexOf(row.id) !== -1}
+              onChange={(e) => onRowClick(e, row.id)}
+            />
+          </TableCell>
+          <TableCell>{row.name}</TableCell>
+          <TableCell>{row.price}</TableCell>
+          <TableCell>{row.date}</TableCell>
+          {renderActions(row)} {/* Render the action buttons */}
+        </TableRow>
+      ))}
     </>
   );
-}
+};
+
+export default TableBody;

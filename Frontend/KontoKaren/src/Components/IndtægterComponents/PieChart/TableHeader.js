@@ -29,9 +29,9 @@ export default function TableHeader({
 
         {/* Kolonnehoveder */}
         <TableCell>Indtægtsnavn</TableCell>
-        <TableCell align="right">Beløb</TableCell>
-        <TableCell align="right">Dato</TableCell>
-        <TableCell align="right"></TableCell>
+        <TableCell align="middle">Beløb</TableCell>
+        <TableCell align="middle">Dato</TableCell>
+        <TableCell align="middle">Handlinger</TableCell>
       </TableRow>
     </TableHead>
   );
