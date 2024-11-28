@@ -63,13 +63,6 @@ function useIntægterHooks(initialRows) {
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      setSelected(rows.map((n) => n.id));
-    } else {
-      setSelected([]);
-    }
-  };
 
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
@@ -106,7 +99,6 @@ function useIntægterHooks(initialRows) {
     setPage,
     rowsPerPage,
     setRowsPerPage,
-    handleSelectAllClick,
     handleClick,
     handleChangePage,
     handleChangeRowsPerPage,
@@ -123,7 +115,6 @@ export default function IndtægterTabel() {
     selected,
     page,
     rowsPerPage,
-    handleSelectAllClick,
     handleClick,
     handleChangePage,
     handleChangeRowsPerPage,
@@ -146,7 +137,6 @@ export default function IndtægterTabel() {
             <TableHeader
               numSelected={selected.length}
               rowCount={rows.length}
-              onSelectAllClick={handleSelectAllClick}
             />
             <TableBody
               rows={rows}
