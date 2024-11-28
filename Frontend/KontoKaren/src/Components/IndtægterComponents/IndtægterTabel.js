@@ -12,7 +12,6 @@ import { Edit, Delete } from "@mui/icons-material";
 
 import TableBody from "./Table/TableBody";
 import TableHeader from "./PieChart/TableHeader";
-import TablePage from "./Table/TablePage";
 import PieChart from "./PieChart/PieChart";
 import { createData, initialRows } from "./Table/TableData";
 
@@ -168,14 +167,6 @@ export default function IndtægterTabel() {
             />
           </Table>
         </TableContainer>
-
-        <TablePage
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
 
         <Button variant="contained" onClick={handleSave} sx={{ marginTop: 2 }}>
           Gem
