@@ -52,7 +52,12 @@ function useIntægterHooks(initialRows) {
       setRows((prevRows) =>
         prevRows.map((r) =>
           r.id === row.id
-            ? { ...r, name: updatedName, price: updatedPrice, date: updatedDate }
+            ? {
+                ...r,
+                name: updatedName,
+                price: updatedPrice,
+                date: updatedDate,
+              }
             : r
         )
       );
@@ -63,7 +68,6 @@ function useIntægterHooks(initialRows) {
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
-
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
@@ -71,7 +75,10 @@ function useIntægterHooks(initialRows) {
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
     }
     setSelected(newSelected);
   };
@@ -134,10 +141,7 @@ export default function IndtægterTabel() {
       <Paper sx={{ width: "100%", mb: 2, position: "relative" }}>
         <TableContainer>
           <Table>
-            <TableHeader
-              numSelected={selected.length}
-              rowCount={rows.length}
-            />
+            <TableHeader numSelected={selected.length} rowCount={rows.length} />
             <TableBody
               rows={rows}
               selected={selected}
@@ -157,11 +161,26 @@ export default function IndtægterTabel() {
             />
           </Table>
         </TableContainer>
-
-        <Button variant="contained" onClick={handleSave} sx={{ marginTop: 2 }}>
-          Gem
-        </Button>
       </Paper>
+
+      <Button
+        variant="contained"
+        aligned="right"
+        onClick={handleAddRow}
+        sx={{ marginTop: 2, marginRight: 2 }}
+      >
+        Tilføj ny Indtægt
+      </Button>
+
+      <Button
+        variant="contained"
+        aligned="right"
+        onClick={handleSave}
+        sx={{ marginTop: 2, marginRight: 2 }}
+      >
+        Gem
+      </Button>
+
       <PieChart chartData={chartData} />
     </Box>
   );
