@@ -2,7 +2,6 @@ import React, { useState } from "react"; // Sørg for at importere useState
 import { Container, Typography } from "@mui/material";
 import PieChart from "../../Components/IndtægterComponents/PieChart/PieChart";
 import IndtægterTabel from "../../Components/IndtægterComponents/IndtægterTabel"; // Importer tabellen
-import { DateRange } from "@mui/icons-material";
 
 // Eksempeldata til tabellen
 const initialRows = [
@@ -15,15 +14,23 @@ function Indtægter() {
   // Brug useState for at definere rows i komponentens tilstand
   const [rows, setRows] = useState(initialRows);
 
+  const chartData = rows.map((row) => ({
+    name: row.name,
+    price: row.price,
+  }));
+
   return (
     <Container>
       <Typography variant="h1" component="h2">
         Welcome to Indtægter
       </Typography>
 
-      {/* Send rows data og setRows funktion som props til IndtægterTabel */}
       <IndtægterTabel data={rows} setData={setRows} />
+
+      //<PieChart chartData={chartData} />
+
     </Container>
+
   );
 }
 
