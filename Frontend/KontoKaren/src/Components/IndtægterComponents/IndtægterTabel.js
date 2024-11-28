@@ -11,20 +11,19 @@ import {
 import { Edit, Delete } from "@mui/icons-material";
 
 import TableBody from "./Table/TableBody";
-import TableHeader from "./PieChart/TableHeader";
+import TableHeader from "./Table/TableHeader";
 import PieChart from "./PieChart/PieChart";
 import { createData, initialRows } from "./Table/TableData";
 
-import AddIncomeDialog from "./AddIncomeDialog";
+import AddIncomeDialog from "./Dialog/AddIncomeDialog";
+import EditIncomeDialog from "./Dialog/EditIncomeDialog";  // Import EditIncomeDialog
 
-// useIntægterHooks hooken
 function useIntægterHooks(initialRows) {
   const [rows, setRows] = useState(initialRows);
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Tilføj ny række med data fra dialogen
   const handleAddRow = (newIncome) => {
     const newRow = createData(
       rows.length + 1,
@@ -35,25 +34,14 @@ function useIntægterHooks(initialRows) {
     setRows([...rows, newRow]);
   };
 
-  const handleEditRow = (row) => {
-    const updatedName = prompt("Rediger navn:", row.name);
-    const updatedPrice = prompt("Rediger pris:", row.price);
-    const updatedDate = prompt("Rediger dato (YYYY-MM-DD):", row.date);
-
-    if (updatedName && updatedPrice && updatedDate) {
-      setRows((prevRows) =>
-        prevRows.map((r) =>
-          r.id === row.id
-            ? {
-                ...r,
-                name: updatedName,
-                price: updatedPrice,
-                date: updatedDate,
-              }
-            : r
-        )
-      );
-    }
+  const handleEditRow = (newIncome) => {
+    setRows((prevRows) =>
+      prevRows.map((r) =>
+        r.id === newIncome.id
+          ? { ...r, name: newIncome.name, price: newIncome.price, date: newIncome.date }
+          : r
+      )
+    );
   };
 
   const handleDeleteRow = (id) => {
@@ -123,19 +111,32 @@ export default function IndtægterTabel() {
     handleSave,
   } = useIntægterHooks(initialRows);
 
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedIncome, setSelectedIncome] = useState(null);  // Store selected income for editing
+
   const chartData = rows.map((row) => ({
     name: row.name,
     price: row.price,
   }));
 
-  const [open, setOpen] = useState(false); // Styre om dialogen er åben
+  const handleClickOpenAdd = () => setOpenAddDialog(true);
+  const handleCloseAdd = () => setOpenAddDialog(false);
 
-  const handleClickOpen = () => setOpen(true); // Åbn dialogen
-  const handleClose = () => setOpen(false); // Luk dialogen
+  const handleClickOpenEdit = (row) => {
+    setSelectedIncome(row);  // Set the income to be edited
+    setOpenEditDialog(true);
+  };
+  const handleCloseEdit = () => setOpenEditDialog(false);
 
   const handleAddIncome = (newIncome) => {
-    handleAddRow(newIncome); // Tilføj den nye indtægt til tabellen
-    setOpen(false); // Luk dialogen
+    handleAddRow(newIncome);
+    setOpenAddDialog(false);
+  };
+
+  const handleEditIncome = (updatedIncome) => {
+    handleEditRow(updatedIncome);
+    setOpenEditDialog(false);
   };
 
   return (
@@ -149,10 +150,10 @@ export default function IndtægterTabel() {
               selected={selected}
               page={page}
               rowsPerPage={rowsPerPage}
-              onRowClick={handleClick}
+              onRowClick={handleClick}  
               renderActions={(row) => (
                 <TableCell>
-                  <IconButton onClick={() => handleEditRow(row)}>
+                  <IconButton onClick={() => handleClickOpenEdit(row)}>  
                     <Edit />
                   </IconButton>
                   <IconButton onClick={() => handleDeleteRow(row.id)}>
@@ -167,8 +168,7 @@ export default function IndtægterTabel() {
 
       <Button
         variant="contained"
-        aligned="right"
-        onClick={handleClickOpen} // Åbn dialogen
+        onClick={handleClickOpenAdd}  // This should trigger handleClickOpenAdd
         sx={{ marginTop: 2, marginRight: 2 }}
       >
         Tilføj ny Indtægt
@@ -176,7 +176,6 @@ export default function IndtægterTabel() {
 
       <Button
         variant="contained"
-        aligned="right"
         onClick={handleSave}
         sx={{ marginTop: 2, marginRight: 2 }}
       >
@@ -184,9 +183,16 @@ export default function IndtægterTabel() {
       </Button>
 
       <AddIncomeDialog
-        open={open}
-        handleClose={handleClose}
-        handleSave={handleAddIncome} // Når brugeren gemmer, send data til handleAddRow
+        open={openAddDialog}
+        handleClose={handleCloseAdd}
+        handleSave={handleAddIncome}
+      />
+
+      <EditIncomeDialog
+        open={openEditDialog}
+        handleClose={handleCloseEdit}
+        handleSave={handleEditIncome}
+        income={selectedIncome}
       />
 
       <PieChart chartData={chartData} />
