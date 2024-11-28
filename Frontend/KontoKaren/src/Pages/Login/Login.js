@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { getBoxStyles } from '../../Assets/Styles/boxStyles'; // Box styling
 import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // TextField styling
 
-function Login({ setUserName }) {
+// Added setUserFullName prop
+function Login({ setUserFullName }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -67,7 +68,7 @@ function Login({ setUserName }) {
         // If login is successful, store token in localStorage or cookies
         localStorage.setItem('authToken', data.token); // Assuming token is returned
 
-        // Fetch the user's name
+        // Fetch the user's full name
         const nameResponse = await fetch('http://localhost:5168/Account/WhoAmI', {
           headers: {
             'Authorization': `Bearer ${data.token}`
@@ -75,8 +76,8 @@ function Login({ setUserName }) {
         });
 
         if (nameResponse.ok) {
-          const name = await nameResponse.text();
-          setUserName(name);
+          const user = await nameResponse.json();
+          setUserFullName(user.fullName); // Set the user's full name
         }
 
         // Redirect to user site/dashboard
