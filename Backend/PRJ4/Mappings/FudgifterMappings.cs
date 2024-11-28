@@ -21,7 +21,7 @@ namespace PRJ4.Mappings
                 .ForMember(dest => dest.Pris, opt => opt.MapFrom(src => src.Pris))
                 .ForMember(dest => dest.Tekst, opt => opt.MapFrom(src => src.Tekst))
                 .ForMember(dest => dest.KategoriNavn, opt => opt.MapFrom(src =>
-                    src.Kategori != null ? src.Kategori.Navn : null))  // Null check instead of null-conditional operator
+                    src.Kategori != null ? src.Kategori.KategoriNavn : null))  // Null check instead of null-conditional operator
                 .ForMember(dest => dest.Dato, opt => opt.MapFrom(src => src.Dato));
 
             // Map for updating Fudgifter from FudgifterUpdateDTO (optional, for future updates)

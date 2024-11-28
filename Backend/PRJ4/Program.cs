@@ -141,7 +141,7 @@ builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
 builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
 builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
 builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
-builder.Services.AddScoped<IKategori, KategoriRepo>();
+builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();    
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();

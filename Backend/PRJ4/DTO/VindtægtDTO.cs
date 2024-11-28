@@ -7,6 +7,8 @@ namespace PRJ4.DTOs
         public decimal? Indtægt { get; set; }
         public string Tekst { get; set; }
         public DateTime? Dato { get; set; }
+        public string KategoriNavn { get; set; }
+        public int? KategoriId { get; set; }
         
     }
 
@@ -15,9 +17,8 @@ namespace PRJ4.DTOs
         public decimal? Indtægt { get; set; }
         public string Tekst { get; set; }
         public DateTime? Dato { get; set; }
-        // public int KategoriId { get; set; }
-        // public string KategoriNavn { get; set; }
-        // Optionally, you can include BrugerId, but it's probably better to use the authenticated user's ID in the backend
+        public string KategoriNavn { get; set; }
+        public int? KategoriId { get; set; }
     }
 
     public class VindtægtUpdateDTO
@@ -25,17 +26,18 @@ namespace PRJ4.DTOs
             public decimal? Indtægt { get; set; }  // Nullable to allow partial updates
             public string Tekst { get; set; }
             public DateTime? Dato { get; set; }
-            // public int? KategoriId { get; set; }
-            // public string? KategoriNavn { get; set; }
-            // Optionally, you can include BrugerId, but it's probably better to use the authenticated user's ID in the backend
+            public string KategoriNavn { get; set; }
+            public int? KategoriId { get; set; }
         }
 
-    public class VindtægtResponseDTO
-    {
-        public int VindtægtId { get; set; }
-        public decimal? Indtægt { get; set; }
-        public string Tekst { get; set; }
-        public DateTime? Dato { get; set; }
-        
-    }
+        public class VindtægtResponseDTO
+        {
+            public int VindtægtId { get; set; }
+            public decimal? Indtægt { get; set; }
+            public string Tekst { get; set; }
+            public DateTime? Dato { get; set; }
+            public string KategoriNavn { get; set; }
+            public int? KategoriId { get; set; }
+            
+        }
 }

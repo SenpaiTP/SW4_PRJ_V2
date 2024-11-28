@@ -12,15 +12,17 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.NetworkInformation;
+using PRJ4.Repositories;
+using PRJ4.Models;
 
-public class VindtægtRepo : IVindtægtRepo
+public class VindtægtRepo : TemplateRepo<Vindtægt>, IVindtægtRepo
 {
     private readonly ApplicationDbContext _context;
 
-    public VindtægtRepo(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+     public VindtægtRepo(ApplicationDbContext context) : base(context)
+        {
+            _context = context;
+        }
 
     public async Task<IEnumerable<VindtægtResponseDTO>> GetVindtægterByUserIdAsync(string userId)
     {
