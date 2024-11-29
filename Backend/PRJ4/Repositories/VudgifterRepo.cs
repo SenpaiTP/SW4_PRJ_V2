@@ -33,5 +33,29 @@ namespace PRJ4.Repositories
                 .ToListAsync();
         }
 
+         public async Task<IEnumerable<Vudgifter>> GetAllByCategory(string brugerId, int kategoryId)
+        {
+
+            return await _context.Vudgifters
+            .Where(v => v.KategoriId == kategoryId && v.BrugerId == brugerId)
+            .Include(v => v.Kategori) // Including the Kategori for reference
+            .ToListAsync();
+        }
+        public async Task<IEnumerable<Vudgifter>> GetAllByDate(string brugerId, DateTime from, DateTime end)
+        {
+            return await _context.Vudgifters
+                .Where(v => v.BrugerId == brugerId && v.Dato >= from && v.Dato <= end)
+                .Include(v => v.Kategori) // Including the Kategori for reference
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Vudgifter>> GetAllByCategoryADate(string brugerId, int kategoryId,DateTime from, DateTime end)
+        {
+            return await _context.Vudgifters
+                .Where(v => v.BrugerId == brugerId && v.Dato >= from && v.Dato <= end && v.KategoriId == kategoryId)
+                .Include(v => v.Kategori) // Including the Kategori for reference
+                .ToListAsync();
+        }
+
     }
 }
