@@ -12,7 +12,7 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241127102227_init")]
+    [Migration("20241127125615_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -256,6 +256,43 @@ namespace PRJ4.Migrations
                     b.ToTable("Brugers");
                 });
 
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.Property<int>("BudgetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+
+                    b.Property<string>("BrugerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("BrugerId1")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BudgetName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("BudgetSlut")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("BudgetStart")
+                        .HasColumnType("date");
+
+                    b.Property<int>("SavingsGoal")
+                        .HasColumnType("int");
+
+                    b.HasKey("BudgetId");
+
+                    b.HasIndex("BrugerId");
+
+                    b.HasIndex("BrugerId1");
+
+                    b.ToTable("Budgets");
+                });
+
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
                     b.Property<int>("FudgiftId")
@@ -421,6 +458,21 @@ namespace PRJ4.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
+                        .WithMany("Budgets")
+                        .HasForeignKey("BrugerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PRJ4.Models.Bruger", null)
+                        .WithMany("Budgets")
+                        .HasForeignKey("BrugerId1");
+
+                    b.Navigation("Bruger");
+                });
+
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -467,6 +519,8 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.ApiUser", b =>
                 {
+                    b.Navigation("Budgets");
+
                     b.Navigation("Fudgifters");
 
                     b.Navigation("Vudgifters");
@@ -474,6 +528,8 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Bruger", b =>
                 {
+                    b.Navigation("Budgets");
+
                     b.Navigation("Fudgifters");
 
                     b.Navigation("Vudgifters");
@@ -482,4 +538,3 @@ namespace PRJ4.Migrations
         }
     }
 }
-

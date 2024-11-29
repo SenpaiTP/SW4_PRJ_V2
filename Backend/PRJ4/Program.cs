@@ -130,8 +130,8 @@ builder.Services.AddAuthorization();
 //         // Prevent default claim mapping
 //         options.MapInboundClaims = false;
 //     });
-builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
-builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
+// builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
+// builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
 //builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
 

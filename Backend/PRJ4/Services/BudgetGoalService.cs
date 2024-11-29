@@ -7,13 +7,13 @@ namespace PRJ4.Services
     public class BudgetGoalService: IBudgetGoalService
     {
         private readonly IBudgetRepo _budgetRepository;
-        private readonly IBrugerRepo _brugerRepository;
+        //private readonly IBrugerRepo _brugerRepository;
 
 
-        public BudgetGoalService(IBudgetRepo budgetRepository, IBrugerRepo brugerRepository)
+        public BudgetGoalService(IBudgetRepo budgetRepository)
         {
             _budgetRepository = budgetRepository;
-            _brugerRepository = brugerRepository;
+            //_brugerRepository = brugerRepository;
 
         }
 
