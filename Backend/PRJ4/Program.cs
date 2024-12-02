@@ -140,6 +140,11 @@ builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
 builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
 
+//Build Kategory Limit
+builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();
+builder.Services.AddScoped<ITemplateRepo<KategoryLimit>,KategoryLimitRepo>();
+builder.Services.AddScoped<IKategoryLimitService,KategoryLimitService>();
+
 builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
 builder.Services.AddScoped<IKategori, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
