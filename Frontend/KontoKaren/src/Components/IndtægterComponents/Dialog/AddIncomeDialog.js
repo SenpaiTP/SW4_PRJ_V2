@@ -49,11 +49,11 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="secondary">
-          Annuller
-        </Button>
         <Button onClick={handleSubmit} color="primary">
           Gem
+        </Button>
+        <Button onClick={handleClose} color="secondary">
+          Annuller
         </Button>
       </DialogActions>
     </Dialog>

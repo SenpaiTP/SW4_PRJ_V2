@@ -57,11 +57,11 @@ export default function EditIncomeDialog({ open, handleClose, handleSave, income
         />
       </DialogContent>
       <DialogActions>
+      <Button onClick={handleSubmit} color="primary">
+          Gem
+        </Button>
         <Button onClick={handleClose} color="secondary">
           Annuller
-        </Button>
-        <Button onClick={handleSubmit} color="primary">
-          Gem
         </Button>
       </DialogActions>
     </Dialog>
