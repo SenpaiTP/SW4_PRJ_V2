@@ -1,7 +1,6 @@
 // AddIncomeDialog.js
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
-import dayjs from "dayjs"; // Importér dayjs for at kunne formatere datoer
 
 export default function AddIncomeDialog({ open, handleClose, handleSave }) {
   const [name, setName] = useState('');

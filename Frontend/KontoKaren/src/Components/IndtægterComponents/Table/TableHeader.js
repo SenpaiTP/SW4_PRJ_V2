@@ -3,15 +3,10 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  Checkbox,
-  IconButton,
 } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export default function TableHeader({
   numSelected,
-  rowCount,
-  onOpenMenu,
 }) {
   return (
     <TableHead>

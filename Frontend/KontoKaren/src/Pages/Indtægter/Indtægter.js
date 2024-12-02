@@ -14,7 +14,7 @@ function Indtægter() {
 
   return (
     <Container>
-      <Typography variant="h1" component="h2">
+      <Typography variant="h1" component="h2" padding ="10" align = "center">
         Welcome to Indtægter
       </Typography>
 

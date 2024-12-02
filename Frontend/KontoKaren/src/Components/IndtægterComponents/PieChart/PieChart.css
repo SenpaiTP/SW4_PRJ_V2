@@ -1,19 +1,15 @@
-
-
-
 .container {
   display: flex;
-  justify-content: flex-end; /* Placerer elementerne til højre */
-  align-items: center; /* Centrerer elementerne vertikalt */
-  height: 50vh; /* Gør containeren til at fylde hele højden af skærmen */
+  justify-content: center; /* Centrerer elementerne horisontalt */
+  align-items: flex-start; /* Justerer elementerne mod toppen */
+  height: 100vh; /* Fylder hele højden af skærmen */
   padding: 10px;
 }
 
 .chart-container {
-  width: 400px; /* Sætter bredden af pie-diagrammet */
-  height: 400px; /* Sætter højden af pie-diagrammet */
-  padding-left: 50px; /* Giver lidt ekstra afstand til venstre */
-
+  width: 400px; /* Bredden af pie-diagrammet */
+  height: 400px; /* Højden af pie-diagrammet */
+  padding-left: 50px; /* Ekstra afstand til venstre */
 }
 
 canvas {
@@ -23,8 +19,8 @@ canvas {
 
 .canvas-container {
   display: flex;
-  justify-content: right; /* Centrerer elementerne horisontalt */
-  align-items: center; /* Centrerer elementerne vertikalt */
-  height: 50vh; /* Gør containeren til at fylde hele højden af skærmen */
+  justify-content: center; /* Centrerer elementerne horisontalt */
+  align-items: flex-start; /* Justerer elementerne mod toppen */
+  height: 50vh; /* Fylder halvdelen af skærmens højde */
   padding: 10px;
 }

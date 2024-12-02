@@ -76,7 +76,7 @@ export default function useIndtægterHooks(initialRows) {
       handleEditRow,
       handleDeleteRow,
       handleSave,
-      handleAddRow, // vi eksponerer handleAddRow her
+      handleAddRow, 
     };
   }
   

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Homepage from './Pages/Homepage';
-import Header from './Components/Header/Header';
+import Header from './Components/HeaderComponents/Header';
 import Indtægter from './Pages/Indtægter/Indtægter';
 import Login from './Pages/Login/Login';
 import Budget from './Pages/Budget/Budget';
@@ -10,14 +10,8 @@ import ForgotPassword from './Pages/Login/ForgotPassword';
 import ResetPassword from './Pages/Login/ResetPassword';
 import LoggedInPage from './Pages/LoggedInPage/test';
 
-<<<<<<< HEAD
-  //import Login from './Pages/Login/Login';
-  import Header from './Components/HeaderComponents/Header';
-  import Indtægter from './Pages/Indtægter/Indtægter';
-=======
 function App() {
   const [userFullName, setUserFullName] = useState(null);
->>>>>>> origin
 
   useEffect(() => {
     const fetchUserFullName = async () => {

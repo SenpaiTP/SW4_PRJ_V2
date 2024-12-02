@@ -56,7 +56,7 @@ export default function IndtægterTabel() {
     <Container sx={{ display: "flex", paddingLeft: 0, paddingRight: 0 }}>
       {/* Box for Table and Buttons (Left Side) */}
       <Box sx={{ width: "60%", paddingRight: 2 }}>
-        <Paper sx={{ width: "100%", mb: 2, position: "relative" }}>
+        <Paper sx={{ width: "100%", mb: 2, position: "relative" , marginTop: 6 }}>
           <TableContainer>
             <Table className="table">
               <TableHeader numSelected={selected.length} rowCount={rows.length} />
