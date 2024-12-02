@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRJ4.Data;
 
@@ -11,9 +12,11 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241127115105_002-AddedVariableIndtægter")]
+    partial class _002AddedVariableIndtægter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,9 +256,6 @@ namespace PRJ4.Migrations
                     b.ToTable("Brugers");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
-=======
             modelBuilder.Entity("PRJ4.Models.Budget", b =>
                 {
                     b.Property<int>("BudgetId")
@@ -294,38 +294,33 @@ namespace PRJ4.Migrations
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
->>>>>>> feature/Vindtægt
                 {
-                    b.Property<int>("FindtægtId")
+                    b.Property<int>("FudgiftId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FindtægtId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FudgiftId"));
 
                     b.Property<string>("BrugerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-<<<<<<< HEAD
-=======
 
                     b.Property<int?>("BrugerId1")
                         .HasColumnType("int");
->>>>>>> feature/Vindtægt
 
                     b.Property<DateTime?>("Dato")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("Indtægt")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("KategoriId")
+                    b.Property<int>("KategoriId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Pris")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Tekst")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("FindtægtId");
+                    b.HasKey("FudgiftId");
 
                     b.HasIndex("BrugerId");
 
@@ -333,7 +328,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Findtægter");
+                    b.ToTable("Fudgifters");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Kategori", b =>
@@ -344,7 +339,7 @@ namespace PRJ4.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("KategoriId"));
 
-                    b.Property<string>("KategoriNavn")
+                    b.Property<string>("Navn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -375,8 +370,6 @@ namespace PRJ4.Migrations
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
-<<<<<<< HEAD
-=======
                 {
                     b.Property<int>("VindtægtId")
                         .ValueGeneratedOnAdd()
@@ -393,9 +386,6 @@ namespace PRJ4.Migrations
 
                     b.Property<decimal?>("Indtægt")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("KategoriId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Tekst")
                         .IsRequired()
@@ -405,44 +395,37 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("BrugerId");
 
-                    b.HasIndex("KategoriId");
-
                     b.ToTable("Vindtægter");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
->>>>>>> feature/Vindtægt
                 {
-                    b.Property<int>("VindtægtId")
+                    b.Property<int>("VudgiftId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VindtægtId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VudgiftId"));
 
                     b.Property<string>("BrugerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-<<<<<<< HEAD
-=======
 
                     b.Property<int?>("BrugerId1")
                         .HasColumnType("int");
->>>>>>> feature/Vindtægt
 
                     b.Property<DateTime?>("Dato")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("Indtægt")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int?>("KategoriId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Pris")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Tekst")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("VindtægtId");
+                    b.HasKey("VudgiftId");
 
                     b.HasIndex("BrugerId");
 
@@ -450,7 +433,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Vindtægter");
+                    b.ToTable("Vudgifters");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -504,12 +487,6 @@ namespace PRJ4.Migrations
                         .IsRequired();
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
-                {
-                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
-                        .WithMany("Findtægter")
-=======
             modelBuilder.Entity("PRJ4.Models.Budget", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -552,29 +529,13 @@ namespace PRJ4.Migrations
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
                         .WithMany()
->>>>>>> feature/Vindtægt
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("PRJ4.Models.Kategori", "Kategori")
-                        .WithMany()
-                        .HasForeignKey("KategoriId");
 
                     b.Navigation("Bruger");
-
-                    b.Navigation("Kategori");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
-                {
-                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
-                        .WithMany()
-                        .HasForeignKey("BrugerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-=======
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -610,20 +571,8 @@ namespace PRJ4.Migrations
                     b.Navigation("Budgets");
 
                     b.Navigation("Fudgifters");
->>>>>>> feature/Vindtægt
 
-                    b.HasOne("PRJ4.Models.Kategori", "Kategori")
-                        .WithMany()
-                        .HasForeignKey("KategoriId");
-
-                    b.Navigation("Bruger");
-
-                    b.Navigation("Kategori");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.ApiUser", b =>
-                {
-                    b.Navigation("Findtægter");
+                    b.Navigation("Vudgifters");
                 });
 #pragma warning restore 612, 618
         }

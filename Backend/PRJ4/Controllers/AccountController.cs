@@ -162,6 +162,8 @@ public class AccountController : ControllerBase
         }
     }
 
+    
+
     [HttpGet]
     [Route("WhoAmI")]
     [Authorize]
@@ -171,7 +173,7 @@ public class AccountController : ControllerBase
 
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
 
-        if(userIdClaim==null)
+        if(userIdClaim.Value ==null)
         {
             return StatusCode(StatusCodes.Status401Unauthorized,"User not found");
         }

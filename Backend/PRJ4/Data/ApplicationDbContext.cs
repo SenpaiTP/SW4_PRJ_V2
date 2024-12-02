@@ -17,14 +17,22 @@ public partial class ApplicationDbContext : IdentityDbContext<ApiUser>
 
     // public DbSet<Bruger> Brugers { get; set; }
     public DbSet<Kategori> Kategorier {get; set;}
+<<<<<<< HEAD
     public DbSet<Findtægt> Findtægter { get; set; }
     public DbSet<Vindtægt> Vindtægter { get; set; }
     //public DbSet<Fudgifter> Fudgifters { get; set; }
     //public DbSet<Vudgifter> Vudgifters { get; set; }
+=======
+    // public DbSet<Findtægt> Findtægts { get; set; }
+    public DbSet<Fudgifter> Fudgifters { get; set; }
+    public DbSet<Vindtægt> Vindtægter { get; set; }
+    // public DbSet<Vindtægter> Vindtægters { get; set; }
+    public DbSet<Vudgifter> Vudgifters { get; set; }
+>>>>>>> feature/Vindtægt
     public DbSet<Bruger> Brugers { get; set; }
     public DbSet<ApiUser> ApiUsers { get; set; }
     public DbSet<LoginModel> LoginModels { get; set; }
-    // public DbSet<Budget> Budgets { get; set; }
+    public DbSet<Budget> Budgets { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
   

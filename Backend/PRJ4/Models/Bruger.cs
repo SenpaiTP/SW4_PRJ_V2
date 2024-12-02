@@ -17,6 +17,8 @@ public partial class Bruger
 
     public string Email { get; set; } = null!;
 
+    public ICollection<Budget>? Budgets { get; set; }
+
     
     //public virtual ICollection<Findtægt> Findtægts { get; set; } = new List<Findtægt>();
 

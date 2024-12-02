@@ -15,7 +15,11 @@ namespace PRJ4.Models
         public decimal? Indtægt { get; set; }
         public DateTime? Dato { get; set; }
 
+<<<<<<< HEAD
          public int? KategoriId { get; set; }
+=======
+        public int? KategoriId { get; set; }
+>>>>>>> feature/Vindtægt
 
         [ForeignKey(nameof(KategoriId))]
         public virtual Kategori? Kategori { get; set; } = null!;
