@@ -16,19 +16,36 @@ function Budget() {
   const [savingsAmount, setSavingsAmount] = useState('');
   const [savingsDate, setSavingsDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [savingsHistory, setSavingsHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchBudgets();
   }, []);
 
   const fetchBudgets = async () => {
-    const response = await fetch(`${API_URL}/budget`, {
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`
-      }
-    });
-    const data = await response.json();
-    setRows(data);
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/budget`, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch budgets");
+      const rawData = await response.json();
+      const formattedData = rawData.map(item => ({
+        id: item.id || item.budgetId,
+        name: item.budgetName,
+        price: item.savingsGoal,
+        goalEndDate: item.budgetSlut,
+        saved: item.saved || 0,
+      }));
+      setRows(formattedData);
+    } catch (error) {
+      console.error("Error fetching budgets:", error);
+      alert("Failed to load budgets.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -40,38 +57,44 @@ function Budget() {
   };
 
   const handleAddRow = async () => {
-    const today = dayjs();
-    const endDate = dayjs(newRow.goalEndDate);
-  
-    if (!endDate.isValid() || endDate.isBefore(today, 'day')) {
-      alert("Please choose a future date for the saving goal.");
-      return;
-    }
-  
-    if (editMode) {
-      await fetch(`${API_URL}/budget/${newRow.id}/update`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAuthToken()}`
-        },
-        body: JSON.stringify(newRow)
-      });
-    } else {
-      await fetch(`${API_URL}/budget`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAuthToken()}`
-        },
-        body: JSON.stringify(newRow)
-      });
-    }
-    fetchBudgets();
+  const today = dayjs();
+  const endDate = dayjs(newRow.goalEndDate);
+
+  if (!endDate.isValid() || endDate.isBefore(today, 'day')) {
+    alert("Please choose a future date for the saving goal.");
+    return;
+  }
+
+  const savingGoal = {
+    budgetName: newRow.name,
+    savingsGoal: parseFloat(newRow.price),
+    budgetSlut: newRow.goalEndDate,
+  };
+
+  try {
+    // Determine if we're in edit mode and set the URL accordingly
+    const url = editMode ? `${API_URL}/budget/${newRow.id}/update` : `${API_URL}/budget`;
+    
+    const response = await fetch(url, {
+      method: editMode ? 'PUT' : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify(editMode ? { ...savingGoal, id: newRow.id } : savingGoal),
+    });
+
+    if (!response.ok) throw new Error("Failed to save the saving goal");
+
+    fetchBudgets();  // Refresh the list of goals
     setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
     setOpen(false);
     setEditMode(false);
-  };
+  } catch (error) {
+    console.error("Error saving goal:", error);
+    alert("Failed to save the goal.");
+  }
+};
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -84,31 +107,88 @@ function Budget() {
   };
 
   const handleRowClick = async (row) => {
-    const response = await fetch(`${API_URL}/budget/${row.id}`, {
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`
-      }
-    });
-    const data = await response.json();
-    setSelectedGoal(data);
+    try {
+      const response = await fetch(`${API_URL}/budget/${row.id}`, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch goal details");
+      const data = await response.json();
+      setSelectedGoal({
+        id: data.id,
+        name: data.budgetName, // Ensure that the name is set correctly
+        price: data.savingsGoal,
+        goalEndDate: data.budgetSlut,
+        saved: data.saved || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching goal details:", error);
+      alert("Failed to load goal details.");
+    }
   };
+  
 
-  const handleEditGoal = (row) => {
-    setNewRow(row);
-    setEditMode(true);
-    setOpen(true);
+  const handleEditGoal = async (row) => {
+    try {
+      // Prepare the data to send to the backend.
+      const updatedData = {
+        id: row.id, // Ensure this is passed for the PUT request
+        budgetName: row.name,
+        savingsGoal: parseFloat(row.price),
+        budgetSlut: row.goalEndDate,
+      };
+  
+      console.log("Sending data:", updatedData);  // Log data to verify it's correct.
+  
+      const response = await fetch(`${API_URL}/budget/${row.id}/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+  
+      // Log the response to see any errors
+      const responseBody = await response.json();
+      console.log("Response body:", responseBody);
+  
+      // Check if response is successful
+      if (!response.ok) {
+        throw new Error('Failed to update goal');
+      }
+  
+      // If the update is successful, update state
+      setNewRow(row);
+      setEditMode(true);
+      setOpen(true);
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      alert("Failed to update the goal.");
+    }
   };
+  
+  
+  
+  
 
   const handleDeleteGoal = async (id) => {
-    await fetch(`${API_URL}/budget/${id}/delete`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`
+    try {
+      const response = await fetch(`${API_URL}/budget/${id}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to delete goal");
+      fetchBudgets();
+      if (selectedGoal && selectedGoal.id === id) {
+        setSelectedGoal(null);
       }
-    });
-    fetchBudgets();
-    if (selectedGoal && selectedGoal.id === id) {
-      setSelectedGoal(null);
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+      alert("Failed to delete goal.");
     }
   };
 
@@ -119,50 +199,61 @@ function Budget() {
   const calculateSavings = (price, goalEndDate) => {
     const startDate = dayjs();
     const endDate = dayjs(goalEndDate);
-    const months = endDate.diff(startDate, 'month') + 1; // Include the current month
-    const weeks = endDate.diff(startDate, 'week') + 1; // Include the current week
-    const days = endDate.diff(startDate, 'day') + 1; // Include the current day
-    const monthlySavings = price / months;
-    const weeklySavings = price / weeks;
-    const dailySavings = price / days;
-    return { monthlySavings, weeklySavings, dailySavings };
+    const months = endDate.diff(startDate, 'month') + 1;
+    const weeks = endDate.diff(startDate, 'week') + 1;
+    const days = endDate.diff(startDate, 'day') + 1;
+    return {
+      monthlySavings: price / months,
+      weeklySavings: price / weeks,
+      dailySavings: price / days,
+    };
   };
 
   const handleAddSavings = async () => {
     if (selectedGoal && savingsAmount) {
-      const newSavings = { amount: parseFloat(savingsAmount), date: savingsDate, type: 'add' };
-      // Assuming you have an endpoint to add savings
-      await fetch(`${API_URL}/budget/${selectedGoal.id}/add-savings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAuthToken()}`
-        },
-        body: JSON.stringify(newSavings)
-      });
-      fetchBudgets();
-      setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
-      setSavingsAmount('');
-      setSavingsDate(dayjs().format('YYYY-MM-DD'));
+      try {
+        const newSavings = { amount: parseFloat(savingsAmount), date: savingsDate, type: 'add' };
+        const response = await fetch(`${API_URL}/budget/${selectedGoal.id}/add-savings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          },
+          body: JSON.stringify(newSavings),
+        });
+        if (!response.ok) throw new Error("Failed to add savings");
+        fetchBudgets();
+        setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
+        setSavingsAmount('');
+        setSavingsDate(dayjs().format('YYYY-MM-DD'));
+      } catch (error) {
+        console.error("Error adding savings:", error);
+        alert("Failed to add savings.");
+      }
     }
   };
 
   const handleRemoveSavings = async () => {
     if (selectedGoal && savingsAmount) {
-      const newSavings = { amount: parseFloat(savingsAmount), date: savingsDate, type: 'remove' };
-      // Assuming you have an endpoint to remove savings
-      await fetch(`${API_URL}/budget/${selectedGoal.id}/remove-savings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAuthToken()}`
-        },
-        body: JSON.stringify(newSavings)
-      });
-      fetchBudgets();
-      setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
-      setSavingsAmount('');
-      setSavingsDate(dayjs().format('YYYY-MM-DD'));
+      try {
+        const newSavings = { amount: parseFloat(savingsAmount), date: savingsDate, type: 'remove' };
+        const response = await fetch(`${API_URL}/budget/${selectedGoal.id}/remove-savings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          },
+          body: JSON.stringify(newSavings),
+        });
+        if (!response.ok) throw new Error("Failed to remove savings");
+        fetchBudgets();
+        setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
+        setSavingsAmount('');
+        setSavingsDate(dayjs().format('YYYY-MM-DD'));
+      } catch (error) {
+        console.error("Error removing savings:", error);
+        alert("Failed to remove savings.");
+      }
     }
   };
 
@@ -194,8 +285,8 @@ function Budget() {
                     <TableCell>{row.price}</TableCell>
                     <TableCell>{dayjs(row.goalEndDate).format('DD/MM/YYYY')}</TableCell>
                     <TableCell>
-                      <IconButton onClick={() => handleEditGoal(row)}><Edit /></IconButton>
-                      <IconButton onClick={() => handleDeleteGoal(row.id)}><Delete /></IconButton>
+                    <IconButton onClick={() => handleEditGoal(row, row.id)}><Edit /></IconButton>
+                    <IconButton onClick={() => handleDeleteGoal(row.id)}><Delete /></IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -289,6 +380,7 @@ function Budget() {
             </Box>
           </Box>
         )}
+
       </Box>
 
       <Dialog open={open} onClose={handleClose}>

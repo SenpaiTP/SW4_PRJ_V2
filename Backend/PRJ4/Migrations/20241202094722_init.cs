@@ -201,6 +201,35 @@ namespace PRJ4.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Budgets",
+                columns: table => new
+                {
+                    BudgetId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SavingsGoal = table.Column<int>(type: "int", nullable: false),
+                    BudgetStart = table.Column<DateOnly>(type: "date", nullable: false),
+                    BudgetSlut = table.Column<DateOnly>(type: "date", nullable: false),
+                    BrugerId1 = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Budgets", x => x.BudgetId);
+                    table.ForeignKey(
+                        name: "FK_Budgets_AspNetUsers_BrugerId",
+                        column: x => x.BrugerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Budgets_Brugers_BrugerId1",
+                        column: x => x.BrugerId1,
+                        principalTable: "Brugers",
+                        principalColumn: "BrugerId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Fudgifters",
                 columns: table => new
                 {
@@ -309,6 +338,16 @@ namespace PRJ4.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Budgets_BrugerId",
+                table: "Budgets",
+                column: "BrugerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Budgets_BrugerId1",
+                table: "Budgets",
+                column: "BrugerId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Fudgifters_BrugerId",
                 table: "Fudgifters",
                 column: "BrugerId");
@@ -356,6 +395,9 @@ namespace PRJ4.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Budgets");
 
             migrationBuilder.DropTable(
                 name: "Fudgifters");
