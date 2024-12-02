@@ -10,6 +10,9 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
   const handleSubmit = () => {
     if (name && price && date) {
       handleSave({ name, price, date });
+      setName('');
+      setPrice('');
+      setDate('');
       handleClose(); // Luk dialogen
     } else {
       alert('Alle felter skal udfyldes!');
