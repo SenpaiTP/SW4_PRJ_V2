@@ -57,14 +57,13 @@ export default function useIndtægterHooks(initialRows) {
     };
   
     const handleSave = () => {
-      console.log("Saving rows:", rows);  // Debugging line to check data
       localStorage.setItem("rows", JSON.stringify(rows));
       alert ("Ændringer er gemt") 
     };
 
     useEffect(() => {
       const savedRows = JSON.parse(localStorage.getItem("rows")) || [];
-      setRows(savedRows); // Opdaterer `rows` med gemte data
+      setRows(savedRows); 
     }, []);
   
     return {

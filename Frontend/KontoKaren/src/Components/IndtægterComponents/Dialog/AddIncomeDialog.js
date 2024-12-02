@@ -1,4 +1,3 @@
-// AddIncomeDialog.js
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
 
@@ -13,7 +12,7 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
       setName('');
       setPrice('');
       setDate('');
-      handleClose(); // Luk dialogen
+      handleClose(); 
     } else {
       alert('Alle felter skal udfyldes!');
     }
@@ -47,7 +46,7 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
           onChange={(e) => setDate(e.target.value)}
           margin="normal"
           InputLabelProps={{
-            shrink: true, // Sørger for, at label forbliver synlig
+            shrink: true, 
           }}
         />
       </DialogContent>

@@ -1,4 +1,3 @@
-// EditIncomeDialog.js
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
 
@@ -18,7 +17,7 @@ export default function EditIncomeDialog({ open, handleClose, handleSave, income
   const handleSubmit = () => {
     if (name && price && date) {
       handleSave({ id: income.id, name, price, date });
-      handleClose(); // Close the dialog
+      handleClose(); 
     } else {
       alert('Alle felter skal udfyldes!');
     }
@@ -52,7 +51,7 @@ export default function EditIncomeDialog({ open, handleClose, handleSave, income
           onChange={(e) => setDate(e.target.value)}
           margin="normal"
           InputLabelProps={{
-            shrink: true, // Ensure the label remains visible
+            shrink: true, 
           }}
         />
       </DialogContent>

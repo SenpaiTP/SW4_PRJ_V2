@@ -1,30 +1,33 @@
-import './PieChart.css';
+import './PieChart.css'; 
 import React from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "react-chartjs-2"; 
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"; 
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend); // registrerer moduler til brug i Chart.js
 
 export default function PieChartColors({ chartData }) {
+  // genererer en unik farve baseret på en string
   const generateColor = (name) => {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    const hue = hash % 360; // Limit to 360 degrees for HSL color
-    return `hsl(${hue}, 70%, 50%)`; // Return color based on the name
+    const hue = hash % 360; // begrænset til 360 grader (i farvehjulet)
+    return `hsl(${hue}, 70%, 50%)`; // 70% saturation, 50% lightness
   };
 
+  // genererer farver for hver indtægt baseret på navn
   const colors = chartData.map((row) => generateColor(row.name));
 
+  // konfigurerer data til Pie Chart
   const data = {
-    labels: chartData.map((row) => row.name), // Labels from the table (income names)
+    labels: chartData.map((row) => row.name), // navne på indtægter
     datasets: [
       {
-        label: "Indtægter", // Label for the dataset
-        data: chartData.map((row) => row.price), // Values from the table (amounts)
-        backgroundColor: colors,
-        hoverOffset: 4,
+        label: "Indtægter", // dataset-etiket
+        data: chartData.map((row) => row.price), // neløb for hver indtægt
+        backgroundColor: colors, // genererede farver
+        hoverOffset: 4, // effekt ved hover
       },
     ],
   };
