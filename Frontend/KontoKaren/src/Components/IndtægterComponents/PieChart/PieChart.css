@@ -1,4 +1,6 @@
-/* Overordnet container med Flexbox */
+
+
+
 .container {
   display: flex;
   justify-content: flex-end; /* Placerer elementerne til højre */
@@ -8,11 +10,21 @@
 }
 
 .chart-container {
-  width: 100px; /* Sætter bredden af pie-diagrammet */
-  height: 100px; /* Sætter højden af pie-diagrammet */
+  width: 400px; /* Sætter bredden af pie-diagrammet */
+  height: 400px; /* Sætter højden af pie-diagrammet */
+  padding-left: 50px; /* Giver lidt ekstra afstand til venstre */
+
 }
 
 canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: right; /* Centrerer elementerne horisontalt */
+  align-items: center; /* Centrerer elementerne vertikalt */
+  height: 50vh; /* Gør containeren til at fylde hele højden af skærmen */
+  padding: 10px;
 }
