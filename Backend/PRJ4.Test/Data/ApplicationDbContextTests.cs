@@ -12,7 +12,7 @@ public class ApplicationDbContextIdentityTests : TestBase
     {
         // Arrange
         using var context = CreateContext();
-        context.Database.EnsureDeleted();  // Delete any existing data
+        //context.Database.EnsureDeleted();  // Delete any existing data
         context.Database.EnsureCreated();
         
 
@@ -31,7 +31,7 @@ public class ApplicationDbContextIdentityTests : TestBase
     {
         // Arrange
         using var context = CreateContext();
-        context.Database.EnsureDeleted();  // Delete any existing data
+        //context.Database.EnsureDeleted();  // Delete any existing data
         context.Database.EnsureCreated();
         var passwordHasher = new PasswordHasher<ApiUser>();
 

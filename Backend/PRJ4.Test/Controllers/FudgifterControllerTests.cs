@@ -38,7 +38,7 @@ public class FudgifterControllerTests
         };
     }
 
-    [Fact]
+    [Test]
     public async Task GetAllByUser_ReturnsOk_WithExpectedData()
     {
         // Arrange
