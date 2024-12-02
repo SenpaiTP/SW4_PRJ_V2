@@ -32,7 +32,7 @@ public class KategoryLimitController : ControllerBase
 
     // GET: api/KategoryLimit/{Id}
     [HttpGet("{id}")]
-    public async Task<KategoryLimitDTO> GetKategoryLimit(int id)
+    public async Task<KategoryLimitGetDTO> GetKategorybyIdLimit(int id)
     {
         var budget = await _kategoryLimitService.GetByIdKategoryLimitAsync(id); 
         return budget; 
@@ -40,7 +40,7 @@ public class KategoryLimitController : ControllerBase
 
     // POST
     [HttpPost] 
-    public async Task<KategoryLimitDTO> AddKategoryLimit(KategoryLimitDTO limitDTO) 
+    public async Task<KategoryLimitGetDTO> AddKategoryLimit(KategoryLimitReturnDTO limitDTO) 
     {
         var user = GetUserId();
     

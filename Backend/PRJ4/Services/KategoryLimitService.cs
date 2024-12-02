@@ -16,35 +16,43 @@ namespace PRJ4.Services
             _kategoriRepository = kategoriRepository;
         }
 
-         public async Task<KategoryLimitDTO> GetByIdKategoryLimitAsync(int id)
+         public async Task<KategoryLimitGetDTO> GetByIdKategoryLimitAsync(int id)
         {
+            //Check if budget with "id" exists and write error message if not.
             var budget = await _kategoriLimitRepository.GetByIdAsync(id); 
-            var kategori = await _kategoriRepository.GetByIdAsync(budget.KategoriId);
             if (budget == null)
             {
-                throw new KeyNotFoundException($"Budget with id {id} not found.");
+                throw new KeyNotFoundException($"Kategorilimit with id {id} not found.");
             }
-            var budgetReturn = new KategoryLimitDTO
+
+            //Check if kategori with foreign key "KategoryId" exists and write error message if not.
+            var kategori = await _kategoriRepository.GetByIdAsync(budget.KategoryId);
+            if (budget == null)
+            {
+                throw new KeyNotFoundException($"Kategory with id {budget.KategoryId} not found.");
+            }
+
+            //Create kategoriLimit DTO to return
+            var budgetReturn = new KategoryLimitGetDTO
             {
                 KategoryName = kategori.Navn,
                 Limit = budget.Limit
             };
-
             return budgetReturn;
         }
 
-        public async Task<KategoryLimitDTO> AddKategoryLimitAsync(string brugerId, KategoryLimitDTO limitDTO)
+        public async Task<KategoryLimitGetDTO> AddKategoryLimitAsync(string brugerId, KategoryLimitReturnDTO limitDTO)
         {
-            //Check if kategory exists
-            var kategory = await _kategoriRepository.SearchByName(limitDTO.KategoryName);
+            //Check if kategory exists and write error message if not.
+            var kategory = await _kategoriRepository.GetByIdAsync(limitDTO.KategoryId);
             
-            if(kategory == null) {throw new ArgumentException($"Kategorien: {limitDTO.KategoryName} findes ikke. ");}
+            if(kategory == null) {throw new ArgumentException($"Kategorien: {kategory.Navn} findes ikke.");}
             
-            //New kategoriLimit
+            //Create new kategoriLimit
             var budget = new KategoryLimit
             {
                 BrugerId = brugerId,
-                KategoriId = kategory.KategoriId,
+                KategoryId = limitDTO.KategoryId,
                 Limit = limitDTO.Limit
             };
 
@@ -53,63 +61,15 @@ namespace PRJ4.Services
             await _kategoriLimitRepository.SaveChangesAsync();
 
 
-            // Map det oprettede budget til BudgetKategoriDTO
-            var createdBudgetDTO = new KategoryLimitDTO
+            //Create kategoriLimit DTO to return
+            var createdBudgetDTO = new KategoryLimitGetDTO
             {
                 KategoryName = kategory.Navn,
                 Limit = createdBudget.Limit,
      
             };
-
-            //Return created budget
             return createdBudgetDTO;
-
         }
-
-
-
-
-
-         // public async Task<List<BudgetKategoriDTO>> GetAllBudgetKategorisAsync()
-        // {
-        //     //Get all kategory limits
-        //     var budgetKategoriListe = await _budgetKategoriRepository.GetAllAsync();
-        //     if (budgetKategoriListe == null || !budgetKategoriListe.Any())
-        //     {
-        //         throw new KeyNotFoundException($"No kategori limits found.");
-        //     }
-
-
-        //     //Get all kategories that have a kategory limit
-        //     foreach (var budgetKategori in budgetKategoriListe)
-        //     {    
-        //         var kategoriListe = await _kategoriRepository.GetByIdAsync(budgetKategori.KategoriId);
-        //         if (kategoriListe == null)
-        //         {
-        //             throw new KeyNotFoundException($"No kategories with id {budgetKategori.KategoriId} found.");
-        //         }
-        //     }
-
-        //     var budgetReturnListe = new List<BudgetKategoriDTO>();
-
-        //     foreach (var budget in budgetKategoriListe)
-        //     {
-                
-        //         var budgetReturn = new BudgetKategoriDTO
-        //         {
-        //             //KategoryName = kategoriListe.Navn,
-        //             KategoryLimit = budget.KategoryLimit
-        //         };
-
-        //         budgetReturnListe.Add(budgetReturn);
-        //     }
-
-        //     return budgetReturnListe;
-        // }
-
-     
-
-
 
     }
 }
