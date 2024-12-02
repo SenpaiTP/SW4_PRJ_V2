@@ -1,0 +1,27 @@
+.container {
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; 
+    height: 100vh; 
+    padding: 10px;
+  }
+  
+  .chart-container {
+    width: 400px; 
+    height: 400px; 
+    padding-left: 50px; 
+  }
+  
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .canvas-container {
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; 
+    height: 50vh; 
+    padding: 10px;
+  }
+  

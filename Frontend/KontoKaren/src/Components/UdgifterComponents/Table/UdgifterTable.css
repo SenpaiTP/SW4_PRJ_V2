@@ -1,0 +1,17 @@
+
+.table-container {
+    width: 100%;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+ 
+  

@@ -1,16 +1,16 @@
 import React, { useState } from "react"; 
 import { Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell } from "@mui/material"; 
 import { Edit, Delete } from "@mui/icons-material"; 
-import TableBody from "./Table/IndtægterTableBody"; 
-import TableHeader from "./Table/IndtægterTableHeader"; 
+import TableBody from "./Table/UdgifterTableBody"; 
+import TableHeader from "./Table/UdgifterTableHeader"; 
 import PieChart from "./PieChart/PieChart"; 
-import './Table/IndtægterTable.css'
-import { initialRows } from "./Table/IndtægterTableData"; 
-import AddIncomeDialog from "./Dialog/AddIndtægterDialog"; 
-import EditIncomeDialog from "./Dialog/EditIndtægterDialog"; 
-import useIndtægterHooks from "../../Hooks/IndtægterHooks"; 
+import './Table/UdgifterTable.css'; 
+import { initialExpenseRows } from "./Table/UdgifterTableData"; 
+import useUdgifterHooks from "../../Hooks/UdgifterHooks";
+import AddExpenseDialog from "./Dialog/AddUdgifterDialog";
+import EditExpenseDialog from "./Dialog/EditUdgifterDialog";
 
-export default function IndtægterTable() {
+export default function UdgifterTable() {
   // bruger hooks til at håndtere logikken i tabellen
   const {
     rows, // data i tabellen
@@ -22,36 +22,36 @@ export default function IndtægterTable() {
     handleEditRow, // redigering af en række
     handleDeleteRow, // sletning af en række
     handleSave, // gemmer ændringer
-  } = useIndtægterHooks(initialRows);
+  } = useUdgifterHooks(initialExpenseRows);
 
   const [openAddDialog, setOpenAddDialog] = useState(false); // styrer visningen af dialog for at tilføje indkomst
   const [openEditDialog, setOpenEditDialog] = useState(false); // styrer visningen af dialog for at redigere indkomst
-  const [selectedIncome, setSelectedIncome] = useState(null); // holder den valgte indkomst til redigering
+  const [selectedExpense, setSelectedExpense] = useState(null); // holder den valgte indkomst til redigering
 
   // ppretter data til PieChart
   const chartData = rows.map((row) => ({
-    name: row.name, // navn på indtægt
-    price: row.price, // bløb for indtægt
+    name: row.name, // navn på udgift
+    price: row.price, // bløb for udgift
   }));
 
   // håndtering af åbning og lukning af dialoger
   const handleClickOpenAdd = () => setOpenAddDialog(true);
   const handleCloseAdd = () => setOpenAddDialog(false);
   const handleClickOpenEdit = (row) => {
-    setSelectedIncome(row); // Indstiller den valgte indkomst
+    setSelectedExpense(row); // Indstiller den valgte indkomst
     setOpenEditDialog(true);
   };
   const handleCloseEdit = () => setOpenEditDialog(false);
 
   // Tilføjer en ny indkomst og lukker dialogen
-  const handleAddIncome = (newIncome) => {
-    handleAddRow(newIncome);
+  const handleAddExpense = (newExpense) => {
+    handleAddRow(newExpense);
     setOpenAddDialog(false);
   };
 
   // Redigerer en eksisterende indkomst og lukker dialogen
-  const handleEditIncome = (updatedIncome) => {
-    handleEditRow(updatedIncome);
+  const handleEditExpense = (updatedExpense) => {
+    handleEditRow(updatedExpense);
     setOpenEditDialog(false);
   };
 
@@ -91,7 +91,7 @@ export default function IndtægterTable() {
             variant="contained"
             onClick={handleClickOpenAdd}
           >
-            Tilføj ny Indtægt
+            Tilføj ny Udgift
           </Button>
 
           <Button
@@ -103,17 +103,17 @@ export default function IndtægterTable() {
         </Box>
 
         {/* dialoger til tilføjelse og redigering */}
-        <AddIncomeDialog
+        <AddExpenseDialog
           open={openAddDialog}
           handleClose={handleCloseAdd}
-          handleSave={handleAddIncome}
+          handleSave={handleAddExpense}
         />
 
-        <EditIncomeDialog
+        <EditExpenseDialog
           open={openEditDialog}
           handleClose={handleCloseEdit}
-          handleSave={handleEditIncome}
-          income={selectedIncome}
+          handleSave={handleEditExpense}
+          expense={selectedExpense}
         />
       </Box>
 

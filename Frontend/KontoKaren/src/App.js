@@ -9,6 +9,7 @@ import Register from './Pages/Login/Register';
 import ForgotPassword from './Pages/Login/ForgotPassword';
 import ResetPassword from './Pages/Login/ResetPassword';
 import LoggedInPage from './Pages/LoggedInPage/test';
+import Udgifter from './Pages/Udgifter/Udgifter';
 
 function App() {
   const [userFullName, setUserFullName] = useState(null);
@@ -42,7 +43,8 @@ function App() {
         <Header userFullName={userFullName} />
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/indtægter" element={<Indtægter />} />
+          <Route path="/Indtægter" element={<Indtægter />} />
+          <Route path="/Udgifter" element={<Udgifter />} />
           <Route path="/Budget" element={<Budget />} />
           <Route path="/Login" element={<Login setUserFullName={setUserFullName} />} />
           <Route path="/Register" element={<Register />} />
