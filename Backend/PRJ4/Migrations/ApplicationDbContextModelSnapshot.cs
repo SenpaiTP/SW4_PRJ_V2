@@ -253,9 +253,6 @@ namespace PRJ4.Migrations
                     b.ToTable("Brugers");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
-=======
             modelBuilder.Entity("PRJ4.Models.Budget", b =>
                 {
                     b.Property<int>("BudgetId")
@@ -294,7 +291,6 @@ namespace PRJ4.Migrations
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
->>>>>>> feature/Vindtægt
                 {
                     b.Property<int>("FindtægtId")
                         .ValueGeneratedOnAdd()
@@ -305,12 +301,6 @@ namespace PRJ4.Migrations
                     b.Property<string>("BrugerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-<<<<<<< HEAD
-=======
-
-                    b.Property<int?>("BrugerId1")
-                        .HasColumnType("int");
->>>>>>> feature/Vindtægt
 
                     b.Property<DateTime?>("Dato")
                         .HasColumnType("datetime2");
@@ -375,8 +365,6 @@ namespace PRJ4.Migrations
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
-<<<<<<< HEAD
-=======
                 {
                     b.Property<int>("VindtægtId")
                         .ValueGeneratedOnAdd()
@@ -387,47 +375,6 @@ namespace PRJ4.Migrations
                     b.Property<string>("BrugerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("Dato")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Indtægt")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("KategoriId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Tekst")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("VindtægtId");
-
-                    b.HasIndex("BrugerId");
-
-                    b.HasIndex("KategoriId");
-
-                    b.ToTable("Vindtægter");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
->>>>>>> feature/Vindtægt
-                {
-                    b.Property<int>("VindtægtId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VindtægtId"));
-
-                    b.Property<string>("BrugerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-<<<<<<< HEAD
-=======
-
-                    b.Property<int?>("BrugerId1")
-                        .HasColumnType("int");
->>>>>>> feature/Vindtægt
 
                     b.Property<DateTime?>("Dato")
                         .HasColumnType("datetime2");
@@ -504,55 +451,10 @@ namespace PRJ4.Migrations
                         .IsRequired();
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
                         .WithMany("Findtægter")
-=======
-            modelBuilder.Entity("PRJ4.Models.Budget", b =>
-                {
-                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
-                        .WithMany("Budgets")
-                        .HasForeignKey("BrugerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PRJ4.Models.Bruger", null)
-                        .WithMany("Budgets")
-                        .HasForeignKey("BrugerId1");
-
-                    b.Navigation("Bruger");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
-                {
-                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
-                        .WithMany("Fudgifters")
-                        .HasForeignKey("BrugerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PRJ4.Models.Bruger", null)
-                        .WithMany("Fudgifters")
-                        .HasForeignKey("BrugerId1");
-
-                    b.HasOne("PRJ4.Models.Kategori", "Kategori")
-                        .WithMany()
-                        .HasForeignKey("KategoriId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bruger");
-
-                    b.Navigation("Kategori");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
-                {
-                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
-                        .WithMany()
->>>>>>> feature/Vindtægt
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -566,7 +468,6 @@ namespace PRJ4.Migrations
                     b.Navigation("Kategori");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -574,43 +475,6 @@ namespace PRJ4.Migrations
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-=======
-            modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
-                {
-                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
-                        .WithMany("Vudgifters")
-                        .HasForeignKey("BrugerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PRJ4.Models.Bruger", null)
-                        .WithMany("Vudgifters")
-                        .HasForeignKey("BrugerId1");
-
-                    b.HasOne("PRJ4.Models.Kategori", "Kategori")
-                        .WithMany()
-                        .HasForeignKey("KategoriId");
-
-                    b.Navigation("Bruger");
-
-                    b.Navigation("Kategori");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.ApiUser", b =>
-                {
-                    b.Navigation("Budgets");
-
-                    b.Navigation("Fudgifters");
-
-                    b.Navigation("Vudgifters");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Bruger", b =>
-                {
-                    b.Navigation("Budgets");
-
-                    b.Navigation("Fudgifters");
->>>>>>> feature/Vindtægt
 
                     b.HasOne("PRJ4.Models.Kategori", "Kategori")
                         .WithMany()

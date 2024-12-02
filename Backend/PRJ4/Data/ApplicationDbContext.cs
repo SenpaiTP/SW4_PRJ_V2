@@ -33,6 +33,8 @@ public partial class ApplicationDbContext : IdentityDbContext<ApiUser>
     public DbSet<ApiUser> ApiUsers { get; set; }
     public DbSet<LoginModel> LoginModels { get; set; }
     public DbSet<Budget> Budgets { get; set; }
+
+    public DbSet<KategoryLimit> KategoryLimits { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
   
