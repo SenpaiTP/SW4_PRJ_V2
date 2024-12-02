@@ -9,4 +9,5 @@ public partial class Kategori
     [Key]
     public int KategoriId { get; set; }
     public string Navn {get; set;}
+    public KategoryLimit? KategoryLimit { get; set; }
 }
