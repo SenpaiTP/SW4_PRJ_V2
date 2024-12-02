@@ -16,7 +16,7 @@ function Homepage() {
   return (
     <Container>
       {/* Heading */}
-      <Typography variant="h1" component="h2" gutterBottom>
+      <Typography variant="h1" component="h2" gutterBottom color="text.primary">
         Welcome to the Homepage
       </Typography>
 
@@ -25,7 +25,7 @@ function Homepage() {
           <Grid item xs={12} md={6}>
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom color="text.primary">
                   Jeg er et Pie Chart
                 </Typography>
                 <PieChart/>

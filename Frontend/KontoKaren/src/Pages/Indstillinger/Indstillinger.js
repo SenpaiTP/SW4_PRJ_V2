@@ -1,14 +1,22 @@
 import React from 'react';
-import { Container, Box, Grid, Card, CardContent, Typography } from '@mui/material';
+import { Container, Box, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import ChangePassword from './ChangePassword'; 
 import DesignFrontPage from './DesignFrontPage';
+//import ThemeProvider from './ThemeProvider';
+import { useContext } from 'react';
+import { ThemeContext } from './ThemeProvider';
 
 function Indstillinger() {
+
+  const { theme, toggleTheme } = useContext(ThemeContext); // Hent temaet
+
   return (
     <Container>
     <Box sx={{ padding: 4 }}>
-      {/* Page Title */}
-      <Typography variant="h4" gutterBottom>
+      {/* Page Title 
+        color="text.primary" skal tilføjes til overskrifter for at de også skifter farve.
+      */}
+      <Typography variant="h4" gutterBottom color="text.primary">
         Indstillinger
       </Typography>
 
@@ -48,6 +56,9 @@ function Indstillinger() {
               <Typography>
                 Placeholder for Light/Dark Mode functionality.
               </Typography>
+              <Button onClick={toggleTheme}>
+               Skift til {theme === 'light' ? 'Dark' : 'Light'} Theme
+               </Button>
             </CardContent>
           </Card>
         </Grid>

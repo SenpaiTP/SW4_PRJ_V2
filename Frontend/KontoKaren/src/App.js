@@ -17,13 +17,14 @@
 
   // Indstillinger page
   import Indstillinger from './Pages/Indstillinger/Indstillinger';
+  import ThemeProvider from './Pages/Indstillinger/ThemeProvider';
 
   // Logged In Test
   import LoggedInPage from './Pages/LoggedInPage/test';
 
   function App() {
     return (
-      
+      <ThemeProvider>
       <Router>
         <div className="App">
           <Header />
@@ -40,6 +41,7 @@
           </Routes>
         </div>
       </Router>
+      </ThemeProvider>
       
     );
   }
