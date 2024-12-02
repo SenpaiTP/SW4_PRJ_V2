@@ -94,7 +94,7 @@ export default function IndtægterTabel() {
             variant="contained"
             onClick={handleSave}
           >
-            Gem
+            Gem ændringer
           </Button>
         </Box>
   

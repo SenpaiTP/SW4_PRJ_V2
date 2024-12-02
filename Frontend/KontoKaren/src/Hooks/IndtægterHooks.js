@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createData } from "../Components/IndtægterComponents/Table/TableData";
 
 
@@ -7,7 +7,7 @@ export default function useIndtægterHooks(initialRows) {
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-  
+
     const handleAddRow = (newIncome) => {
       const newRow = createData(
         rows.length + 1,
@@ -57,9 +57,15 @@ export default function useIndtægterHooks(initialRows) {
     };
   
     const handleSave = () => {
+      console.log("Saving rows:", rows);  // Debugging line to check data
       localStorage.setItem("rows", JSON.stringify(rows));
-      alert("Ændringerne er gemt!");
+      alert ("Ændringer er gemt") 
     };
+
+    useEffect(() => {
+      const savedRows = JSON.parse(localStorage.getItem("rows")) || [];
+      setRows(savedRows); // Opdaterer `rows` med gemte data
+    }, []);
   
     return {
       rows,

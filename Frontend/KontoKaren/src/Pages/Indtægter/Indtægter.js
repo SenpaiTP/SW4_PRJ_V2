@@ -14,8 +14,8 @@ function Indtægter() {
 
   return (
     <Container>
-      <Typography variant="h1" component="h2" padding ="10" align = "center">
-        Welcome to Indtægter
+      <Typography variant="h1" component="h2" padding ="10" align = "left">
+        Indtægter
       </Typography>
 
       <IndtægterTabel data={rows} setData={setRows} />
