@@ -23,7 +23,10 @@ function Indstillinger() {
           </Card>
         </Grid>
 
-        {/* Design Forside Section */}
+        {/* 
+            Design Forside Section 
+            <DesignFrontPage/> er link til DesignFrontpage.js
+        */}
         <Grid item xs={12} md={6}>
           <Card variant="outlined">
             <CardContent>
