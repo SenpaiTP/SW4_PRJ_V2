@@ -1,8 +1,7 @@
-using NUnit.Framework;
-using PRJ4.Data;
 using PRJ4.Models;
 using Microsoft.AspNetCore.Identity;
 using NUnit.Framework.Legacy;
+using PRJ4.Test.Setup;
 
 [TestFixture]
 public class ApplicationDbContextIdentityTests : TestBase
@@ -12,10 +11,7 @@ public class ApplicationDbContextIdentityTests : TestBase
     {
         // Arrange
         using var context = CreateContext();
-        //context.Database.EnsureDeleted();  // Delete any existing data
-        context.Database.EnsureCreated();
         
-
         // Act
         var user = context.Users.FirstOrDefault(u => u.UserName == "testuser@example.com");
         
@@ -31,8 +27,7 @@ public class ApplicationDbContextIdentityTests : TestBase
     {
         // Arrange
         using var context = CreateContext();
-        //context.Database.EnsureDeleted();  // Delete any existing data
-        context.Database.EnsureCreated();
+
         var passwordHasher = new PasswordHasher<ApiUser>();
 
         var user = context.Users.FirstOrDefault(u => u.UserName == "testuser@example.com");
