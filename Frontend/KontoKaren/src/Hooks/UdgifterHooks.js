@@ -7,18 +7,23 @@ export default function useUdgifterHooks(initialExpenseRows) {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
+    useEffect(() => {
+        const savedRows = JSON.parse(localStorage.getItem("udgifterRows")) || initialExpenseRows;
+        setRows(savedRows);
+    }, [initialExpenseRows]);
+
     const handleAddRow = (newExpense) => {
-      const newRow = createData(
+      const newRow = createData (
         Date.now(),
-        //rows.length + 1,
         newExpense.name,
         newExpense.category,
         newExpense.price,
         newExpense.date
       );
       setRows([...rows, newRow]);
+      console.log("After adding row:", [...rows, newRow]);
     };
-  
+
     const handleEditRow = (newExpense) => {
       setRows((prevRows) =>
         prevRows.map((r) =>
@@ -27,16 +32,18 @@ export default function useUdgifterHooks(initialExpenseRows) {
             : r
         )
       );
+      console.log("After editing row:", rows);
     };
-  
+
     const handleDeleteRow = (id) => {
       setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      console.log("After deleting row:", rows);
     };
-  
+
     const handleClick = (event, id) => {
       const selectedIndex = selected.indexOf(id);
       let newSelected = [];
-  
+
       if (selectedIndex === -1) {
         newSelected = newSelected.concat(selected, id);
       } else {
@@ -47,27 +54,21 @@ export default function useUdgifterHooks(initialExpenseRows) {
       }
       setSelected(newSelected);
     };
-  
+
     const handleChangePage = (event, newPage) => {
       setPage(newPage);
     };
-  
+
     const handleChangeRowsPerPage = (event) => {
       setRowsPerPage(parseInt(event.target.value, 10));
       setPage(0);
     };
-  
+
     const handleSave = () => {
-      localStorage.setItem("rows", JSON.stringify(rows));
-      alert ("Ændringer er gemt") 
+      localStorage.setItem("udgifterRows", JSON.stringify(rows));
+      alert("Ændringer er gemt");
     };
 
-    useEffect(() => {
-        const savedRows = JSON.parse(localStorage.getItem("rows")) || initialExpenseRows;
-        setRows(savedRows);
-      }, [initialExpenseRows]);  // Added initialExpenseRows as a dependency
-      
-  
     return {
       rows,
       setRows,
@@ -83,7 +84,6 @@ export default function useUdgifterHooks(initialExpenseRows) {
       handleEditRow,
       handleDeleteRow,
       handleSave,
-      handleAddRow, 
+      handleAddRow,
     };
-  }
-  
+}

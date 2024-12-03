@@ -1,6 +1,7 @@
 
 // Function to create data
-export function createData(id, name, category, price, date) {
+export function createData(id, name, category, price, date) //PLEASE FOR THE LOVE OF GOD FUCKING PUT TYPES ON UR PARAMETERS (GÆLDER FOR ALLE STEDER I DIN KODE JULIE!!!!)
+ {
     return { id, name, category, price, date };
   }
   
