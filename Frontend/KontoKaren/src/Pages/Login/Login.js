@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { getBoxStyles } from '../../Assets/Styles/boxStyles'; // Box styling
 import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // TextField styling
 
-function Login() {
+// Added setUserFullName prop
+function Login({ setUserFullName }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -57,15 +58,28 @@ function Login() {
         body: JSON.stringify({
           Username: email,
           Password: password,
-      }),
-    });
+        }),
+      });
 
       const data = await response.json();
-      
+
       // Check if login is successful (you can adjust this check based on your backend response)
       if (response.ok) {
         // If login is successful, store token in localStorage or cookies
         localStorage.setItem('authToken', data.token); // Assuming token is returned
+
+        // Fetch the user's full name
+        const nameResponse = await fetch('http://localhost:5168/Account/WhoAmI', {
+          headers: {
+            'Authorization': `Bearer ${data.token}`
+          }
+        });
+
+        if (nameResponse.ok) {
+          const user = await nameResponse.json();
+          setUserFullName(user.fullName); // Set the user's full name
+        }
+
         // Redirect to user site/dashboard
         navigate('/user-dashboard');
       } else {
@@ -149,97 +163,3 @@ function Login() {
 }
 
 export default Login;
-
-
-// import React, { useState } from 'react';
-// import { TextField, Button, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
-// import { Link, useNavigate } from 'react-router-dom';  // Import useNavigate for redirection
-// import { getBoxStyles } from '../../Assets/Styles/boxStyles';
-// import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles';
-
-// function Login() {
-//   const navigate = useNavigate();
-  
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [rememberMe, setRememberMe] = useState(false);
-//   const [error, setError] = useState(''); // To display error message if login fails
-
-//   // Dummy credentials for testing
-//   const dummyEmail = 'test@example.com';
-//   const dummyPassword = 'Password123';
-
-//   const handleSubmit = (event) => {
-//     event.preventDefault();
-
-//     // Simulate user login with dummy data
-//     if (email === dummyEmail && password === dummyPassword) {
-//       // Simulate setting a JWT token in localStorage after a successful login
-//       localStorage.setItem('authToken', 'dummyAuthToken123');
-//       navigate('/user-dashboard');  // Redirect to the logged-in page
-//     } else {
-//       setError('Invalid email or password');  // Display error if credentials do not match
-//     }
-//   };
-
-//   return (
-//     <Box
-//       component="form"
-//       onSubmit={handleSubmit}
-//       sx={{
-//         ...getBoxStyles('medium'),
-//       }}
-//     >
-//       <Typography variant="h5" gutterBottom>
-//         Login
-//       </Typography>
-
-//       {/* Email Input */}
-//       <TextField
-//         label="Enter your email"
-//         value={email}
-//         onChange={(e) => setEmail(e.target.value)}
-//         {...getTextFieldStyles()} // Apply shared styles
-//       />
-
-//       {/* Password Input */}
-//       <TextField
-//         label="Enter your password"
-//         type="password"
-//         value={password}
-//         onChange={(e) => setPassword(e.target.value)}
-//         {...getTextFieldStyles()} // Apply shared styles
-//       />
-
-//       {/* Remember me checkbox */}
-//       <FormControlLabel
-//         control={
-//           <Checkbox
-//             checked={rememberMe}
-//             onChange={(e) => setRememberMe(e.target.checked)}
-//             color="primary"
-//           />
-//         }
-//         label="Remember me"
-//       />
-
-//       {/* Error message */}
-//       {error && <Typography color="error">{error}</Typography>}
-
-//       {/* Login button */}
-//       <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
-//         LOGIN NOW
-//       </Button>
-
-//       {/* Register and forgot password links */}
-//       <Typography variant="body2" sx={{ mt: 2 }}>
-//         Not a member? <Link to="/register">Register Now</Link>
-//       </Typography>
-//       <Typography variant="body2">
-//         <Link to="/forgot-password">Forgot password?</Link>
-//       </Typography>
-//     </Box>
-//   );
-// }
-
-// export default Login;

@@ -1,18 +1,14 @@
-// Mangler at implementere styles
-
 import { Container, Typography, TextField, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from 'dayjs';
 
-function Budget() {
-  const [rows, setRows] = useState([
-    { id: 1, name: "New Laptop", price: 1500, goalEndDate: "2023-12-31", saved: 500 },
-    { id: 2, name: "Vacation", price: 3000, goalEndDate: "2024-06-15", saved: 1000 },
-    { id: 3, name: "Car", price: 20000, goalEndDate: "2025-01-01", saved: 5000 },
-    { id: 4, name: "Bike", price: 500, goalEndDate: "2023-09-01", saved: 200 },
-  ]);
+const API_URL = 'http://localhost:5168/api';
 
+const getAuthToken = () => localStorage.getItem('authToken');
+
+function Budget() {
+  const [rows, setRows] = useState([]);
   const [newRow, setNewRow] = useState({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -20,6 +16,20 @@ function Budget() {
   const [savingsAmount, setSavingsAmount] = useState('');
   const [savingsDate, setSavingsDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [savingsHistory, setSavingsHistory] = useState([]);
+
+  useEffect(() => {
+    fetchBudgets();
+  }, []);
+
+  const fetchBudgets = async () => {
+    const response = await fetch(`${API_URL}/budget`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    const data = await response.json();
+    setRows(data);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,16 +39,35 @@ function Budget() {
     }));
   };
 
-  const handleAddRow = () => {
-    if (editMode) {
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          row.id === newRow.id ? newRow : row
-        )
-      );
-    } else {
-      setRows((prevRows) => [...prevRows, { ...newRow, id: prevRows.length + 1 }]);
+  const handleAddRow = async () => {
+    const today = dayjs();
+    const endDate = dayjs(newRow.goalEndDate);
+  
+    if (!endDate.isValid() || endDate.isBefore(today, 'day')) {
+      alert("Please choose a future date for the saving goal.");
+      return;
     }
+  
+    if (editMode) {
+      await fetch(`${API_URL}/budget/${newRow.id}/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify(newRow)
+      });
+    } else {
+      await fetch(`${API_URL}/budget`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify(newRow)
+      });
+    }
+    fetchBudgets();
     setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
     setOpen(false);
     setEditMode(false);
@@ -54,8 +83,14 @@ function Budget() {
     setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
   };
 
-  const handleRowClick = (row) => {
-    setSelectedGoal(row);
+  const handleRowClick = async (row) => {
+    const response = await fetch(`${API_URL}/budget/${row.id}`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    const data = await response.json();
+    setSelectedGoal(data);
   };
 
   const handleEditGoal = (row) => {
@@ -64,8 +99,14 @@ function Budget() {
     setOpen(true);
   };
 
-  const handleDeleteGoal = (id) => {
-    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+  const handleDeleteGoal = async (id) => {
+    await fetch(`${API_URL}/budget/${id}/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    fetchBudgets();
     if (selectedGoal && selectedGoal.id === id) {
       setSelectedGoal(null);
     }
@@ -87,32 +128,38 @@ function Budget() {
     return { monthlySavings, weeklySavings, dailySavings };
   };
 
-  const handleAddSavings = () => {
+  const handleAddSavings = async () => {
     if (selectedGoal && savingsAmount) {
       const newSavings = { amount: parseFloat(savingsAmount), date: savingsDate, type: 'add' };
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          row.id === selectedGoal.id
-            ? { ...row, saved: row.saved + newSavings.amount }
-            : row
-        )
-      );
+      // Assuming you have an endpoint to add savings
+      await fetch(`${API_URL}/budget/${selectedGoal.id}/add-savings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify(newSavings)
+      });
+      fetchBudgets();
       setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
       setSavingsAmount('');
       setSavingsDate(dayjs().format('YYYY-MM-DD'));
     }
   };
 
-  const handleRemoveSavings = () => {
+  const handleRemoveSavings = async () => {
     if (selectedGoal && savingsAmount) {
       const newSavings = { amount: parseFloat(savingsAmount), date: savingsDate, type: 'remove' };
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          row.id === selectedGoal.id
-            ? { ...row, saved: row.saved - newSavings.amount }
-            : row
-        )
-      );
+      // Assuming you have an endpoint to remove savings
+      await fetch(`${API_URL}/budget/${selectedGoal.id}/remove-savings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify(newSavings)
+      });
+      fetchBudgets();
       setSavingsHistory((prevHistory) => [...prevHistory, { ...newSavings, goalId: selectedGoal.id }]);
       setSavingsAmount('');
       setSavingsDate(dayjs().format('YYYY-MM-DD'));
@@ -145,7 +192,7 @@ function Budget() {
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.price}</TableCell>
-                    <TableCell>{row.goalEndDate}</TableCell>
+                    <TableCell>{dayjs(row.goalEndDate).format('DD/MM/YYYY')}</TableCell>
                     <TableCell>
                       <IconButton onClick={() => handleEditGoal(row)}><Edit /></IconButton>
                       <IconButton onClick={() => handleDeleteGoal(row.id)}><Delete /></IconButton>
@@ -278,6 +325,9 @@ function Budget() {
             InputLabelProps={{
               shrink: true,
             }}
+            inputProps={{
+              min: dayjs().format('YYYY-MM-DD'), // Restrict to today's date and future dates
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -292,4 +342,5 @@ function Budget() {
     </Container>
   );
 }
+
 export default Budget;
