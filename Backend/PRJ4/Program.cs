@@ -103,8 +103,8 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     return client.GetDatabase(mongoDatabaseName);
 });
 //Register mapping profiles
-builder.Services.AddAutoMapper(typeof(FudgifterProfile));
-builder.Services.AddAutoMapper(typeof(VudgifterProfile));
+//builder.Services.AddAutoMapper(typeof(FudgifterProfile));
+//builder.Services.AddAutoMapper(typeof(VudgifterProfile));
 builder.Services.AddAutoMapper(typeof(LogMappingProfile));
 // Add services to the container
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
@@ -133,6 +133,17 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
 builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
 //builder.Services.AddScoped<IBrugerService, BrugerService>();
+builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
+builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
+//builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
+//builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
+//builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<IFindtægtService, FindtægtService>();
+builder.Services.AddScoped<IVindtægtService, VindtægtService>();
+//builder.Services.AddScoped<IFudgifterService,FudgifterService>();
+//builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+
 builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
 
 //Build Budgets
@@ -140,9 +151,15 @@ builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
 builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
 
+//Build Kategory Limit
+builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();
+builder.Services.AddScoped<ITemplateRepo<KategoryLimit>,KategoryLimitRepo>();
+builder.Services.AddScoped<IKategoryLimitService,KategoryLimitService>();
+
 builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
-builder.Services.AddScoped<IKategori, KategoriRepo>();
+builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<IVindtægtService, VindtægtService>();    
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
