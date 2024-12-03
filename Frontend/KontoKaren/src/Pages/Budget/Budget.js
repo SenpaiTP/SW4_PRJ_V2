@@ -61,7 +61,7 @@ function Budget() {
   const endDate = dayjs(newRow.goalEndDate);
 
   if (!endDate.isValid() || endDate.isBefore(today, 'day')) {
-    alert("Please choose a future date for the saving goal.");
+    alert("Vælg venligst en fremtidig dato for opsparingsmålet.");
     return;
   }
 
@@ -294,13 +294,13 @@ function Budget() {
             </Table>
           </TableContainer>
           <Button variant="contained" color="primary" onClick={handleClickOpen}>
-            Add New Saving Goal
+            Opret nyt opsparingsmål
           </Button>
         </Box>
 
         {selectedGoal && (
           <Box flex={1} marginLeft="20px">
-            <Typography variant="h4" gutterBottom>Progress for {selectedGoal.name}</Typography>
+            <Typography variant="h4" gutterBottom>Fremskridt for {selectedGoal.name}</Typography>
             <Box height="20px" marginTop="10px">
               <LinearProgress variant="determinate" value={calculateProgress(selectedGoal.saved, selectedGoal.price)} style={{ height: '20px' }} />
             </Box>
@@ -308,19 +308,19 @@ function Budget() {
             <Box marginTop="20px" padding="10px" border="1px solid #ccc" borderRadius="5px">
               <Typography variant="h5">Savings Plan</Typography>
               <Typography>
-                To save up for {selectedGoal.name}, you need to save approximately {calculateSavings(selectedGoal.price, selectedGoal.goalEndDate).monthlySavings.toFixed(2)} DKK per month.
+              For at spare op til {selectedGoal.name}, skal du spare cirka {calculateSavings(selectedGoal.price, selectedGoal.goalEndDate).monthlySavings.toFixed(2)} DKK per måned.
               </Typography>
               <Typography>
-                This is equivalent to approximately {calculateSavings(selectedGoal.price, selectedGoal.goalEndDate).weeklySavings.toFixed(2)} DKK per week.
+                Det er tilsvarende til {calculateSavings(selectedGoal.price, selectedGoal.goalEndDate).weeklySavings.toFixed(2)} DKK per uge.
               </Typography>
               <Typography>
-                This is equivalent to approximately {calculateSavings(selectedGoal.price, selectedGoal.goalEndDate).dailySavings.toFixed(2)} DKK per day.
+                Det er tilsvarende til {calculateSavings(selectedGoal.price, selectedGoal.goalEndDate).dailySavings.toFixed(2)} DKK per dag.
               </Typography>
               <Typography>
-                You have {dayjs(selectedGoal.goalEndDate).diff(dayjs(), 'day')} days left to reach your goal.
+                Du har {dayjs(selectedGoal.goalEndDate).diff(dayjs(), 'day')} dage tilbage til at nå dit mål.
               </Typography>
               <Typography>
-                You have saved {calculateProgress(selectedGoal.saved, selectedGoal.price).toFixed(2)}% of your goal.
+                Du har opsaret {calculateProgress(selectedGoal.saved, selectedGoal.price).toFixed(2)}% af dit mål.
               </Typography>
             </Box>
 
