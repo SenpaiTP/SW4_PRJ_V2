@@ -13,6 +13,7 @@ using PRJ4.Models;
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using PRJ4.Repositories;
+using PRJ4.Services; // Add this line for IRevocationService
 
 
 namespace PRJ4.Controllers;
@@ -26,14 +27,17 @@ public class AccountController : ControllerBase
     private readonly UserManager<ApiUser> _userManager;
     private readonly IConfiguration _config;
     private readonly SignInManager<ApiUser> _signInManager;
+    private readonly IRevocationService _revocationService;
+
     public AccountController(ApplicationDbContext context, ILogger<AccountController> logger, 
-            UserManager<ApiUser> userManager, IConfiguration config, SignInManager<ApiUser> signInManager)
+            UserManager<ApiUser> userManager, IConfiguration config, SignInManager<ApiUser> signInManager, IRevocationService revocationService)
     {
         _context = context;
         _logger = logger; // For logging
         _userManager = userManager;
         _config = config;
         _signInManager = signInManager;
+        _revocationService = revocationService;
     }
 
     [HttpPost]
@@ -162,7 +166,22 @@ public class AccountController : ControllerBase
         }
     }
 
-    
+    [HttpPost]
+    [Route("Logout")]
+    [Authorize]
+    public async Task<ActionResult>Logout()
+    {
+
+        var claims = User.Claims;
+        var userIdClaim = claims.FirstOrDefault(c=>c.Type.Split('/').Last()=="nameidentifier");
+        if(userIdClaim.Value!=null)
+        {
+            await _revocationService.RevokeRefreshTokenAsync(userIdClaim.Value);
+        }
+        
+        await _signInManager.SignOutAsync();
+        return StatusCode(StatusCodes.Status200OK,"User logged out");
+    }
 
     [HttpGet]
     [Route("WhoAmI")]

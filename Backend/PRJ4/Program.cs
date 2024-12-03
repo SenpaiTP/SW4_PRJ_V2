@@ -13,6 +13,8 @@ using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Mappings;
 using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using DnsClient.Protocol;
 
 
 
@@ -85,14 +87,26 @@ builder.Services.AddAuthentication(options=>
         };
     options.Events = new JwtBearerEvents
     {
-        OnTokenValidated = context =>
+        OnTokenValidated = async context =>
         {
-            var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
-            foreach (var claim in claims)
+            var token =context.SecurityToken as JwtSecurityToken;
+            if (token !=null)
             {
-                Console.WriteLine(claim);  // Log claims to verify them
+                var TokenId=token.RawData;
+                var revocationService=context.HttpContext.RequestServices.GetRequiredService<IRevocationService>();
+                var tokenIsRevoked=await revocationService.IsTokenRevokedAsync(TokenId);
+
+                if(tokenIsRevoked)
+                {
+                    context.Fail("Token is revoked");
+                }
             }
-            return Task.CompletedTask;
+            // var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
+            // foreach (var claim in claims)
+            // {
+            //     Console.WriteLine(claim);  // Log claims to verify them
+            // }
+            // return Task.CompletedTask;
         }
     };
     });
@@ -139,6 +153,7 @@ builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
 builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
+builder.Services.AddScoped<IRevocationService,RevocationService>();
 
 //Build Kategory Limit
 builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();
@@ -173,3 +188,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+    

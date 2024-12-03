@@ -67,6 +67,9 @@ function Login({ setUserFullName }) {
       if (response.ok) {
         // If login is successful, store token in localStorage or cookies
         localStorage.setItem('authToken', data.token); // Assuming token is returned
+        // console.log(data.token);
+        // console.log("Stored Token:", localStorage.getItem('authToken'));
+
 
         // Fetch the user's full name
         const nameResponse = await fetch('http://localhost:5168/Account/WhoAmI', {
@@ -79,6 +82,7 @@ function Login({ setUserFullName }) {
           const user = await nameResponse.json();
           setUserFullName(user.fullName); // Set the user's full name
         }
+        console.log("Stored Token:", localStorage.getItem('authToken'));
 
         // Redirect to user site/dashboard
         navigate('/user-dashboard');
