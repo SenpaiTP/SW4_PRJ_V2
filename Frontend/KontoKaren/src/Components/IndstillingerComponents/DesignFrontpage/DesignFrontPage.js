@@ -10,17 +10,31 @@ function DesignFrontPage() {
     //variable til box checked
     const [showPieChart, setShowPieChart] = useState(true);
     const [showBudget, setShowBudget] = useState(true);
+    const [showIndtægter, setShowIndtægter] = useState(true);
+    const [showUdgifter, setShowUdgifter] = useState(true);
+    const [showSøjlediagram, setShowSøjlediagram] = useState(true);
 
     useEffect(() => {
         const savedPieChart = localStorage.getItem('showPieChart') === 'true';
         const savedBudget = localStorage.getItem('showBudget') === 'true';
+        const savedIndtægter = localStorage.getItem('showIndtægter') === 'true';
+        const savedUdgifter = localStorage.getItem('showUdgifter') === 'true';
+        const savedSøjlediagram = localStorage.getItem('showSøjlediagram') === 'true';
+
         setShowPieChart(savedPieChart); //default er at den er true
         setShowBudget(savedBudget); 
+        setShowIndtægter(savedIndtægter);
+        setShowUdgifter(savedUdgifter);
+        setShowSøjlediagram(savedSøjlediagram);
   }, []);
 
     const handleSaveSettings = () => {
         localStorage.setItem('showPieChart', showPieChart); //sender til local storage
         localStorage.setItem('showBudget', showBudget);
+        localStorage.setItem('showIndtægter', showIndtægter);
+        localStorage.setItem('showUdgifter', showUdgifter);
+        localStorage.setItem('showSøjlediagram', showSøjlediagram);
+
         alert('Settings saved!');
     };
 
@@ -44,7 +58,21 @@ function DesignFrontPage() {
         </Box>
 
         <Box>
-        <FormControlLabel control={<Checkbox />} label="Indtægter placeholder" />
+        <FormControlLabel
+         control={<Checkbox checked={showIndtægter} onChange={(e) => setShowIndtægter(e.target.checked)} />}
+         label="Vis Indtægter" />  
+        </Box>
+
+        <Box>
+        <FormControlLabel
+         control={<Checkbox checked={showUdgifter} onChange={(e) => setShowUdgifter(e.target.checked)} />}
+         label="Vis Udgifter" />  
+        </Box>
+
+        <Box>
+        <FormControlLabel
+         control={<Checkbox checked={showSøjlediagram} onChange={(e) => setShowSøjlediagram(e.target.checked)} />}
+         label="Vis Søjlediagram" />  
         </Box>
 
         <Box>

@@ -8,13 +8,23 @@ function Homepage() {
 
   const [showPieChart, setShowPieChart] = useState(false);
   const [showBudget, setShowBudget] = useState(false);
+  const [showIndtægter, setShowIndtægter] = useState(false);
+  const [showUdgifter, setShowUdgifter] = useState(false);
+  const [showSøjlediagram, setShowSøjlediagram] = useState(false);
+
 
   useEffect(() => {
     const savedPieChart = localStorage.getItem('showPieChart') === 'true';
-    setShowPieChart(savedPieChart);
-
     const savedBudget = localStorage.getItem('showBudget') === 'true';
-    setShowBudget(savedBudget);
+    const savedIndtægter = localStorage.getItem('showIndtægter') === 'true';
+    const savedUdgifter = localStorage.getItem('showUdgifter') === 'true';
+    const savedSøjlediagram = localStorage.getItem('showSøjlediagram') === 'true';
+
+    setShowPieChart(savedPieChart); //default er at den er true
+    setShowBudget(savedBudget); 
+    setShowIndtægter(savedIndtægter);
+    setShowUdgifter(savedUdgifter);
+    setShowSøjlediagram(savedSøjlediagram);
 }, []);
 
   return (
@@ -49,6 +59,43 @@ function Homepage() {
             </Card>
           </Grid>
         )}
+
+      {showIndtægter && (
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" gutterBottom color="text.primary">
+                  Jeg er Indtægter
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+
+        {showUdgifter && (
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" gutterBottom color="text.primary">
+                  Jeg er Udgifter
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+
+        {showSøjlediagram&& (
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" gutterBottom color="text.primary">
+                  Jeg er et Søjlediagram
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+      
       
     </Container>
   );

@@ -8,7 +8,7 @@ function Indtægter() {
 
   return (
     <Container>
-      <Typography variant="h1" component="h2" padding ="10" align = "left">
+      <Typography variant="h1" component="h2" padding ="10" align = "left" color="text.primary">
         Indtægter
       </Typography>
 
