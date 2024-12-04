@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Http;
 using FluentAssertions;
 using PRJ4.Data;
 using PRJ4.Test.Setup;
+using PRJ4.Repositories;
+using PRJ4.Models;
+using PRJ4.Mappings;
 
 
 
@@ -20,16 +23,22 @@ namespace PRJ4.Test.SystemTest
 {
     public class FudgifterSystemTest : TestBase, IDisposable
     {
-        private readonly Mock<IFudgifterService> _fudgifterServiceMock;
-        private readonly Mock<ILogger<FudgifterController>> _loggerMock;
+        private readonly IFudgifterService _fudgifterService;
+        private readonly Mock<ILogger<FudgifterController>> _loggerControllerMock;
+        private readonly Mock<ILogger<FudgifterService>> _loggerServiceMock;
         private readonly FudgifterController _controller;
-
+        private readonly IKategoriRepo _kategoriRepo;
+        private readonly IFudgifter _fudgifterRepo;
         private ApplicationDbContext _context;
         public FudgifterSystemTest()
         {
-            _fudgifterServiceMock = new Mock<IFudgifterService>();
-            _loggerMock = new Mock<ILogger<FudgifterController>>();
-            _controller = new FudgifterController(_fudgifterServiceMock.Object, _loggerMock.Object);
+            _loggerControllerMock = new Mock<ILogger<FudgifterController>>();
+             _loggerServiceMock = new Mock<ILogger<FudgifterService>>();
+            _kategoriRepo = new KategoriRepo(_context);
+            _fudgifterRepo = new FudgifterRepo(_context);
+            _fudgifterService = new FudgifterService(_fudgifterRepo,_kategoriRepo, _loggerServiceMock.Object, );
+            
+            _controller = new FudgifterController(_fudgifterService, _loggerControllerMock.Object);
         }
         private void SetupUserContext(string userId)
         {

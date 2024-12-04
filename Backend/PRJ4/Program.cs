@@ -144,7 +144,7 @@ builder.Services.AddScoped<IVindtægtService, VindtægtService>();
 //builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 //builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 
-builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
+builder.Services.AddScoped<IFudgifterRepo, FudgifterRepo>();
 
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
