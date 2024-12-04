@@ -1,15 +1,14 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
-
 function ResetPassword() {
   return (
     <Box sx={{ padding: 2, maxWidth: 400, margin: 'auto' }}>
       <Typography variant="h5" gutterBottom>
-        Reset Password
+        Nulstil adgangskode
       </Typography>
       <Typography variant="body1">
-        Instructions to reset your password have been sent to your email.
+        Instruktioner til at nulstille din adgangskode er sendt til din email.
       </Typography>
     </Box>
   );

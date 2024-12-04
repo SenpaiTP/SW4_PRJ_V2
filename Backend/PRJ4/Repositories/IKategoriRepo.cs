@@ -8,7 +8,7 @@ using PRJ4.Models;
 
 namespace PRJ4.Repositories
 {
-    public interface IKategori:ITemplateRepo<Kategori>
+    public interface IKategoriRepo:ITemplateRepo<Kategori>
     {
         Task<Kategori> NyKategori(string KategoriNavn);
         Task<Kategori> SearchByName(string kategoriNavn);

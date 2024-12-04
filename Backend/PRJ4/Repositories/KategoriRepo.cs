@@ -1,49 +1,49 @@
+
 using Microsoft.EntityFrameworkCore;
+using PRJ4.Data;
+using PRJ4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PRJ4.Data;
-using PRJ4.Models;
 
 namespace PRJ4.Repositories
 {
-    public class KategoriRepo : TemplateRepo<Kategori>,IKategori
+    public class KategoriRepo : TemplateRepo<Kategori>,IKategoriRepo
     {
         private readonly ApplicationDbContext _context;
+
         public KategoriRepo(ApplicationDbContext context) : base(context)
         {
-           _context = context;
+            _context = context;
         }
 
-        public async Task<Kategori> SearchByName(string KategoriNavn)
+    
+        
+
+        public async Task<Kategori> SearchByName(string kategoriNavn)
         {
-            if (string.IsNullOrWhiteSpace(KategoriNavn)) return null;
-            
+            if (string.IsNullOrWhiteSpace(kategoriNavn)) return null;
+
             return await _context.Kategorier
-                .FirstOrDefaultAsync(k => k.Navn.ToLower() == KategoriNavn.Trim().ToLower());
+                .FirstOrDefaultAsync(k => k.KategoriNavn.ToLower() == kategoriNavn.Trim().ToLower());
         }
-
-        public async Task<Kategori> NyKategori(string KategoriNavn)
+        public async Task<Kategori> NyKategori(string kategoriNavn)
         {
-            if (string.IsNullOrWhiteSpace(KategoriNavn))
+            if (string.IsNullOrWhiteSpace(kategoriNavn))
             {
                 throw new ArgumentException("Kategori name cannot be null or whitespace.");
             }
-            
-            // Convert the name to lowercase after validation
-            KategoriNavn = KategoriNavn.Trim().ToLower();
+
+            kategoriNavn = kategoriNavn.Trim().ToLower();
 
             // Create a new Kategori instance with the validated and transformed name
-            Kategori kategori = new Kategori { Navn = KategoriNavn };
+            Kategori kategori = new Kategori { KategoriNavn = kategoriNavn };
 
-            // Add and save changes, allowing the database to generate the ID
             await AddAsync(kategori);
             await SaveChangesAsync();
 
-            // Return the created kategori object
             return kategori;
         }
-
     }
 }
