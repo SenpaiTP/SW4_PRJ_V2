@@ -17,14 +17,16 @@ public partial class Bruger
 
     public string Email { get; set; } = null!;
 
+    public ICollection<Budget>? Budgets { get; set; }
+
     
     //public virtual ICollection<Findtægt> Findtægts { get; set; } = new List<Findtægt>();
 
-    public virtual ICollection<Fudgifter> Fudgifters { get; set; } = new List<Fudgifter>();
+    //public virtual ICollection<Fudgifter> Fudgifters { get; set; } = new List<Fudgifter>();
 
     //public virtual ICollection<Vindtægter> Vindtægters { get; set; } = new List<Vindtægter>();
 
-    public virtual ICollection<Vudgifter> Vudgifters { get; set; } = new List<Vudgifter>();
+   // public virtual ICollection<Vudgifter> Vudgifters { get; set; } = new List<Vudgifter>();
 
     //public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 }

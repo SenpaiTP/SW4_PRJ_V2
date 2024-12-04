@@ -9,13 +9,13 @@ namespace PRJ4.Services
     {
         private readonly IVudgifter _VudgifterRepo;
         private readonly IBrugerRepo _brugerRepo;
-        private readonly IKategori _kategoriRepo;
+        private readonly IKategoriRepo _kategoriRepo;
         private readonly ILogger<VudgifterService> _logger;
         private readonly IMapper _mapper;
 
         public VudgifterService(
             IVudgifter VudgifterRepo,
-            IKategori kategoriRepo,
+            IKategoriRepo kategoriRepo,
             IBrugerRepo brugerRepo,
             ILogger<VudgifterService> logger,
             IMapper mapper)
@@ -28,7 +28,7 @@ namespace PRJ4.Services
         }
 
         // Get all expenses for a user
-        public async Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(int brugerId)
+        public async Task<IEnumerable<VudgifterResponseDTO>> GetAllByUser(string brugerId)
         {
 
             var Vudgifter = await _VudgifterRepo.GetAllByUserId(brugerId);
@@ -40,15 +40,8 @@ namespace PRJ4.Services
         }
 
         // Add a new expense for a user
-        public async Task<VudgifterResponseDTO> AddVudgifter(int brugerId, nyVudgifterDTO dto)
+        public async Task<VudgifterResponseDTO> AddVudgifter(string brugerId, nyVudgifterDTO dto)
         {
-
-            var bruger = await _brugerRepo.GetByIdAsync(brugerId);
-            if (bruger == null)
-            {
-                _logger.LogWarning("User with ID {BrugerId} not found", brugerId);
-                throw new KeyNotFoundException("Bruger not found.");
-            }
 
             Kategori kategori;
 
@@ -74,7 +67,6 @@ namespace PRJ4.Services
             // Set additional properties
             nyVudgifter.BrugerId = brugerId;
             nyVudgifter.Kategori = kategori;
-            nyVudgifter.Bruger = bruger;
 
             await _VudgifterRepo.AddAsync(nyVudgifter);
             await _VudgifterRepo.SaveChangesAsync();
@@ -84,7 +76,7 @@ namespace PRJ4.Services
         }
 
         // Update an existing expense for a user
-        public async Task UpdateVudgifter(int id, int brugerId, VudgifterUpdateDTO nydto)
+        public async Task UpdateVudgifter(string brugerId, int id, VudgifterUpdateDTO nydto)
         {
 
             var Vudgifter = await _VudgifterRepo.GetByIdAsync(id)
@@ -133,7 +125,7 @@ namespace PRJ4.Services
         }
 
         // Delete an expense for a user
-        public async Task DeleteVudgifter(int brugerId, int id)
+        public async Task DeleteVudgifter(string brugerId, int id)
         {
             var Vudgifter = await _VudgifterRepo.GetByIdAsync(id)
                            ?? throw new KeyNotFoundException("Vudgifter not found.");

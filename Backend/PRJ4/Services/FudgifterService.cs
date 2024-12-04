@@ -9,13 +9,13 @@ namespace PRJ4.Services
     {
         private readonly IFudgifter _fudgifterRepo;
         private readonly IBrugerRepo _brugerRepo;
-        private readonly IKategori _kategoriRepo;
+        private readonly IKategoriRepo _kategoriRepo;
         private readonly ILogger<FudgifterService> _logger;
         private readonly IMapper _mapper; 
 
         public FudgifterService(
             IFudgifter fudgifterRepo,
-            IKategori kategoriRepo,
+            IKategoriRepo kategoriRepo,
             IBrugerRepo brugerRepo,
             ILogger<FudgifterService> logger,
             IMapper mapper)
@@ -28,7 +28,7 @@ namespace PRJ4.Services
         }
 
         // Get all expenses for a user
-        public async Task<IEnumerable<FudgifterResponseDTO>> GetAllByUser(int brugerId)
+        public async Task<IEnumerable<FudgifterResponseDTO>> GetAllByUser(string brugerId)
         {
             var fudgifter = await _fudgifterRepo.GetAllByUserId(brugerId);
 
@@ -39,14 +39,8 @@ namespace PRJ4.Services
         }
 
         // Add a new expense for a user
-        public async Task<FudgifterResponseDTO> AddFudgifter(int brugerId, nyFudgifterDTO nydto)
+        public async Task<FudgifterResponseDTO> AddFudgifter(string brugerId, nyFudgifterDTO nydto)
         {
-            var bruger = await _brugerRepo.GetByIdAsync(brugerId);
-            if (bruger == null)
-            {
-                _logger.LogWarning("User with ID {BrugerId} not found", brugerId);
-                throw new KeyNotFoundException("Bruger not found.");
-            }
 
             Kategori kategori;
 
@@ -72,7 +66,6 @@ namespace PRJ4.Services
             // Set additional properties
             nyFudgifter.BrugerId = brugerId;
             nyFudgifter.Kategori = kategori;
-            nyFudgifter.Bruger = bruger;
 
             await _fudgifterRepo.AddAsync(nyFudgifter);
             await _fudgifterRepo.SaveChangesAsync();
@@ -81,7 +74,7 @@ namespace PRJ4.Services
         }
 
         // Update an existing expense for a user
-        public async Task UpdateFudgifter(int id, int brugerId, FudgifterUpdateDTO dto)
+        public async Task UpdateFudgifter(string brugerId, int id,  FudgifterUpdateDTO dto)
         {
 
             var fudgifter = await _fudgifterRepo.GetByIdAsync(id)
@@ -122,7 +115,7 @@ namespace PRJ4.Services
         }
 
         // Delete an expense for a user
-        public async Task DeleteFudgifter(int brugerId, int id)
+        public async Task DeleteFudgifter(string brugerId, int id)
         {
 
             var fudgifter = await _fudgifterRepo.GetByIdAsync(id)
