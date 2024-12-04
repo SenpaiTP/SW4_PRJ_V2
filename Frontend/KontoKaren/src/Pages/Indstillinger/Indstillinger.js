@@ -1,14 +1,15 @@
 import React from 'react';
-import { Container, Box, Grid, Card, CardContent, Typography, Button } from '@mui/material';
+import { Container, Box, Grid, Card, CardContent, Typography, FormControlLabel, Switch } from '@mui/material';
 import ChangePassword from './ChangePassword'; 
 import DesignFrontPage from './DesignFrontPage';
-//import ThemeProvider from './ThemeProvider';
+import SetTheme from './SetTheme';
+import ThemeProvider from './ThemeProvider';
 import { useContext } from 'react';
 import { ThemeContext } from './ThemeProvider';
 
-const API_URL = 'http://localhost:5168/api';
+/*const API_URL = 'http://localhost:5168/api';
 
-const getAuthToken = () => localStorage.getItem('authToken');
+const getAuthToken = () => localStorage.getItem('authToken');*/
 
 function Indstillinger() {
 
@@ -43,7 +44,7 @@ function Indstillinger() {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Design Forside
+                Design din forside
               </Typography>
               <DesignFrontPage />
             </CardContent>
@@ -55,14 +56,9 @@ function Indstillinger() {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Light/Dark Mode
+                Mørk tilstand
               </Typography>
-              <Typography>
-                Placeholder for Light/Dark Mode functionality.
-              </Typography>
-              <Button onClick={toggleTheme}>
-               Skift til {theme === 'light' ? 'Dark' : 'Light'} Theme
-               </Button>
+              <SetTheme />
             </CardContent>
           </Card>
         </Grid>

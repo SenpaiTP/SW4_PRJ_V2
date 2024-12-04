@@ -6,8 +6,8 @@ import { lightTheme, darkTheme } from './theme';
 
 export const ThemeContext = createContext();
 
-
 const ThemeProvider = ({ children }) => {
+  
   const [theme, setTheme] = useState(() => {
     // Hent tema fra localStorage, eller brug 'light' som standard
     return localStorage.getItem('theme') || 'light';
@@ -16,9 +16,8 @@ const ThemeProvider = ({ children }) => {
   // Effekt til at hente tema fra localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setTheme(savedTheme); // Sæt temaet til den gemte værdi
-    }
+    setTheme(savedTheme); // Sæt temaet til den gemte værdi
+    
   }, []); //Når [] er tom, kørers effekten kun én gang
 
   useEffect(() => {

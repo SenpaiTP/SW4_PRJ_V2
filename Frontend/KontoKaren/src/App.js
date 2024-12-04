@@ -41,7 +41,7 @@ function App() {
   }, []);
 
   return (
-    
+    <ThemeProvider >
     <Router>
       <div className="App">
         <Header userFullName={userFullName} />
@@ -58,6 +58,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </ThemeProvider>
     
   );
 }
