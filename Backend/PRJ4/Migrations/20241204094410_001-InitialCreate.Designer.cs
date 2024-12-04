@@ -12,7 +12,7 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241202103830_001-InitialCreate")]
+    [Migration("20241204094410_001-InitialCreate")]
     partial class _001InitialCreate
     {
         /// <inheritdoc />
