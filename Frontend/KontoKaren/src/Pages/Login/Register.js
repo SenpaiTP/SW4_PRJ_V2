@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom'; // Importer useNavigate
 import { getBoxStyles } from '../../Assets/Styles/boxStyles';
-import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // Import textFieldStyles
+import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // Importer textFieldStyles
 
 function Register() {
   const [firstName, setFirstName] = useState('');
@@ -10,7 +10,7 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showPassword, setShowPassword] = useState(false); // State for adgangskodesynlighed
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
@@ -18,8 +18,8 @@ function Register() {
     password: '',
     confirmPassword: '',
   });
-  const [loading, setLoading] = useState(false); // Loading state for button
-  const navigate = useNavigate(); // Hook to redirect the user
+  const [loading, setLoading] = useState(false); // Loading state for knap
+  const navigate = useNavigate(); // Hook til at redirecte brugeren
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,78 +27,73 @@ function Register() {
     let formErrors = { ...errors };
     let formValid = true;
 
-    // Reset errors
-    Object.keys(formErrors).forEach((key) => formErrors[key] = '');
+    // Nulstil fejl
+    Object.keys(formErrors).forEach((key) => (formErrors[key] = ''));
 
-    // Check if all fields are filled
+    // Tjek om alle felter er udfyldt
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      formErrors.firstName = 'First name is required';
-      formErrors.lastName = 'Last name is required';
-      formErrors.email = 'Email is required';
-      formErrors.password = 'Password is required';
-      formErrors.confirmPassword = 'Confirm password is required';
+      formErrors.firstName = 'Fornavn er påkrævet';
+      formErrors.lastName = 'Efternavn er påkrævet';
+      formErrors.email = 'Email er påkrævet';
+      formErrors.password = 'Adgangskode er påkrævet';
+      formErrors.confirmPassword = 'Bekræft adgangskode er påkrævet';
       formValid = false;
     }
 
-    // Check if email is valid
+    // Tjek om email er gyldig
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (email && !emailRegex.test(email)) {
-      formErrors.email = 'Please enter a valid email address';
+      formErrors.email = 'Indtast en gyldig emailadresse';
       formValid = false;
     }
 
-    // Check if passwords match
+    // Tjek om adgangskoderne matcher
     if (password && confirmPassword && password !== confirmPassword) {
-      formErrors.confirmPassword = 'Passwords do not match';
+      formErrors.confirmPassword = 'Adgangskoderne matcher ikke';
       formValid = false;
     }
 
-    // Check if password is at least 8 characters long and contains at least one uppercase letter
+    // Tjek om adgangskoden opfylder kravene
     const passwordRegex = /^(?=.*[A-Z]).{8,}$/;
     if (password && !passwordRegex.test(password)) {
-      formErrors.password = 'Password must be at least 8 characters long and contain at least one uppercase letter';
+      formErrors.password = 'Adgangskode skal være mindst 8 tegn lang og indeholde mindst ét stort bogstav';
       formValid = false;
     }
 
     setErrors(formErrors);
 
-    // If there are errors, prevent form submission
-    if (!formValid) return;
+    if (!formValid) return; // Hvis der er fejl, forhindrer vi formularen i at blive sendt
 
-    // If all validations pass, handle form submission
+    // Hvis alle valideringer er bestået
     setLoading(true); // Start loading
-  try {
-    const response = await fetch('http://localhost:5168/Account/Register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    try {
+      const response = await fetch('http://localhost:5168/Account/Register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           Fornavn: firstName,
           Efternavn: lastName,
           Email: email,
-          Password: password
-      }),
-    });
+          Password: password,
+        }),
+      });
 
-      console.log('API response:', response.status);
+      console.log('API-svar:', response.status);
 
       const data = await response.json();
 
-      
-      // Check if registration is successful (you can adjust this check based on your backend response)
       if (response.ok) {
-        // If registration is successful, redirect to login page
-        console.log('Registration successful:', data);
-        navigate('/login');
+        console.log('Registrering lykkedes:', data);
+        navigate('/login'); // Redirect til login-siden
       } else {
-        console.error('Registration failed:', data);
-        // If registration fails, show error message (you can adjust based on your backend response)
-        setErrors({ ...errors, email: data.message || 'Registration failed' });
+        console.error('Registrering mislykkedes:', data);
+        setErrors({ ...errors, email: data.message || 'Registrering mislykkedes' });
       }
     } catch (error) {
-      console.error('Registration failed:', error);
-      setErrors({ ...errors, email: 'An error occurred. Please try again.' });
+      console.error('Registrering mislykkedes:', error);
+      setErrors({ ...errors, email: 'Der opstod en fejl. Prøv igen.' });
     } finally {
       setLoading(false); // Stop loading
     }
@@ -109,29 +104,29 @@ function Register() {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        ...getBoxStyles('medium'), // Dynamically get the medium box styles
+        ...getBoxStyles('medium'), // Dynamisk styling til medium box
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Sign Up
+        Tilmeld
       </Typography>
 
-      {/* First Name */}
+      {/* Fornavn */}
       <TextField
-        label="First Name"
+        label="Fornavn"
         value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles here
-        error={!!errors.firstName} // Show error if there's an error for this field
-        helperText={errors.firstName} // Display error message
+        {...getTextFieldStyles()}
+        error={!!errors.firstName}
+        helperText={errors.firstName}
       />
-      
-      {/* Last Name */}
+
+      {/* Efternavn */}
       <TextField
-        label="Last Name"
+        label="Efternavn"
         value={lastName}
         onChange={(e) => setLastName(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles here
+        {...getTextFieldStyles()}
         error={!!errors.lastName}
         helperText={errors.lastName}
       />
@@ -141,39 +136,37 @@ function Register() {
         label="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles here
+        {...getTextFieldStyles()}
         error={!!errors.email}
         helperText={errors.email}
       />
 
-      {/* Password */}
+      {/* Adgangskode */}
       <TextField
-        label="Password"
-        type={showPassword ? 'text' : 'password'} // Toggle between text and password
+        label="Adgangskode"
+        type={showPassword ? 'text' : 'password'}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles here
+        {...getTextFieldStyles()}
         error={!!errors.password}
-        helperText={errors.password || "Password must be at least 8 characters long and contain at least one uppercase letter"} // Display default message if no error
-        FormHelperTextProps={{
-          style: {
-            color: errors.password ? 'red' : 'black', // Change color to red if error exists
-          },
-        }}
+        helperText={
+          errors.password ||
+          'Adgangskode skal være mindst 8 tegn lang og indeholde mindst ét stort bogstav og et special tegn (f.eks. !@#$%^&*)'
+        }
       />
 
-      {/* Confirm Password */}
+      {/* Bekræft adgangskode */}
       <TextField
-        label="Confirm Password"
-        type={showPassword ? 'text' : 'password'} // Toggle between text and password
+        label="Bekræft adgangskode"
+        type={showPassword ? 'text' : 'password'}
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles here
+        {...getTextFieldStyles()}
         error={!!errors.confirmPassword}
         helperText={errors.confirmPassword}
       />
 
-      {/* Show Password Checkbox */}
+      {/* Vis adgangskode checkbox */}
       <FormControlLabel
         control={
           <Checkbox
@@ -182,15 +175,15 @@ function Register() {
             color="primary"
           />
         }
-        label="Show Password"
+        label="Vis adgangskode"
       />
 
       <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }} disabled={loading}>
-        {loading ? 'Signing Up...' : 'Sign Up Now'}
+        {loading ? 'Registrerer...' : 'Tilmeld nu'}
       </Button>
 
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Already have an account? <Link to="/login">Login Here</Link>
+        Har du allerede en konto? <Link to="/login">Log ind her</Link>
       </Typography>
     </Box>
   );
