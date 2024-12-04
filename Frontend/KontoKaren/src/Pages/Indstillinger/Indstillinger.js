@@ -1,11 +1,11 @@
 import React from 'react';
 import { Container, Box, Grid, Card, CardContent, Typography, FormControlLabel, Switch } from '@mui/material';
-import ChangePassword from './ChangePassword'; 
-import DesignFrontPage from './DesignFrontPage';
-import SetTheme from './SetTheme';
-import ThemeProvider from './ThemeProvider';
+import ChangePassword from '../../Components/IndstillingerComponents/ChangePassword/ChangePassword'; 
+import DesignFrontPage from '../../Components/IndstillingerComponents/DesignFrontpage/DesignFrontPage';
+import SetTheme from '../../Components/IndstillingerComponents/Theme/SetTheme';
+import ThemeProvider from '../../Components/IndstillingerComponents/Theme/ThemeProvider';
 import { useContext } from 'react';
-import { ThemeContext } from './ThemeProvider';
+import { ThemeContext } from '../../Components/IndstillingerComponents/Theme/ThemeProvider';
 
 /*const API_URL = 'http://localhost:5168/api';
 

@@ -11,8 +11,8 @@ import ResetPassword from './Pages/Login/ResetPassword';
 
   // Indstillinger page
   import Indstillinger from './Pages/Indstillinger/Indstillinger';
-  import ThemeProvider from './Pages/Indstillinger/ThemeProvider';
-import LoggedInPage from './Pages/LoggedInPage/test';
+  import ThemeProvider from './Components/IndstillingerComponents/Theme/ThemeProvider';
+  import LoggedInPage from './Pages/LoggedInPage/test';
 
 function App() {
   const [userFullName, setUserFullName] = useState(null);
