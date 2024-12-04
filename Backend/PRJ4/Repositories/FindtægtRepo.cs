@@ -41,6 +41,24 @@ public class FindtægtRepo : TemplateRepo<Findtægt>, IFindtægtRepo
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<FindtægtResponseDTO>> GetById(string userId, int id)
+    {
+        return await _context.Findtægter
+            .Where(f => f.BrugerId == userId)
+            .Include(f => f.Kategori)
+            .Select(f => new FindtægtResponseDTO
+            {
+                // Map properties here
+                FindtægtId = f.FindtægtId,
+                Indtægt = f.Indtægt,
+                Tekst = f.Tekst,
+                Dato = f.Dato,
+                KategoriNavn = f.Kategori.KategoriNavn,
+                KategoriId = f.KategoriId
+            })
+            .ToListAsync();
+    }
+
     public async Task<Findtægt> CreateFindtægtAsync(string userId, FindtægtCreateDTO findtægtCreateDTO)
     {
         var findtægt = new Findtægt
