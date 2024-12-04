@@ -19,7 +19,7 @@ export default function useIndtægterHooks(initialRows) {
         newIncome.price,
         newIncome.date
       );
-      setRows([...rows, newRow]);
+      setRows((prevRows) => [newRow, ...prevRows]); // Tilføj den nye række øverst
       console.log("After adding row:", [...rows, newRow]);
     };
 

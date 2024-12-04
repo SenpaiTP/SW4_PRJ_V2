@@ -36,8 +36,7 @@ export default function useUdgifterHooks(initialExpenseRows) {
         newExpense.price,
         newExpense.date
       );
-      setRows([...rows, newRow]);
-      console.log("After adding row:", [...rows, newRow]);
+      setRows((prevRows) => [newRow, ...prevRows]); // Tilføj den nye række øverst
     };
 
     const handleEditRow = (newExpense) => {
@@ -85,6 +84,7 @@ export default function useUdgifterHooks(initialExpenseRows) {
       alert("Ændringer er gemt");
     };
 
+    
 
     return {
       rows,

@@ -1,27 +1,15 @@
 import React from "react";
-import {
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@mui/material";
+import { TableHead, TableRow, TableCell } from "@mui/material";
 
-export default function TableHeader({
-  numSelected,
-}) {
+export default function TableHeader({ numSelected }) {
   return (
     <TableHead>
       <TableRow>
-        {/* Checkbox for at vælge alle */}
-        <TableCell padding="checkbox">
-         
-        </TableCell>
-
-        {/* Kolonnehoveder */}
-        <TableCell>Udgiftsnavn</TableCell>
-        <TableCell align="left">Kategori</TableCell>
-        <TableCell align="left">Beløb</TableCell>
-        <TableCell align="left">Dato</TableCell>
-        <TableCell align="left">Handlinger</TableCell>
+        <TableCell style={{ width: '20%' }}>Udgiftsnavn</TableCell>
+        <TableCell style={{ width: '20%' }} align="left">Kategori</TableCell>
+        <TableCell style={{ width: '20%' }} align="left">Beløb</TableCell>
+        <TableCell style={{ width: '20%' }} align="left">Dato</TableCell>
+        <TableCell style={{ width: '20%' }} align="left">Handlinger</TableCell>
       </TableRow>
     </TableHead>
   );
