@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Button, Grid, Card, CardContent } from '@mui/material'; // Box and Button from Material-UI
 import { getBoxStyles } from '../Assets/Styles/boxStyles'; // Adjust path if needed
 import { getButtonStyles } from '../Assets/Styles/buttonStyles'; // Import button styles
-import PieChart from '../Pages/Indtægter/PieChart';
+import PieChart from '../Components/IndtægterComponents/PieChart/PieChart';
 
 function Homepage() {
 

@@ -38,6 +38,10 @@ function Header({ userFullName }) {
         <Button color="inherit" component={Link} to="/Budget">
           Budget
         </Button>
+
+        <Button color="inherit" component={Link} to="/Indstillinger">
+          Indstillinger
+        </Button>
         {userFullName ? (
           <>
             <Typography
