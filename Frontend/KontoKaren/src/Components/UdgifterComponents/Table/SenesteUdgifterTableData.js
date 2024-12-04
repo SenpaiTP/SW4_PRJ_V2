@@ -1,4 +1,4 @@
-import { createData } from "../../../Utils/CreateData";
+import { createData } from "../../../Utils/CreateData.js";
 
   // Initial data example
   export const initialExpenseRows = [

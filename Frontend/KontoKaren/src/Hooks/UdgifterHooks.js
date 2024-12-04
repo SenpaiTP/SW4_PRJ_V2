@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createData } from "../Components/UdgifterComponents/Table/UdgifterTableData";
+import { createData } from "../Utils/CreateData";
 
 export default function useUdgifterHooks(initialExpenseRows) {
     const [rows, setRows] = useState(initialExpenseRows);
