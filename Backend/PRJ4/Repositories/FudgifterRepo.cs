@@ -10,7 +10,7 @@ using PRJ4.Models;
 namespace PRJ4.Repositories
 {
     
-    public class FudgifterRepo : TemplateRepo<Fudgifter>,IFudgifter
+    public class FudgifterRepo : TemplateRepo<Fudgifter>,IFudgifterRepo
     {
         private readonly ApplicationDbContext _context;
         public FudgifterRepo(ApplicationDbContext context) : base(context)

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PRJ4.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class _001InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,7 +73,7 @@ namespace PRJ4.Migrations
                 {
                     KategoriId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Navn = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    KategoriNavn = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -201,6 +201,63 @@ namespace PRJ4.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Budgets",
+                columns: table => new
+                {
+                    BudgetId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SavingsGoal = table.Column<int>(type: "int", nullable: false),
+                    BudgetStart = table.Column<DateOnly>(type: "date", nullable: false),
+                    BudgetSlut = table.Column<DateOnly>(type: "date", nullable: false),
+                    BrugerId1 = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Budgets", x => x.BudgetId);
+                    table.ForeignKey(
+                        name: "FK_Budgets_AspNetUsers_BrugerId",
+                        column: x => x.BrugerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Budgets_Brugers_BrugerId1",
+                        column: x => x.BrugerId1,
+                        principalTable: "Brugers",
+                        principalColumn: "BrugerId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Findtægter",
+                columns: table => new
+                {
+                    FindtægtId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Tekst = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Indtægt = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Dato = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    KategoriId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Findtægter", x => x.FindtægtId);
+                    table.ForeignKey(
+                        name: "FK_Findtægter_AspNetUsers_BrugerId",
+                        column: x => x.BrugerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Findtægter_Kategorier_KategoriId",
+                        column: x => x.KategoriId,
+                        principalTable: "Kategorier",
+                        principalColumn: "KategoriId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Fudgifters",
                 columns: table => new
                 {
@@ -210,8 +267,7 @@ namespace PRJ4.Migrations
                     Tekst = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Dato = table.Column<DateTime>(type: "datetime2", nullable: true),
                     KategoriId = table.Column<int>(type: "int", nullable: false),
-                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BrugerId1 = table.Column<int>(type: "int", nullable: true)
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -223,16 +279,66 @@ namespace PRJ4.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Fudgifters_Brugers_BrugerId1",
-                        column: x => x.BrugerId1,
-                        principalTable: "Brugers",
-                        principalColumn: "BrugerId");
-                    table.ForeignKey(
                         name: "FK_Fudgifters_Kategorier_KategoriId",
                         column: x => x.KategoriId,
                         principalTable: "Kategorier",
                         principalColumn: "KategoriId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KategoryLimits",
+                columns: table => new
+                {
+                    KategoryLimitId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    KategoryId = table.Column<int>(type: "int", nullable: false),
+                    Limit = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KategoryLimits", x => x.KategoryLimitId);
+                    table.ForeignKey(
+                        name: "FK_KategoryLimits_AspNetUsers_BrugerId",
+                        column: x => x.BrugerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_KategoryLimits_Kategorier_KategoryId",
+                        column: x => x.KategoryId,
+                        principalTable: "Kategorier",
+                        principalColumn: "KategoriId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vindtægter",
+                columns: table => new
+                {
+                    VindtægtId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Tekst = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Indtægt = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Dato = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    KategoriId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vindtægter", x => x.VindtægtId);
+                    table.ForeignKey(
+                        name: "FK_Vindtægter_AspNetUsers_BrugerId",
+                        column: x => x.BrugerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vindtægter_Kategorier_KategoriId",
+                        column: x => x.KategoriId,
+                        principalTable: "Kategorier",
+                        principalColumn: "KategoriId");
                 });
 
             migrationBuilder.CreateTable(
@@ -245,8 +351,7 @@ namespace PRJ4.Migrations
                     Tekst = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Dato = table.Column<DateTime>(type: "datetime2", nullable: true),
                     BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    KategoriId = table.Column<int>(type: "int", nullable: true),
-                    BrugerId1 = table.Column<int>(type: "int", nullable: true)
+                    KategoriId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -257,11 +362,6 @@ namespace PRJ4.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Vudgifters_Brugers_BrugerId1",
-                        column: x => x.BrugerId1,
-                        principalTable: "Brugers",
-                        principalColumn: "BrugerId");
                     table.ForeignKey(
                         name: "FK_Vudgifters_Kategorier_KategoriId",
                         column: x => x.KategoriId,
@@ -309,14 +409,29 @@ namespace PRJ4.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Fudgifters_BrugerId",
-                table: "Fudgifters",
+                name: "IX_Budgets_BrugerId",
+                table: "Budgets",
                 column: "BrugerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Fudgifters_BrugerId1",
-                table: "Fudgifters",
+                name: "IX_Budgets_BrugerId1",
+                table: "Budgets",
                 column: "BrugerId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Findtægter_BrugerId",
+                table: "Findtægter",
+                column: "BrugerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Findtægter_KategoriId",
+                table: "Findtægter",
+                column: "KategoriId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fudgifters_BrugerId",
+                table: "Fudgifters",
+                column: "BrugerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Fudgifters_KategoriId",
@@ -324,14 +439,30 @@ namespace PRJ4.Migrations
                 column: "KategoriId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vudgifters_BrugerId",
-                table: "Vudgifters",
+                name: "IX_KategoryLimits_BrugerId",
+                table: "KategoryLimits",
                 column: "BrugerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vudgifters_BrugerId1",
+                name: "IX_KategoryLimits_KategoryId",
+                table: "KategoryLimits",
+                column: "KategoryId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vindtægter_BrugerId",
+                table: "Vindtægter",
+                column: "BrugerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vindtægter_KategoriId",
+                table: "Vindtægter",
+                column: "KategoriId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vudgifters_BrugerId",
                 table: "Vudgifters",
-                column: "BrugerId1");
+                column: "BrugerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vudgifters_KategoriId",
@@ -358,10 +489,22 @@ namespace PRJ4.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Budgets");
+
+            migrationBuilder.DropTable(
+                name: "Findtægter");
+
+            migrationBuilder.DropTable(
                 name: "Fudgifters");
 
             migrationBuilder.DropTable(
+                name: "KategoryLimits");
+
+            migrationBuilder.DropTable(
                 name: "LoginModels");
+
+            migrationBuilder.DropTable(
+                name: "Vindtægter");
 
             migrationBuilder.DropTable(
                 name: "Vudgifters");
@@ -370,10 +513,10 @@ namespace PRJ4.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Brugers");
 
             migrationBuilder.DropTable(
-                name: "Brugers");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Kategorier");

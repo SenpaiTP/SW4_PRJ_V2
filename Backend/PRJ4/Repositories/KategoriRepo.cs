@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PRJ4.Repositories
 {
-    public class KategoriRepo : TemplateRepo<Kategori>, IKategori
+    public class KategoriRepo : TemplateRepo<Kategori>,IKategoriRepo
     {
         private readonly ApplicationDbContext _context;
 
@@ -26,7 +26,7 @@ namespace PRJ4.Repositories
             if (string.IsNullOrWhiteSpace(kategoriNavn)) return null;
 
             return await _context.Kategorier
-                .FirstOrDefaultAsync(k => k.Navn.ToLower() == kategoriNavn.Trim().ToLower());
+                .FirstOrDefaultAsync(k => k.Navn.ToLower() == KategoriNavn.Trim().ToLower());
         }
         public async Task<Kategori> NyKategori(string kategoriNavn)
         {
@@ -37,7 +37,8 @@ namespace PRJ4.Repositories
 
             kategoriNavn = kategoriNavn.Trim().ToLower();
 
-            var kategori = new Kategori { Navn = kategoriNavn };
+            // Create a new Kategori instance with the validated and transformed name
+            Kategori kategori = new Kategori { Navn = KategoriNavn };
 
             await AddAsync(kategori);
             await SaveChangesAsync();

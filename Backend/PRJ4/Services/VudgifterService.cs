@@ -7,15 +7,15 @@ namespace PRJ4.Services
 {
     public class VudgifterService : IVudgifterService
     {
-        private readonly IVudgifter _VudgifterRepo;
+        private readonly IVudgifterRepo _VudgifterRepo;
         private readonly IBrugerRepo _brugerRepo;
-        private readonly IKategori _kategoriRepo;
+        private readonly IKategoriRepo _kategoriRepo;
         private readonly ILogger<VudgifterService> _logger;
         private readonly IMapper _mapper;
 
         public VudgifterService(
-            IVudgifter VudgifterRepo,
-            IKategori kategoriRepo,
+            IVudgifterRepo VudgifterRepo,
+            IKategoriRepo kategoriRepo,
             IBrugerRepo brugerRepo,
             ILogger<VudgifterService> logger,
             IMapper mapper)
