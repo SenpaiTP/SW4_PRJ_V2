@@ -20,8 +20,8 @@ export default function EditExpenseDialog({ open, handleClose, handleSave, expen
     if (name && category && price && date) {
       handleSave({ id: expense.id, name, category, price, date });
       handleClose(); 
-    } else {
-      alert('Alle felter skal udfyldes!');
+    // } else {
+    //   alert('Alle felter skal udfyldes!');
     }
   };
 

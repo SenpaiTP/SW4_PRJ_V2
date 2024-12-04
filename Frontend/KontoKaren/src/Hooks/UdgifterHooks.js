@@ -6,11 +6,27 @@ export default function useUdgifterHooks(initialExpenseRows) {
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [category, setCategory] = useState(localStorage.getItem("selectedCategory") || ''); // Get category from localStorage
 
     useEffect(() => {
         const savedRows = JSON.parse(localStorage.getItem("udgifterRows")) || initialExpenseRows;
         setRows(savedRows);
     }, [initialExpenseRows]);
+
+
+  // Update localStorage when category changes
+  useEffect(() => {
+    if (category) {
+      localStorage.setItem("selectedCategory", category);
+    }
+  }, [category]); // This effect runs whenever `category` changes
+
+  const addExpense = (expense) => {
+    setRows([...rows, expense]);
+    // You can use `category` in your logic, for example:
+    console.log(category); // Example usage of category
+  };
+
 
     const handleAddRow = (newExpense) => {
       const newRow = createData (
@@ -69,6 +85,7 @@ export default function useUdgifterHooks(initialExpenseRows) {
       alert("Ændringer er gemt");
     };
 
+
     return {
       rows,
       setRows,
@@ -85,5 +102,8 @@ export default function useUdgifterHooks(initialExpenseRows) {
       handleDeleteRow,
       handleSave,
       handleAddRow,
+      category,
+      setCategory,
+      addExpense
     };
 }

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
+import CategoryOption from '../Category/CategoryOption';
 
-export default function AddExpenseDialog({ open, handleClose, handleSave }) {
+export default function AddExpenseDialog({ open, handleClose, handleSave, selectedCategory = '', setSelectedCategory }) {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(selectedCategory); // Use the passed or default value
   const [price, setPrice] = useState('');
   const [date, setDate] = useState('');
 
+  // Handle saving expense
   const handleSubmit = () => {
     if (name && category && price && date) {
       handleSave({ name, category, price, date });
@@ -14,7 +16,7 @@ export default function AddExpenseDialog({ open, handleClose, handleSave }) {
       setCategory('');
       setPrice('');
       setDate('');
-      handleClose(); 
+      handleClose();
     } else {
       alert('Alle felter skal udfyldes!');
     }
@@ -33,13 +35,13 @@ export default function AddExpenseDialog({ open, handleClose, handleSave }) {
           sx={{ marginBottom: 2, mariginTop: 2 }}
         />
 
-        <TextField
-          label="Kategori"
-          variant="outlined"
-          fullWidth
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          sx={{ marginBottom: 2, mariginTop: 2 }}
+        {/* Pass setCategory and category to CategoryOption */}
+        <CategoryOption
+          onCategorySelect={(newCategory) => {
+            setCategory(newCategory);  // Update category
+          }}
+          selectedCategory={category}  // Pass current category
+          
         />
 
         <TextField
@@ -50,7 +52,7 @@ export default function AddExpenseDialog({ open, handleClose, handleSave }) {
           onChange={(e) => setPrice(e.target.value)}
           sx={{ marginBottom: 2 }}
         />
-  <TextField
+        <TextField
           label="Dato"
           type="date"
           fullWidth
@@ -58,7 +60,7 @@ export default function AddExpenseDialog({ open, handleClose, handleSave }) {
           onChange={(e) => setDate(e.target.value)}
           margin="normal"
           InputLabelProps={{
-            shrink: true, 
+            shrink: true,
           }}
         />
       </DialogContent>

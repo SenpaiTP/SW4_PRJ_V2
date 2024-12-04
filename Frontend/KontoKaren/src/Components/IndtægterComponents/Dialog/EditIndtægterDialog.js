@@ -18,8 +18,8 @@ export default function EditIncomeDialog({ open, handleClose, handleSave, income
     if (name && price && date) {
       handleSave({ id: income.id, name, price, date });
       handleClose(); 
-    } else {
-      alert('Alle felter skal udfyldes!');
+    // } else {
+    //   alert('Alle felter skal udfyldes!');
     }
   };
 
