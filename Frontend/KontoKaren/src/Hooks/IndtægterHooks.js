@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { createData } from "../Components/IndtægterComponents/Table/IndtægterTableData";
-
+import { createData
+  
+ } from "../Utils/CreateData";
 export default function useIndtægterHooks(initialRows) {
     const [rows, setRows] = useState(initialRows);
     const [selected, setSelected] = useState([]);
