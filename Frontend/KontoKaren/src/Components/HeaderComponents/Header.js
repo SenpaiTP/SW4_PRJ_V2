@@ -15,6 +15,9 @@ function Header({ userFullName }) {
         <Button color="inherit" component={Link} to="/indtægter">
           Indtægter
         </Button>
+        <Button color="inherit" component={Link} to="/Indstillinger">
+          Indstillinger
+        </Button>
         <Button color="inherit" component={Link} to="/Budget">
           Budget
         </Button>
