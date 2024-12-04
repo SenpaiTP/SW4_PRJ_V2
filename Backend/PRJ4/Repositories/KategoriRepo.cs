@@ -8,7 +8,7 @@ using PRJ4.Models;
 
 namespace PRJ4.Repositories
 {
-    public class KategoriRepo : TemplateRepo<Kategori>,IKategori
+    public class KategoriRepo : TemplateRepo<Kategori>,IKategoriRepo
     {
         private readonly ApplicationDbContext _context;
         public KategoriRepo(ApplicationDbContext context) : base(context)
@@ -21,7 +21,7 @@ namespace PRJ4.Repositories
             if (string.IsNullOrWhiteSpace(KategoriNavn)) return null;
             
             return await _context.Kategorier
-                .FirstOrDefaultAsync(k => k.Navn.ToLower() == KategoriNavn.Trim().ToLower());
+                .FirstOrDefaultAsync(k => k.KategoriNavn.ToLower() == KategoriNavn.Trim().ToLower());
         }
 
         public async Task<Kategori> NyKategori(string KategoriNavn)
@@ -35,7 +35,7 @@ namespace PRJ4.Repositories
             KategoriNavn = KategoriNavn.Trim().ToLower();
 
             // Create a new Kategori instance with the validated and transformed name
-            Kategori kategori = new Kategori { Navn = KategoriNavn };
+            Kategori kategori = new Kategori { KategoriNavn = KategoriNavn };
 
             // Add and save changes, allowing the database to generate the ID
             await AddAsync(kategori);

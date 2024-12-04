@@ -8,9 +8,9 @@ namespace PRJ4.Services
     {
         private readonly IKategoryLimitRepo _kategoriLimitRepository;
 
-        private readonly IKategori _kategoriRepository;
+        private readonly IKategoriRepo _kategoriRepository;
 
-        public KategoryLimitService(IKategoryLimitRepo kategoriLimitRepository, IKategori kategoriRepository)
+        public KategoryLimitService(IKategoryLimitRepo kategoriLimitRepository, IKategoriRepo kategoriRepository)
         {
             _kategoriLimitRepository = kategoriLimitRepository;
             _kategoriRepository = kategoriRepository;
@@ -35,7 +35,7 @@ namespace PRJ4.Services
             //Create kategoriLimit DTO to return
             var budgetReturn = new KategoryLimitGetDTO
             {
-                KategoryName = kategori.Navn,
+                KategoryName = kategori.KategoriNavn,
                 Limit = budget.Limit
             };
             return budgetReturn;
@@ -46,7 +46,7 @@ namespace PRJ4.Services
             //Check if kategory exists and write error message if not.
             var kategory = await _kategoriRepository.GetByIdAsync(limitDTO.KategoryId);
             
-            if(kategory == null) {throw new ArgumentException($"Kategorien: {kategory.Navn} findes ikke.");}
+            if(kategory == null) {throw new ArgumentException($"Kategorien: {kategory.KategoriNavn} findes ikke.");}
             
             //Create new kategoriLimit
             var budget = new KategoryLimit
@@ -64,7 +64,7 @@ namespace PRJ4.Services
             //Create kategoriLimit DTO to return
             var createdBudgetDTO = new KategoryLimitGetDTO
             {
-                KategoryName = kategory.Navn,
+                KategoryName = kategory.KategoriNavn,
                 Limit = createdBudget.Limit,
      
             };
