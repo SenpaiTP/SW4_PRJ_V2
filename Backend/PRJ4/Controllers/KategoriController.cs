@@ -9,11 +9,11 @@ namespace PRJ4.Controllers
     [Route("api/[controller]")]
     public class KategoriController : ControllerBase
     {
-        private readonly IKategori _kategorirepo;
+        private readonly IKategoriRepo _kategorirepo;
         //private readonly OpenAIClient _openAIClient;
         private readonly OpenAIClient _openAi;
 
-        public KategoriController(IKategori kategorirepo, OpenAIClient openAI )//OpenAIClient openAIClient)
+        public KategoriController(IKategoriRepo kategorirepo, OpenAIClient openAI )//OpenAIClient openAIClient)
         {
             _kategorirepo = kategorirepo;
             //_openAIClient = openAIClient;

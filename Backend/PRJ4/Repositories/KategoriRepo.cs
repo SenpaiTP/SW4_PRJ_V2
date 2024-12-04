@@ -26,7 +26,7 @@ namespace PRJ4.Repositories
             if (string.IsNullOrWhiteSpace(kategoriNavn)) return null;
 
             return await _context.Kategorier
-                .FirstOrDefaultAsync(k => k.Navn.ToLower() == KategoriNavn.Trim().ToLower());
+                .FirstOrDefaultAsync(k => k.KategoriNavn.ToLower() == kategoriNavn.Trim().ToLower());
         }
         public async Task<Kategori> NyKategori(string kategoriNavn)
         {
@@ -38,7 +38,7 @@ namespace PRJ4.Repositories
             kategoriNavn = kategoriNavn.Trim().ToLower();
 
             // Create a new Kategori instance with the validated and transformed name
-            Kategori kategori = new Kategori { Navn = KategoriNavn };
+            Kategori kategori = new Kategori { KategoriNavn = kategoriNavn };
 
             await AddAsync(kategori);
             await SaveChangesAsync();

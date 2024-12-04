@@ -24,7 +24,7 @@ namespace PRJ4.Services
 
         public async Task<string> GetCategorySuggestion(string description,  IEnumerable<Kategori> currentCategories)
         {
-            string categoriesList = string.Join(", ", currentCategories.Select(c => c.Navn));
+            string categoriesList = string.Join(", ", currentCategories.Select(c => c.KategoriNavn));
             var prompt = $"Suggest a category with a 1 word respone, for the following expense or income: '{description}', if a existing category all ready exist from this list of categories use that or create a new one that matches better {categoriesList}.";
 
             // Create a request for chat completion
