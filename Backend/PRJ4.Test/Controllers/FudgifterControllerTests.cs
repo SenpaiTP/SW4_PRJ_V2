@@ -116,7 +116,6 @@ public class FudgifterControllerTests
 
         // Assert
         var badRequestResult = result.Result as BadRequestObjectResult;
-          // Use As<T> extension for casting
         Xunit.Assert.NotNull(badRequestResult);
         Xunit.Assert.Equal(badRequestResult.Value, "Service error");
     }
@@ -162,15 +161,17 @@ public class FudgifterControllerTests
     {
         // Arrange
         SetupUserContext("user-1");
+        _fudgifterServiceMock.Setup(s => s.DeleteFudgifter("user-1", 1))
+            .Returns(Task.CompletedTask); // Simulate success
 
         // Act
         var result = await _controller.Delete(1);
 
         // Assert
-        
         result.Should().BeOfType<NoContentResult>();
         _fudgifterServiceMock.Verify(s => s.DeleteFudgifter("user-1", 1), Times.Once);
     }
+
 
     [Test]
     public async Task Delete_ReturnsBadRequest_OnException()

@@ -8,21 +8,18 @@ namespace PRJ4.Services
     public class FudgifterService : IFudgifterService
     {
         private readonly IFudgifter _fudgifterRepo;
-        //private readonly IBrugerRepo _brugerRepo;
-        private readonly IKategori _kategoriRepo;
+        private readonly IKategoriRepo _kategoriRepo;
         private readonly ILogger<FudgifterService> _logger;
         private readonly IMapper _mapper; 
 
         public FudgifterService(
             IFudgifter fudgifterRepo,
-            IKategori kategoriRepo,
-           // IBrugerRepo brugerRepo,
+            IKategoriRepo kategoriRepo,
             ILogger<FudgifterService> logger,
             IMapper mapper)
         {
             _fudgifterRepo = fudgifterRepo;
             _kategoriRepo = kategoriRepo;
-           // _brugerRepo = brugerRepo;
             _logger = logger;
             _mapper = mapper; 
         }
