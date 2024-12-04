@@ -44,8 +44,7 @@ namespace PRJ4.Test.Setup
             context.Users.Add(testUser);
             context.SaveChanges();
         }
-        public void Dispose()
-        {}
+        
     }
 
 }
