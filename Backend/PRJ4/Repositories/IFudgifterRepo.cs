@@ -8,7 +8,7 @@ using PRJ4.Models;
 
 namespace PRJ4.Repositories
 {
-    public interface IFudgifter:ITemplateRepo<Fudgifter>
+    public interface IFudgifterRepo:ITemplateRepo<Fudgifter>
     {
         Task<IEnumerable<Fudgifter>> GetAllByUserId(string brugerId);
         Task<IEnumerable<Fudgifter>> GetAllByCategory(string brugerId, int kategoryId);
