@@ -63,15 +63,11 @@ function Login({ setUserFullName }) {
       const data = await response.json();
 
       if (response.ok) {
-<<<<<<< HEAD
         // If login is successful, store token in localStorage or cookies
         localStorage.setItem('authToken', data.token); // Assuming token is returned
         // console.log(data.token);
         // console.log("Stored Token:", localStorage.getItem('authToken'));
 
-=======
-        localStorage.setItem('authToken', data.token); // Antag, at token returneres
->>>>>>> main
 
         const nameResponse = await fetch('http://localhost:5168/Account/WhoAmI', {
           headers: {
@@ -85,7 +81,7 @@ function Login({ setUserFullName }) {
         }
         console.log("Stored Token:", localStorage.getItem('authToken'));
 
-        navigate('/user-dashboard');
+        navigate('/');
       } else {
         setErrors({ ...errors, password: data.message || 'Ugyldige loginoplysninger' });
       }

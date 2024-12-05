@@ -70,16 +70,20 @@ function ChangePassword()
     setLoading(true); // Start loading
     setSuccessMessage(''); // Reset success message
     try {
-      const response = await fetch('https://your-backend-api-url.com/change-password', {
+      const response = await fetch('http://localhost:5168/Account/changepassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Assuming a token is stored in localStorage
         },
-        body: JSON.stringify({ email, currentPassword, newPassword }),
+        body: JSON.stringify({ 
+          CurrentPassword: currentPassword,
+          NewPassword: newPassword,
+          ConfirmPassword:confirmNewPassword 
+        }),
       });
 
-      const data = await response.json();
+      const data = await response.text();
 
       if (response.ok) {
         setSuccessMessage('Password changed successfully!');
