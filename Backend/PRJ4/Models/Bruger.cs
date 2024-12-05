@@ -8,7 +8,7 @@ namespace PRJ4.Models;
 public partial class Bruger
 {
     [Key]
-    public int BrugerId { get; set; }
+    public string BrugerId { get; set; }
 
     public string Fornavn { get; set; } = null!;
     public string Efternavn { get; set; } = null!;
@@ -22,11 +22,11 @@ public partial class Bruger
     
     //public virtual ICollection<Findtægt> Findtægts { get; set; } = new List<Findtægt>();
 
-    public virtual ICollection<Fudgifter> Fudgifters { get; set; } = new List<Fudgifter>();
+    //public virtual ICollection<Fudgifter> Fudgifters { get; set; } = new List<Fudgifter>();
 
     //public virtual ICollection<Vindtægter> Vindtægters { get; set; } = new List<Vindtægter>();
 
-    public virtual ICollection<Vudgifter> Vudgifters { get; set; } = new List<Vudgifter>();
+   // public virtual ICollection<Vudgifter> Vudgifters { get; set; } = new List<Vudgifter>();
 
     //public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 }

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Checkbox, FormControlLabel } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom'; // Importer useNavigate
 import { getBoxStyles } from '../../Assets/Styles/boxStyles'; // Box styling
 import { getTextFieldStyles } from '../../Assets/Styles/textFieldStyles'; // TextField styling
 
-// Added setUserFullName prop
 function Login({ setUserFullName }) {
   const [email, setEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({
@@ -14,7 +14,7 @@ function Login({ setUserFullName }) {
     password: '',
   });
   const [loading, setLoading] = useState(false); // Loading state for button
-  const navigate = useNavigate(); // Hook to redirect the user
+  const navigate = useNavigate(); // Hook til at redirecte brugeren
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,34 +22,33 @@ function Login({ setUserFullName }) {
     let formErrors = { ...errors };
     let formValid = true;
 
-    // Reset errors
-    Object.keys(formErrors).forEach((key) => formErrors[key] = '');
+    // Nulstil fejl
+    Object.keys(formErrors).forEach((key) => (formErrors[key] = ''));
 
-    // Check if email is valid
+    // Tjek om email er gyldig
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!email) {
-      formErrors.email = 'Email is required';
+      formErrors.email = 'Email er påkrævet';
       formValid = false;
     } else if (!emailRegex.test(email)) {
-      formErrors.email = 'Please enter a valid email address';
+      formErrors.email = 'Indtast en gyldig emailadresse';
       formValid = false;
     }
 
-    // Check if password is entered
+    // Tjek om adgangskode er indtastet
     if (!password) {
-      formErrors.password = 'Password is required';
+      formErrors.password = 'Adgangskode er påkrævet';
       formValid = false;
     }
 
     setErrors(formErrors);
 
-    // If there are errors, prevent form submission
+    // Hvis der er fejl, forhindrer vi formularen i at blive sendt
     if (!formValid) return;
 
-    // If no validation errors, proceed with login API call
+    // Hvis der ikke er valideringsfejl, fortsæt med login API-kald
     setLoading(true); // Start loading
     try {
-      // Make a POST request to your backend for login
       const response = await fetch('http://localhost:5168/Account/Login', {
         method: 'POST',
         headers: {
@@ -63,36 +62,36 @@ function Login({ setUserFullName }) {
 
       const data = await response.json();
 
-      // Check if login is successful (you can adjust this check based on your backend response)
       if (response.ok) {
+<<<<<<< HEAD
         // If login is successful, store token in localStorage or cookies
         localStorage.setItem('authToken', data.token); // Assuming token is returned
         // console.log(data.token);
         // console.log("Stored Token:", localStorage.getItem('authToken'));
 
+=======
+        localStorage.setItem('authToken', data.token); // Antag, at token returneres
+>>>>>>> main
 
-        // Fetch the user's full name
         const nameResponse = await fetch('http://localhost:5168/Account/WhoAmI', {
           headers: {
-            'Authorization': `Bearer ${data.token}`
-          }
+            Authorization: `Bearer ${data.token}`,
+          },
         });
 
         if (nameResponse.ok) {
           const user = await nameResponse.json();
-          setUserFullName(user.fullName); // Set the user's full name
+          setUserFullName(user.fullName); // Sæt brugerens fulde navn
         }
         console.log("Stored Token:", localStorage.getItem('authToken'));
 
-        // Redirect to user site/dashboard
         navigate('/user-dashboard');
       } else {
-        // If login fails, show error message (you can adjust based on your backend response)
-        setErrors({ ...errors, password: data.message || 'Invalid login credentials' });
+        setErrors({ ...errors, password: data.message || 'Ugyldige loginoplysninger' });
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      setErrors({ ...errors, password: 'An error occurred. Please try again.' });
+      console.error('Login mislykkedes:', error);
+      setErrors({ ...errors, password: 'Der opstod en fejl. Prøv igen.' });
     } finally {
       setLoading(false); // Stop loading
     }
@@ -103,64 +102,78 @@ function Login({ setUserFullName }) {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        ...getBoxStyles('medium'), // Dynamically get the medium box styles
+        ...getBoxStyles('medium'), // Dynamisk styling til medium box
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Login
+        Log ind
       </Typography>
 
       {/* Email Input */}
       <TextField
-        label="Enter your email"
+        label="Indtast din email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles
-        error={!!errors.email} // Show error if there's an error for this field
-        helperText={errors.email} // Display error message
+        {...getTextFieldStyles()} // Brug de delte styles
+        error={!!errors.email}
+        helperText={errors.email}
       />
 
       {/* Password Input */}
       <TextField
-        label="Enter your password"
-        type="password"
+        label="Indtast din adgangskode"
+        type={showPassword ? 'text' : 'password'}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        {...getTextFieldStyles()} // Apply the shared styles
-        error={!!errors.password} // Show error if there's an error for this field
-        helperText={errors.password} // Display error message
+        {...getTextFieldStyles()}
+        error={!!errors.password}
+        helperText={errors.password}
       />
 
-      {/* Remember me checkbox */}
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-            color="primary"
-          />
-        }
-        label="Remember me"
-      />
+      {/* Checkboxes */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              color="primary"
+            />
+          }
+          label="Husk mig"
+          labelPlacement="end"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showPassword}
+              onChange={(e) => setShowPassword(e.target.checked)}
+              color="primary"
+            />
+          }
+          label="Vis adgangskode"
+          labelPlacement="end"
+        />
+      </Box>
 
-      {/* Login button */}
+      {/* Login Button */}
       <Button 
         variant="contained" 
         color="primary" 
         type="submit" 
         fullWidth 
         sx={{ mt: 2 }} 
-        disabled={loading} // Disable button while loading
+        disabled={loading}
       >
-        {loading ? 'Logging in...' : 'LOGIN NOW'}
+        {loading ? 'Logger ind...' : 'LOG IND'}
       </Button>
 
-      {/* Register and forgot password links */}
+      {/* Links */}
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Not a member? <Link to="/Register">Register Now</Link>
+        Ikke medlem? <Link to="/Register">Tilmeld dig nu</Link>
       </Typography>
       <Typography variant="body2">
-        <Link to="/ForgotPassword">Forgot password?</Link>
+        <Link to="/ForgotPassword">Glemt adgangskode?</Link>
       </Typography>
     </Box>
   );
