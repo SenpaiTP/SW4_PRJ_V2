@@ -27,10 +27,10 @@ public class budgetController : ControllerBase
     }
     private readonly IBudgetGoalService _budgetGoalService;
     private readonly IVudgifterService _vudgifterService;
-    private readonly IVudgifter _vudgifterRepo;
-    private readonly IKategori _kategoryRepo;
+    private readonly IVudgifterRepo _vudgifterRepo;
+    private readonly IKategoriRepo _kategoryRepo;
     
-    public budgetController(IBudgetGoalService budgetService, IVudgifterService vudgifterService, IVudgifter vudgifterRepo, IKategori kategoryRepo)
+    public budgetController(IBudgetGoalService budgetService, IVudgifterService vudgifterService, IVudgifterRepo vudgifterRepo, IKategoriRepo kategoryRepo)
     {
         _budgetGoalService = budgetService;
         _vudgifterService = vudgifterService;

@@ -9,13 +9,13 @@ namespace PRJ4.Services
     {
         private readonly IBudgetRepo _budgetRepository;
         private readonly IBrugerRepo _brugerRepository;
-        private readonly IKategori _kategoryRepositry;
+        private readonly IKategoriRepo _kategoryRepositry;
         private readonly IVudgifterService _vudgifterService;
 
-        private readonly IVudgifter _vudgifterRepository;
+        private readonly IVudgifterRepo _vudgifterRepository;
 
 
-        public BudgetGoalService(IBudgetRepo budgetRepository, IBrugerRepo brugerRepository, IKategori kategoryRepositry, IVudgifterService vudgifterService, IVudgifter vudgifterRepository)
+        public BudgetGoalService(IBudgetRepo budgetRepository, IBrugerRepo brugerRepository, IKategoriRepo kategoryRepositry, IVudgifterService vudgifterService, IVudgifterRepo vudgifterRepository)
         {
             _budgetRepository = budgetRepository;
             _brugerRepository = brugerRepository;
@@ -191,7 +191,7 @@ namespace PRJ4.Services
     
             var saving = new nyVudgifterDTO
             {
-                KategoriNavn = kategory.Navn,
+                KategoriNavn = kategory.KategoriNavn,
                 KategoriId = budget.KategoryId,
                 Pris = savingDTO.Saving, 
                 Dato = savingDTO.Date
