@@ -3,6 +3,10 @@ import { Typography, TextField, Button, Box } from "@mui/material";
 //import React from "react";
 import React, { useState } from 'react';
 
+/*const API_URL = 'http://localhost:5168/api';
+
+const getAuthToken = () => localStorage.getItem('authToken');*/
+
 function ChangePassword()
  {
   const [email, setEmail] = useState('');
@@ -70,7 +74,7 @@ function ChangePassword()
     setLoading(true); // Start loading
     setSuccessMessage(''); // Reset success message
     try {
-      const response = await fetch('https://your-backend-api-url.com/change-password', {
+      const response = await fetch('https://localhist:5168/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

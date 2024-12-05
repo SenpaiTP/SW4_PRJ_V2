@@ -7,13 +7,8 @@ import ThemeProvider from '../../Components/IndstillingerComponents/Theme/ThemeP
 import { useContext } from 'react';
 import { ThemeContext } from '../../Components/IndstillingerComponents/Theme/ThemeProvider';
 
-/*const API_URL = 'http://localhost:5168/api';
-
-const getAuthToken = () => localStorage.getItem('authToken');*/
 
 function Indstillinger() {
-
-  const { theme, toggleTheme } = useContext(ThemeContext); // Hent temaet
 
   return (
     <Container>
