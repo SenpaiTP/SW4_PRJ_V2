@@ -146,6 +146,10 @@ builder.Services.AddScoped<IVindtægtService, VindtægtService>();
 
 builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
 
+// Build Indstillinger:
+builder.Services.AddScoped<IIndstillingerRepo, IndstillingerRepo>();
+builder.Services.AddScoped<IIndstillingerService, IndstillingerService>();
+
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();

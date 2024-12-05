@@ -31,6 +31,8 @@ public partial class ApplicationDbContext : IdentityDbContext<ApiUser>
     public DbSet<KategoryLimit> KategoryLimits { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
+    public DbSet<Indstillinger> Indstillingers {get; set;}
+
   
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
     //     {
