@@ -65,8 +65,11 @@ builder.Services.AddIdentity<ApiUser, IdentityRole>(options =>
         options.Password.RequireNonAlphanumeric = true;
         options.Password.RequiredLength = 2;
         })
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
+    o.TokenLifespan = TimeSpan.FromHours(2));
 builder.Services.AddAuthentication(options=>
     {
     options.DefaultAuthenticateScheme =
@@ -116,6 +119,7 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     var client = serviceProvider.GetRequiredService<IMongoClient>();
     return client.GetDatabase(mongoDatabaseName);
 });
+
 //Register mapping profiles
 builder.Services.AddAutoMapper(typeof(FudgifterProfile));
 builder.Services.AddAutoMapper(typeof(VudgifterProfile));
@@ -166,6 +170,12 @@ builder.Services.AddScoped<IKategori, KategoriRepo>();
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
+builder.Services.AddSingleton(provider =>
+    new EmailService(
+        "3f60840382a09172c229cac33ddd7e63-f55d7446-6c90d163", // Replace with your Mailgun API key
+        "sandboxf55113ec9eef4f6580a316b419167ded.mailgun.org" // Replace with your Mailgun domain
+    )
+);
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

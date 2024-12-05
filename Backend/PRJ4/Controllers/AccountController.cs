@@ -14,6 +14,8 @@ using PRJ4.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using PRJ4.Repositories;
 using PRJ4.Services; // Add this line for IRevocationService
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore.Metadata.Internal; // For QueryHelpers
 
 
 namespace PRJ4.Controllers;
@@ -28,9 +30,12 @@ public class AccountController : ControllerBase
     private readonly IConfiguration _config;
     private readonly SignInManager<ApiUser> _signInManager;
     private readonly IRevocationService _revocationService;
+    private readonly EmailService _emailService;
 
     public AccountController(ApplicationDbContext context, ILogger<AccountController> logger, 
-            UserManager<ApiUser> userManager, IConfiguration config, SignInManager<ApiUser> signInManager, IRevocationService revocationService)
+            UserManager<ApiUser> userManager, IConfiguration config,
+            SignInManager<ApiUser> signInManager, IRevocationService revocationService,
+            EmailService emailService)
     {
         _context = context;
         _logger = logger; // For logging
@@ -38,6 +43,7 @@ public class AccountController : ControllerBase
         _config = config;
         _signInManager = signInManager;
         _revocationService = revocationService;
+        _emailService = emailService;
     }
 
     [HttpPost]
@@ -219,25 +225,139 @@ public class AccountController : ControllerBase
         }
     }
 
-    // [HttpDelete]
-    // [Route("Delete/{id}")]
-    // //could be admin only
-    // public async Task<IActionResult> Delete(string id)
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("Deleting Bruger");
-                
-    //         _context.Remove(id);
-    //         await _context.SaveChangesAsync();
+    // [HttpPost]
+    // [Route("SendEmail")]
+    // [AllowAnonymous]
 
-    //         _logger.LogInformation("Successfully deleted");
-    //         return NoContent();
-    //     }
-    //     catch (Exception ex)
+    // public ActionResult SendEmail(string to,string subject,string text)
+    // {
+    //     if (string.IsNullOrEmpty(to) || string.IsNullOrEmpty(subject) || string.IsNullOrEmpty(text))
     //     {
-    //         _logger.LogError("Error deleting ");
-    //         return BadRequest(ex.Message);
+    //         return StatusCode(StatusCodes.Status400BadRequest, "Missing parameters");
+    //     }
+        
+    //     var response = _emailService.SendSimpleMessage(
+    //         to, subject, text);
+        
+    //     if (response.IsSuccessful)
+    //     {
+    //         return StatusCode(StatusCodes.Status200OK, "Email sent successfully");
+    //     }
+    //     else
+    //     {
+    //         return StatusCode(StatusCodes.Status500InternalServerError, "Email could not be sent");
     //     }
     // }
+
+    [HttpPost]
+    [Route("forgotpassword")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPassword)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest();
+        
+        var user = await _userManager.FindByEmailAsync(forgotPassword.Email);
+
+        if(user==null)
+            return BadRequest("User not found");
+        
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        
+        var param = new Dictionary<string, string?>
+        {
+            {"token", token},
+            {"email", forgotPassword.Email}
+        };
+
+        var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI!, param);
+        
+        var response = _emailService.SendSimpleMessage(
+           user.Email, "Reset Password", callback);
+
+        if (response.IsSuccessful)
+        {
+            return StatusCode(StatusCodes.Status200OK, "Email sent successfully" + token);
+            Console.WriteLine(token);
+        }
+        else
+            return StatusCode(StatusCodes.Status500InternalServerError, "Email could not be sent");
+
+
+    }
+
+    [HttpPost]
+    [Route("resetpassword")]
+    [AllowAnonymous]
+
+    public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordDTO resetPassword)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest();
+        
+        var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+
+        if(user==null)
+            return BadRequest("User not found");
+
+        var result = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
+
+        if(result.Succeeded)
+            return StatusCode(StatusCodes.Status200OK, "Password reset successfully");
+        else
+        {
+            var errors = result.Errors.Select(e => e.Description);
+            return BadRequest(new { Errors = errors });
+        }
+    }
+
+    [HttpPost]
+    [Route("changepassword")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordDTO changePasswordDTO)
+    {
+        var claims = User.Claims;
+
+        var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
+
+        if(userIdClaim.Value ==null)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized,"User not found");
+        }
+
+        try
+        {
+            var user=await _userManager.FindByIdAsync(userIdClaim.Value);
+            if(user==null)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized,"User not found");
+            }
+
+            
+            if(!ModelState.IsValid)
+                return BadRequest();
+            
+            var result = await _userManager.ChangePasswordAsync(user, changePasswordDTO.CurrentPassword, changePasswordDTO.NewPassword);
+
+            if(result.Succeeded)
+                return StatusCode(StatusCodes.Status200OK, "Password changed successfully");
+            else
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { Errors = errors });
+            }
+
+        }
+        catch (Exception e)
+        {
+            var exceptionDetails = new ProblemDetails();
+            exceptionDetails.Detail = e.Message;
+            exceptionDetails.Status =
+            StatusCodes.Status500InternalServerError;
+            exceptionDetails.Type =
+            "https:/ /tools.ietf.org/html/rfc7231#section-6.6.1";
+            return StatusCode(
+                StatusCodes.Status500InternalServerError, exceptionDetails);
+        }
+    }
 }
