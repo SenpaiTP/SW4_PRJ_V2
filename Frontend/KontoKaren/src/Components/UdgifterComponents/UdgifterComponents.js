@@ -9,6 +9,7 @@ import { initialExpenseRows } from "./Table/UdgifterTableData";
 import useUdgifterHooks from "../../Hooks/UseUdgifterHooks";
 import AddExpenseDialog from "./Dialog/AddUdgifterDialog";
 import EditExpenseDialog from "./Dialog/EditUdgifterDialog";
+import SuggestCategory from "../../Services/CategoryService";
 
 export default function UdgifterTable() {
   const {
@@ -52,6 +53,20 @@ export default function UdgifterTable() {
     price: row.price,
   }));
 
+
+
+  
+
+  rows.forEach((row) => {
+    const descriptionName = { description: row.name };
+    SuggestCategory(descriptionName.description).then((category) => {
+        if (category) {
+            console.log(`Navn: ${row.name}, Foreslået kategori: ${category}`);
+        }
+    });
+});
+
+
   return (
     <Container sx={{ display: "flex", paddingLeft: 0, paddingRight: 0 }}>
       <Box sx={{ width: "60%", paddingRight: 2 }}>
@@ -74,6 +89,11 @@ export default function UdgifterTable() {
                     <IconButton onClick={() => handleDeleteRow(row.id)}>
                       <Delete />
                     </IconButton>
+
+
+                    
+
+
                     </Box>
 
                   </TableCell>

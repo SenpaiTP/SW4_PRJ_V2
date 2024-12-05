@@ -7,10 +7,17 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
+import SuggestCategory from '../../../Services/CategoryService';
+import useUdgifterHooks from '../../../Hooks/UseUdgifterHooks';
+import { initialExpenseRows } from '../Table/UdgifterTableData';
+
 const filter = createFilterOptions();
 
-export default function CategoryOption({ onCategorySelect }) {
-  // Load categories from localStorage on component mount
+export default function CategorySet({ onCategorySelect }) {
+  const { rows } = useUdgifterHooks(initialExpenseRows); // Hent rows fra hooket
+  const [categories, setCategories] = useState([]);
+
+  // Load categories from localStorage or default categories
   const loadCategoriesFromStorage = () => {
     const savedCategories = localStorage.getItem('categories');
     return savedCategories ? JSON.parse(savedCategories) : [
@@ -47,6 +54,17 @@ export default function CategoryOption({ onCategorySelect }) {
 
       handleClose(); // Close the dialog after adding
     }
+  };
+
+  const handleSuggestCategories = () => {
+    rows.forEach((row) => {
+      const descriptionName = { description: row.name };
+      SuggestCategory(descriptionName.description).then((category) => {
+        if (category) {
+          console.log(`Navn: ${row.name}, Foreslået kategori: ${category}`);
+        }
+      });
+    });
   };
 
   return (
@@ -98,8 +116,17 @@ export default function CategoryOption({ onCategorySelect }) {
         label="Udgiftsnavn"
         variant="outlined"
         fullWidth
-        sx={{ marginBottom: 2, mariginTop: 2 }}
+        sx={{ marginBottom: 2, marginTop: 2 }}
       />
+
+      {/* Button to suggest categories */}
+      <Button
+        variant="contained"
+        onClick={handleSuggestCategories}
+        sx={{ marginTop: 2 }}
+      >
+        Foreslå Kategorier
+      </Button>
 
       {/* Dialog for adding a new category */}
       <Dialog open={open} onClose={handleClose}>

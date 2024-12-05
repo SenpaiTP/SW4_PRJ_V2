@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRJ4.Data;
 
@@ -11,9 +12,11 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241205113325_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,7 +250,7 @@ namespace PRJ4.Migrations
 
                     b.HasKey("BrugerId");
 
-                    b.ToTable("Brugers", (string)null);
+                    b.ToTable("Brugers");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Budget", b =>
@@ -284,7 +287,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("BrugerId1");
 
-                    b.ToTable("Budgets", (string)null);
+                    b.ToTable("Budgets");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
@@ -318,7 +321,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Findtægter", (string)null);
+                    b.ToTable("Findtægter");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
@@ -351,7 +354,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Fudgifters", (string)null);
+                    b.ToTable("Fudgifters");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Kategori", b =>
@@ -368,7 +371,7 @@ namespace PRJ4.Migrations
 
                     b.HasKey("KategoriId");
 
-                    b.ToTable("Kategorier", (string)null);
+                    b.ToTable("Kategorier");
                 });
 
             modelBuilder.Entity("PRJ4.Models.KategoryLimit", b =>
@@ -396,7 +399,7 @@ namespace PRJ4.Migrations
                     b.HasIndex("KategoryId")
                         .IsUnique();
 
-                    b.ToTable("KategoryLimits", (string)null);
+                    b.ToTable("KategoryLimits");
                 });
 
             modelBuilder.Entity("PRJ4.Models.LoginModel", b =>
@@ -417,7 +420,7 @@ namespace PRJ4.Migrations
 
                     b.HasKey("LoginId");
 
-                    b.ToTable("LoginModels", (string)null);
+                    b.ToTable("LoginModels");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
@@ -451,7 +454,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Vindtægter", (string)null);
+                    b.ToTable("Vindtægter");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
@@ -484,7 +487,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Vudgifters", (string)null);
+                    b.ToTable("Vudgifters");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
