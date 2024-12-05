@@ -6,7 +6,7 @@ import TableHeader from "./Table/UdgifterTableHeader";
 import PieChart from "./PieChart/PieChart";
 import './Table/UdgifterTable.css';
 import { initialExpenseRows } from "./Table/UdgifterTableData";
-import useUdgifterHooks from "../../Hooks/UdgifterHooks";
+import useUdgifterHooks from "../../Hooks/UseUdgifterHooks";
 import AddExpenseDialog from "./Dialog/AddUdgifterDialog";
 import EditExpenseDialog from "./Dialog/EditUdgifterDialog";
 
@@ -67,12 +67,15 @@ export default function UdgifterTable() {
                 onRowClick={handleClick}
                 renderActions={(row) => (
                   <TableCell>
+                      <Box sx={{ display: "flex", gap: 1 }}>
                     <IconButton onClick={() => handleClickOpenEdit(row)}>
                       <Edit />
                     </IconButton>
                     <IconButton onClick={() => handleDeleteRow(row.id)}>
                       <Delete />
                     </IconButton>
+                    </Box>
+
                   </TableCell>
                 )}
               />

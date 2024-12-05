@@ -18,16 +18,18 @@ const TableBody = ({
   return (
     <>
       {rowsToDisplay.map((row) => (
+
         <TableRow
           key={row.id}
           selected={selected.indexOf(row.id) !== -1}
           onClick={(e) => onRowClick(e, row.id)}
         >
-          <TableCell>{}</TableCell>
           <TableCell>{row.name}</TableCell>
           <TableCell>{row.price}</TableCell>
           <TableCell>{row.date}</TableCell>
-          {renderActions(row)} {/* Render the action buttons */}
+          <TableCell>         {renderActions(row)} 
+        </TableCell>
+
         </TableRow>
       ))}
     </>

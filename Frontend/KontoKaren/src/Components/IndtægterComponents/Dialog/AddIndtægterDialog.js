@@ -13,8 +13,8 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
       setPrice('');
       setDate('');
       handleClose(); 
-    // } else {
-    //   alert('Alle felter skal udfyldes!');
+    } else {
+      alert('Alle felter skal udfyldes!');
     }
   };
 

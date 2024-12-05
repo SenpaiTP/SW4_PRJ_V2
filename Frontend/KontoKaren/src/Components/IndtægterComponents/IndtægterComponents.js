@@ -8,7 +8,7 @@ import './Table/IndtægterTable.css'
 import { initialRows } from "./Table/IndtægterTableData"; 
 import AddIncomeDialog from "./Dialog/AddIndtægterDialog"; 
 import EditIncomeDialog from "./Dialog/EditIndtægterDialog"; 
-import useIndtægterHooks from "../../Hooks/IndtægterHooks"; 
+import useIndtægterHooks from "../../Hooks/UseIndtægterHooks"; 
 
 export default function IndtægterTable() {
   // bruger hooks til at håndtere logikken i tabellen

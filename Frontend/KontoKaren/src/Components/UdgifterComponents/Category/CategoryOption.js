@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -10,32 +10,37 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 const filter = createFilterOptions();
 
 export default function CategoryOption({ onCategorySelect }) {
-  const [categoryOptions, setCategoryOptions] = useState([
-    { categoryName: 'Tøj' },
-    { categoryName: 'Mad' },
-    { categoryName: 'Underholdning' },
-  ]); // Initial categories in state
+  // Load categories from localStorage on component mount
+  const loadCategoriesFromStorage = () => {
+    const savedCategories = localStorage.getItem('categories');
+    return savedCategories ? JSON.parse(savedCategories) : [
+      { categoryName: 'Tøj' },
+      { categoryName: 'Mad' },
+      { categoryName: 'Underholdning' },
+    ];
+  };
 
-  const [value, setValue] = useState(null); // Track the selected value
-  const [open, toggleOpen] = useState(false); // Manage the dialog open state
-  const [dialogValue, setDialogValue] = useState({
-    categoryName: '',
-  });
+  const [categoryOptions, setCategoryOptions] = useState(loadCategoriesFromStorage()); // Initial categories from localStorage or default
+  const [value, setValue] = useState(null);
+  const [open, toggleOpen] = useState(false);
+  const [dialogValue, setDialogValue] = useState({ categoryName: '' });
+
+  useEffect(() => {
+    // Persist categories in localStorage whenever categoryOptions changes
+    localStorage.setItem('categories', JSON.stringify(categoryOptions));
+  }, [categoryOptions]);
 
   const handleClose = () => {
     setDialogValue({ categoryName: '' });
     toggleOpen(false);
   };
 
-  // Handle adding a new category
   const handleSubmit = (event) => {
     event.preventDefault();
     if (dialogValue.categoryName.trim()) {
       const newCategory = { categoryName: dialogValue.categoryName };
-      // Add the new category to the options list
       setCategoryOptions((prevOptions) => [...prevOptions, newCategory]);
 
-      // Pass the new category to the parent
       if (onCategorySelect) {
         onCategorySelect(newCategory.categoryName);
       }
@@ -60,23 +65,21 @@ export default function CategoryOption({ onCategorySelect }) {
           } else {
             setValue(newValue);
             if (onCategorySelect && newValue?.categoryName) {
-              onCategorySelect(newValue.categoryName); // Select a category
+              onCategorySelect(newValue.categoryName);
             }
           }
         }}
         filterOptions={(options, params) => {
           const filtered = filter(options, params);
-
           if (params.inputValue !== '') {
             filtered.push({
               inputValue: params.inputValue,
-              categoryName: `Tilføj "${params.inputValue}"`, // Suggest adding new category
+              categoryName: `Tilføj "${params.inputValue}"`,
             });
           }
-
           return filtered;
         }}
-        options={categoryOptions} // Dynamically update the list of categories
+        options={categoryOptions}
         getOptionLabel={(option) => {
           if (typeof option === 'string') {
             return option;

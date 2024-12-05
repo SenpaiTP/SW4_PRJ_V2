@@ -22,10 +22,11 @@ const UdgifterTableBody = ({
           selected={selected.indexOf(row.id) !== -1}
           onClick={(e) => onRowClick(e, row.id)}
         >
-          <TableCell>{row.name}</TableCell>
-          <TableCell>{row.category}</TableCell>
-          <TableCell>{row.price}</TableCell>
-          <TableCell>{row.date}</TableCell>
+                 
+          <TableCell align="center">{row.name}</TableCell>
+          <TableCell align="center">{row.category}</TableCell>
+          <TableCell align="center">{row.price}</TableCell>
+          <TableCell align="center">{row.date}</TableCell>
           <TableCell>{renderActions(row)}</TableCell>
         </TableRow>
       ))}

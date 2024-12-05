@@ -6,10 +6,10 @@ export default function TableHeader({ numSelected }) {
     <TableHead>
       <TableRow>
         <TableCell style={{ width: '20%' }}>Udgiftsnavn</TableCell>
-        <TableCell style={{ width: '20%' }} align="left">Kategori</TableCell>
-        <TableCell style={{ width: '20%' }} align="left">Beløb</TableCell>
-        <TableCell style={{ width: '20%' }} align="left">Dato</TableCell>
-        <TableCell style={{ width: '20%' }} align="left">Handlinger</TableCell>
+        <TableCell style={{ width: '20%' }} align="center">Kategori</TableCell>
+        <TableCell style={{ width: '20%' }} align="center">Beløb</TableCell>
+        <TableCell style={{ width: '20%' }} align="center">Dato</TableCell>
+        <TableCell style={{ width: '20%' }} align="center">Handlinger</TableCell>
       </TableRow>
     </TableHead>
   );

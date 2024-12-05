@@ -11,16 +11,11 @@ export default function TableHeader({
   return (
     <TableHead>
       <TableRow>
-        {/* Checkbox for at vælge alle */}
-        <TableCell padding="checkbox">
-         
-        </TableCell>
-
         {/* Kolonnehoveder */}
-        <TableCell>Indtægtsnavn</TableCell>
-        <TableCell align="left">Beløb</TableCell>
-        <TableCell align="left">Dato</TableCell>
-        <TableCell align="left">Handlinger</TableCell>
+        <TableCell style={{ width: '20%' }}>Indtægtsnavn</TableCell>
+        <TableCell style={{ width: '20%' }}>Beløb</TableCell>
+        <TableCell style={{ width: '20%' }}>Dato</TableCell>
+        <TableCell style={{ width: '20%' }}>Handlinger</TableCell>
       </TableRow>
     </TableHead>
   );
