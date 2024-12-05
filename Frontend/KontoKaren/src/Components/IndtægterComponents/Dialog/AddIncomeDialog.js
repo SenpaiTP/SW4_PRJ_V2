@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
+import fetchIncomeById from './FetchById';
 
 export default function AddIncomeDialog({ open, handleClose, handleSave }) {
   const [name, setName] = useState('');
@@ -7,6 +8,7 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
   const [date, setDate] = useState('');
   const [kategoriNavn, setKategoriNavn] = useState('');
   const [kategoriId, setKategoriId] = useState('');
+
   const handleSubmit = async () => {
     if (name && price && date) {
       const income = {
@@ -20,7 +22,7 @@ export default function AddIncomeDialog({ open, handleClose, handleSave }) {
         name, price, date
       }
 
-      await handleIndtægt(income);
+      handleIndtægt(income);
       handleSave(PieIncome);
       setName('');
       setPrice('');

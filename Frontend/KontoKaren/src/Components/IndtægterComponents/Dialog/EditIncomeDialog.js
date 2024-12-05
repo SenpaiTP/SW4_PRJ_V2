@@ -1,30 +1,127 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
+import useIndtægterHooks from '../../../Hooks/IndtægterHooks.js';
+import { initialRows } from '../Table/TableData';
+import { useFetchAllIndtægt } from './FetchAllIndtægt.js';
 
-export default function EditIncomeDialog({ open, handleClose, handleSave, income }) {
+export default function EditIncomeDialog({ open, handleClose}) {
+  const {
+    rows, // data i tabellen
+    selected, // valgte rækker
+    page, // sktuel side
+    rowsPerPage, // antal rækker pr. side
+    handleClick, // håndtering af klik på rækker
+    handleAddRow, // tilføjelse af en ny række
+    handleEditRow, // redigering af en række
+    handleDeleteRow, // sletning af en række
+    handleSave, // gemmer ændringer
+    setRows, // opdaterer rækkerne
+  } = useIndtægterHooks(initialRows);
+
+  const [income, setIncome] = useState(null);
+  const id = income?.id;
+  const [row, setRow] = useState([]);
+
   const [FindtægtId, setFindtægtId] = useState('');
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [date, setDate] = useState('');
   const [kategoriNavn, setKategoriNavn] = useState('');
   const [kategoriId, setKategoriId] = useState('');
-
   const token = localStorage.getItem("authToken");
 
-  useEffect(() => {
-    if (income) {
-      console.log('Income object:', income); // Log income object to verify its structure
-      setFindtægtId(income.id); // Set FindtægtId from income
-      setName(income.name);
-      setPrice(income.price);
-      setDate(income.date);
-      setKategoriNavn(income.kategoriNavn);
-      setKategoriId(income.kategoriId);
+  const fetchIncomes = async () => {
+
+    try {
+      const response = await fetch('http://localhost:5168/api/Findtægt', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Kunne ikke hente findtægter.');
+      }
+  
+      const data = await response.json();
+      const mappedData = mapData(data);
+      console.log("Mapped data: ", mappedData);
+      setIncome(mappedData);
+      setRows(mappedData); // Opdaterer tabellen med data
+    } catch (error) {
+      console.error('Fejl:', error.message);
     }
-  }, [income, open]);
+  };
+
+  const handleIndtægt = async (mappedData) => {
+    fetchIncomes(); // Debug
+    console.log("Income in HandleIndtægt: ", mappedData ); // Debug
+    try {
+      const response = await fetch('http://localhost:5168/api/Findtægt', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Kunne ikke hente findtægter.');
+      }
+  
+      const data = await response.json();
+      const mappedData = mapData(data);
+      console.log("Mapped data: ", mappedData);
+      setIncome(mappedData);
+      setRows(mappedData); // Opdaterer tabellen med data
+  
+      // After getting the mappedData, make a PUT call for each income (if it's an array)
+      mappedData.forEach(async (income) => {
+        try {
+          const response = await fetch(`http://localhost:5168/api/Findtægt?findid=${income.id}`, { // Use income.FindtægtId
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(income),
+          });
+  
+          console.log("Income", income);
+          console.log("Response", response);
+  
+          if (!response.ok) {
+            throw new Error('Noget gik galt. Kunne ikke gemme indkomst.');
+          }
+  
+          const result = await response.json();
+          console.log('Indkomst gemt:', result);
+        } catch (error) {
+          console.error('Fejl:', error);
+        }
+      });
+    
+    } catch (error) {
+      console.error('Fejl:', error.message);
+    }
+
+   };
+
+  useIndtægterHooks(() => {
+    fetchIncomes();
+  }, []);
+
+  const mapData = (data) => {
+    return data.map(item => ({
+        id: item.findtægtId,
+        Tekst: item.tekst,
+        Indtægt: item.indtægt,
+        Dato: item.dato,
+        kategoriNavn: item.kategoriNavn,
+        kategoriId: item.kategoriId,
+    }));
+};
 
   const handleSubmit = async () => {
-    if (name && price && date) {
+    if (name && price && date && kategoriNavn && kategoriId) {
       const updatedIncome = {
         id: FindtægtId, // Use FindtægtId from state
         Tekst: name,
@@ -33,8 +130,8 @@ export default function EditIncomeDialog({ open, handleClose, handleSave, income
         KategoriNavn: kategoriNavn,
         KategoriId: kategoriId,
       };
-      await handleIndtægt(income);
-      handleSave({ id: FindtægtId, name, price, date, kategoriNavn, kategoriId });
+      await handleIndtægt(updatedIncome);
+      handleSave(updatedIncome);
       handleClose(); 
     } else {
       alert('Alle felter skal udfyldes!');
@@ -42,35 +139,6 @@ export default function EditIncomeDialog({ open, handleClose, handleSave, income
   };
 
  
-
-  const handleIndtægt = async (income) => {
-    try {
-      const response = await fetch(`http://localhost:5168/api/Findtægt?findid=${FindtægtId}`, { // Use income.id
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-            Tekst: income.name,
-            Indtægt: income.price,
-            Dato: income.date,
-            KategoriNavn: income.kategoriNavn,
-            KategoriId: income.kategoriId
-        }),
-      });
-      console.log("Income", income);
-      console.log("Response", response);
-      if (!response.ok) {
-        throw new Error('Noget gik galt. Kunne ikke gemme indkomst.');
-      }
-      
-      const result = await response.json();
-      console.log('Indkomst gemt:', result);
-    } catch (error) {
-      console.error('Fejl:', error);
-    }
-   }
 
   return (
     <Dialog open={open} onClose={handleClose}>

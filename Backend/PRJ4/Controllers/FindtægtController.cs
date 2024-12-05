@@ -78,7 +78,7 @@ public class FindtægtController:ControllerBase
 
     [HttpPut]
     
-    public async Task<IActionResult> UpdateFindtægt([FromQuery] int findid, FindtægtUpdateDTO findtægtUpdateDTO)
+    public async Task<IActionResult> UpdateFindtægt([FromQuery] int findid, [FromBody] FindtægtUpdateDTO findtægtUpdateDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
