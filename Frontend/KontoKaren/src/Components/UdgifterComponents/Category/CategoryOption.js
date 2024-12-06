@@ -6,85 +6,85 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-
-import SuggestCategory from '../../../Services/CategoryService';
+import { suggestCategory } from '../../../Services/CategoryService';
 import useUdgifterHooks from '../../../Hooks/UseUdgifterHooks';
 import { initialExpenseRows } from '../Table/UdgifterTableData';
 
 const filter = createFilterOptions();
 
-export default function CategorySet({ onCategorySelect }) {
+export default function CategorySet({ onCategorySelect, selectedCategory }) {
   const { rows } = useUdgifterHooks(initialExpenseRows); // Hent rows fra hooket
   const [categories, setCategories] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState(loadCategoriesFromStorage()); // Initial categories
+  const [category, setCategory] = useState(selectedCategory || ''); // Holder værdien fra kategori inputfeltet
+  const [name, setName] = useState(''); // Holder værdien fra udgiftsnavn inputfeltet
+  const [suggestedCategory, setSuggestedCategory] = useState(''); // Foreslået kategori
 
   // Load categories from localStorage or default categories
-  const loadCategoriesFromStorage = () => {
+  function loadCategoriesFromStorage() {
     const savedCategories = localStorage.getItem('categories');
     return savedCategories ? JSON.parse(savedCategories) : [
       { categoryName: 'Tøj' },
       { categoryName: 'Mad' },
       { categoryName: 'Underholdning' },
     ];
-  };
-
-  const [categoryOptions, setCategoryOptions] = useState(loadCategoriesFromStorage()); // Initial categories from localStorage or default
-  const [value, setValue] = useState(null);
-  const [open, toggleOpen] = useState(false);
-  const [dialogValue, setDialogValue] = useState({ categoryName: '' });
+  }
 
   useEffect(() => {
     // Persist categories in localStorage whenever categoryOptions changes
     localStorage.setItem('categories', JSON.stringify(categoryOptions));
   }, [categoryOptions]);
 
-  const handleClose = () => {
-    setDialogValue({ categoryName: '' });
-    toggleOpen(false);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (dialogValue.categoryName.trim()) {
-      const newCategory = { categoryName: dialogValue.categoryName };
-      setCategoryOptions((prevOptions) => [...prevOptions, newCategory]);
-
-      if (onCategorySelect) {
-        onCategorySelect(newCategory.categoryName);
-      }
-
-      handleClose(); // Close the dialog after adding
+  const handleSuggestCategories = (description) => {
+    if (!description || description.trim() === '') {
+      console.error('Ingen tekst angivet til kategoriforslag.');
+      return;
     }
+
+    suggestCategory(description.trim())
+      .then((category) => {
+        if (category) {
+          console.log(`Foreslået kategori: ${category}`);
+
+          // Tjek, om kategorien allerede eksisterer
+          const exists = categoryOptions.some(
+            (cat) => cat.categoryName.toLowerCase() === category.toLowerCase()
+          );
+          if (!exists) {
+            setCategoryOptions((prevOptions) => [
+              ...prevOptions,
+              { categoryName: category },
+            ]);
+          }
+        }
+      })
+      .catch((error) => console.error('Fejl ved foreslåelse af kategori:', error));
   };
 
-  const handleSuggestCategories = () => {
-    rows.forEach((row) => {
-      const descriptionName = { description: row.name };
-      SuggestCategory(descriptionName.description).then((category) => {
-        if (category) {
-          console.log(`Navn: ${row.name}, Foreslået kategori: ${category}`);
-        }
-      });
-    });
+  // Når inputfeltet for udgiftsnavn ændres
+  const handleUdgiftsnavnChange = (e) => {
+    const newName = e.target.value;
+    setName(newName); // Opdaterer 'name' state med inputværdi
   };
 
   return (
     <>
+      {/* Udgiftsnavn TextField */}
+      <TextField
+        label="Udgiftsnavn"
+        variant="outlined"
+        fullWidth
+        value={name} // Bruger 'name' som værdien af inputfeltet
+        onChange={handleUdgiftsnavnChange} // Opdaterer 'name' state uden at foreslå kategorier
+        sx={{ marginBottom: 2, marginTop: 2 }}
+      />
+
       <Autocomplete
-        value={value}
+        value={category}
         onChange={(event, newValue) => {
-          if (typeof newValue === 'string') {
-            setTimeout(() => {
-              toggleOpen(true);
-              setDialogValue({ categoryName: newValue });
-            });
-          } else if (newValue && newValue.inputValue) {
-            toggleOpen(true);
-            setDialogValue({ categoryName: newValue.inputValue });
-          } else {
-            setValue(newValue);
-            if (onCategorySelect && newValue?.categoryName) {
-              onCategorySelect(newValue.categoryName);
-            }
+          setCategory(newValue?.categoryName || ''); // Opdaterer kategori
+          if (onCategorySelect && newValue?.categoryName) {
+            onCategorySelect(newValue.categoryName); // Opdaterer den valgte kategori i forældrekomponenten
           }
         }}
         filterOptions={(options, params) => {
@@ -97,7 +97,7 @@ export default function CategorySet({ onCategorySelect }) {
           }
           return filtered;
         }}
-        options={categoryOptions}
+        options={[...categoryOptions, ...(suggestedCategory ? [{ categoryName: suggestedCategory }] : [])]} // Add suggested category if available
         getOptionLabel={(option) => {
           if (typeof option === 'string') {
             return option;
@@ -112,38 +112,36 @@ export default function CategorySet({ onCategorySelect }) {
         handleHomeEndKeys
         renderOption={(props, option) => <li {...props}>{option.categoryName}</li>}
         freeSolo
-        renderInput={(params) => <TextField {...params} label="Kategori" />}
-        label="Udgiftsnavn"
-        variant="outlined"
-        fullWidth
-        sx={{ marginBottom: 2, marginTop: 2 }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Kategori"
+            fullWidth
+          />
+        )}
       />
 
       {/* Button to suggest categories */}
       <Button
         variant="contained"
-        onClick={handleSuggestCategories}
+        onClick={() => handleSuggestCategories(name)} // Forslår kategorier baseret på 'name'
+        disabled={!name || name.trim() === ''} // Disable knappen, hvis name er tomt
         sx={{ marginTop: 2 }}
       >
         Foreslå Kategorier
       </Button>
 
       {/* Dialog for adding a new category */}
-      <Dialog open={open} onClose={handleClose}>
-        <form onSubmit={handleSubmit}>
+      <Dialog open={false} onClose={() => {}}>
+        <form onSubmit={() => {}}>
           <DialogTitle>Tilføj ny kategori</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
               margin="dense"
               id="name"
-              value={dialogValue.categoryName}
-              onChange={(event) =>
-                setDialogValue({
-                  ...dialogValue,
-                  categoryName: event.target.value,
-                })
-              }
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               label="Kategori"
               type="text"
               variant="standard"
@@ -151,7 +149,7 @@ export default function CategorySet({ onCategorySelect }) {
           </DialogContent>
           <DialogActions>
             <Button type="submit">Tilføj</Button>
-            <Button onClick={handleClose}>Annuller</Button>
+            <Button onClick={() => {}}>Annuller</Button>
           </DialogActions>
         </form>
       </Dialog>

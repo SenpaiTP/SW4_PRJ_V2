@@ -1,6 +1,6 @@
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5168/api/Kategori';
 
-export default async function suggestCategory(description) {
+export async function suggestCategory(description) {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -40,7 +40,7 @@ export default async function suggestCategory(description) {
       throw new Error("Unexpected response format: Neither JSON nor plain text.");
     }
 
-    console.log('Suggested category:', suggestedCategory);
+    console.log('Suggested category:', description, ":", suggestedCategory);
 
     return suggestedCategory;
   } catch (error) {

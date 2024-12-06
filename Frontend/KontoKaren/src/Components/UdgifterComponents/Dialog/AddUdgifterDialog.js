@@ -26,14 +26,15 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Tilføj ny Udgift</DialogTitle>
       <DialogContent>
-        <TextField
+        {/* { <TextField
           label="Udgiftsnavn"
           variant="outlined"
           fullWidth
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          sx={{ marginBottom: 2, mariginTop: 2 }}
-        />
+          //onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setValue(e.target.value)} // Sørg for at opdatere value
+          sx={{ marginBottom: 2, marginTop: 2 }}
+        /> } */}
 
         {/* Pass setCategory and category to CategoryOption */}
         <CategoryOption
@@ -41,7 +42,6 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
             setCategory(newCategory);  // Update category
           }}
           selectedCategory={category}  // Pass current category
-          
         />
 
         <TextField
