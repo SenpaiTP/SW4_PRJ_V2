@@ -19,10 +19,12 @@ export default function CategorySet({ onCategorySelect, selectedCategory }) {
   const [category, setCategory] = useState(selectedCategory || ''); // Holder værdien fra kategori inputfeltet
   const [name, setName] = useState(''); // Holder værdien fra udgiftsnavn inputfeltet
   const [suggestedCategory, setSuggestedCategory] = useState(''); // Foreslået kategori
+  const [suggestedCategoryText, setSuggestedCategoryText] = useState(''); // Vis tekst for foreslået kategori
 
   // Load categories from localStorage or default categories
   function loadCategoriesFromStorage() {
     const savedCategories = localStorage.getItem('categories');
+    console.log('Henter kategorier fra localStorage:', savedCategories);
     return savedCategories ? JSON.parse(savedCategories) : [
       { categoryName: 'Tøj' },
       { categoryName: 'Mad' },
@@ -31,8 +33,16 @@ export default function CategorySet({ onCategorySelect, selectedCategory }) {
   }
 
   useEffect(() => {
-    // Persist categories in localStorage whenever categoryOptions changes
-    localStorage.setItem('categories', JSON.stringify(categoryOptions));
+    // Fjern dubletter baseret på kategorinavnet
+    const uniqueCategories = categoryOptions.filter((value, index, self) => 
+      index === self.findIndex((t) => (
+        t.categoryName.toLowerCase() === value.categoryName.toLowerCase()
+      ))
+    );
+    console.log('Unikke kategorier:', uniqueCategories); // Debugging
+  
+    // Gem unikke kategorier i localStorage
+    localStorage.setItem('categories', JSON.stringify(uniqueCategories));
   }, [categoryOptions]);
 
   const handleSuggestCategories = (description) => {
@@ -44,7 +54,11 @@ export default function CategorySet({ onCategorySelect, selectedCategory }) {
     suggestCategory(description.trim())
       .then((category) => {
         if (category) {
-          console.log(`Foreslået kategori: ${category}`);
+          console.log(`${category}`);
+
+          // Opdaterer den foreslåede kategori, som skal vises i UI'et
+          setSuggestedCategoryText(`${category}`);
+          setSuggestedCategory(category); // Sæt den foreslåede kategori som en state
 
           // Tjek, om kategorien allerede eksisterer
           const exists = categoryOptions.some(
@@ -65,6 +79,14 @@ export default function CategorySet({ onCategorySelect, selectedCategory }) {
   const handleUdgiftsnavnChange = (e) => {
     const newName = e.target.value;
     setName(newName); // Opdaterer 'name' state med inputværdi
+  };
+
+  // Når knappen til at tilføje foreslået kategori trykkes
+  const handleAddSuggestedCategory = () => {
+    if (suggestedCategory) {
+      setCategory(suggestedCategory); // Tilføj den foreslåede kategori til kategori-inputfeltet
+      setSuggestedCategoryText(''); // Fjern den foreslåede tekst
+    }
   };
 
   return (
@@ -130,6 +152,29 @@ export default function CategorySet({ onCategorySelect, selectedCategory }) {
       >
         Foreslå Kategorier
       </Button>
+
+      {/* Display the suggested category with an 'Add' button */}
+      {suggestedCategory && (
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center' }}>
+          <TextField
+            label="Foreslået Kategori"
+            variant="outlined"
+            fullWidth
+            value={suggestedCategoryText}
+            InputProps={{
+              readOnly: true,
+            }}
+            sx={{ marginRight: 2 }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleAddSuggestedCategory} // Tilføj den foreslåede kategori
+            disabled={!suggestedCategory} // Disable knappen, hvis ingen kategori er foreslået
+          >
+            Tilføj
+          </Button>
+        </div>
+      )}
 
       {/* Dialog for adding a new category */}
       <Dialog open={false} onClose={() => {}}>
