@@ -1,27 +1,31 @@
 namespace PRJ4.DTOs;
 
-//Create budget
-public class BudgetCreateUpdateDTO
+
+public class BudgetCreateDTO
 {
     public required string BudgetName { get; set; }  
     public int SavingsGoal { get; set; }
     public DateOnly BudgetSlut { get; set; }
 }
 
-//Get one budget to show all info
-public class BudgetGetbyIdDTO
+public class BudgetUpdateDTO
+{
+    public required string BudgetName { get; set; }  
+    public int SavingsGoal { get; set; }
+    public DateOnly BudgetSlut { get; set; }
+}
+
+public class BudgetResponsDTO
 {
     public int BudgetId { get; set; }
     public required string BudgetName { get; set; }
     public int KategoryId { get; set; }
     public int SavingsGoal { get; set; }
     public DateOnly BudgetSlut { get; set; }
-    public int MonthlySavingsAmount { get; set;}
+    public decimal MonthlySavingsAmount { get; set;}
     public decimal MoneySaved { get; set; } 
 }
 
-
-//View all user budget on frontpage for a user
 public class BudgetGetAllDTO
 {
     public int BudgetId { get; set; }
@@ -33,7 +37,7 @@ public class BudgetGetAllDTO
 }
 
 
-public class SavingDTO
+public class BudgetSavingCreateDTO
 {
     public decimal Saving { get; set; }
     public DateTime Date {get;set;}
@@ -41,11 +45,10 @@ public class SavingDTO
 }
 
 
-public class SavingPostDTO
+public class BudgetSavingResponsDTO
 {
-    public decimal Pris {get; set;}
+    public decimal Saving {get; set;}
     public int KategoryId { get; set; }
-    public string ?KategoriNavn {get; set;}
-    public DateTime Dato {get;set;}
+    public DateTime Date {get;set;}
 
 }

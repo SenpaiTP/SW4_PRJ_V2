@@ -22,42 +22,7 @@ namespace PRJ4.Services
 
         }
 
-
-        //Skal ikke bruge denne medtode
-        public async Task<List<BudgetGetbyIdDTO>> GetAllBudgetGoalsAsync()
-        {
-            var budgetListe = await _budgetRepository.GetAllAsync();
-        
-            if (budgetListe == null || !budgetListe.Any())
-            {
-                throw new KeyNotFoundException($"No budgets found.");
-            }
-
-            var budgetReturnListe = new List<BudgetGetbyIdDTO>();
-
-            foreach (var budget in budgetListe)
-            {
-                int monthlysaving = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut);
-                //decimal moneysaved = await CalculateMoneySaved(budget.BudgetId,budget.BudgetName);
-
-                var budgetReturn = new BudgetGetbyIdDTO
-                {
-                    BudgetId = budget.BudgetId,
-                    KategoryId = budget.KategoryId,
-                    BudgetName = budget.BudgetName,
-                    SavingsGoal = budget.SavingsGoal,
-                    BudgetSlut = budget.BudgetSlut,
-                    MonthlySavingsAmount = monthlysaving,
-                    MoneySaved = 200
-                };
-
-                budgetReturnListe.Add(budgetReturn);
-            }
-
-            return budgetReturnListe;
-        }
-
-        public async Task<BudgetGetbyIdDTO> GetByIdBudgetGoalAsync(int budgetId, string userId)
+        public async Task<BudgetResponsDTO> GetByIdBudgetGoalAsync(int budgetId, string userId)
         {
             //Validating parameter
             if (budgetId <= 0)
@@ -73,11 +38,11 @@ namespace PRJ4.Services
             }
 
             //Calculate monthly savings and money saved
-            int monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
+            decimal monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
             decimal savingResult = await CalculateSavingsForCategoryAsync(userId, budget.KategoryId);
 
             // Return DTO 
-            var budgetReturn = new BudgetGetbyIdDTO
+            var budgetReturn = new BudgetResponsDTO
             {
                 BudgetId = budget.BudgetId,
                 BudgetName = budget.BudgetName,
@@ -91,7 +56,7 @@ namespace PRJ4.Services
             return budgetReturn;
         }
 
-        public async Task<List<SavingDTO>> GetAllSavingsAsync(int budgetId, string userId)
+        public async Task<List<BudgetSavingResponsDTO>> GetAllSavingsAsync(int budgetId, string userId)
         {
             // Validate parameter
             if (budgetId <= 0)
@@ -105,13 +70,14 @@ namespace PRJ4.Services
             }
 
             var udgifter = await _vudgifterRepository.GetAllByCategory(userId, budget.KategoryId);
-            var udgiftReturnListe = new List<SavingDTO>();
+            var udgiftReturnListe = new List<BudgetSavingResponsDTO>();
 
             foreach (var udgift in udgifter)
             {
-                var saving = new SavingDTO
+                var saving = new BudgetSavingResponsDTO
                 {
                     Saving = udgift.Pris,
+                    KategoryId = udgift.KategoriId ?? 0,
                     Date = udgift.Dato
                 };
                 udgiftReturnListe.Add(saving);
@@ -122,7 +88,7 @@ namespace PRJ4.Services
 
         }
 
-        public async Task<List<BudgetGetAllDTO>> GetAllByUserIdBudgetGoalAsync(string userId)
+        public async Task<List<BudgetResponsDTO>> GetAllByUserIdBudgetGoalAsync(string userId)
         {
             var budgetListe = await _budgetRepository.GetBudgetsForUserAsync(userId);
             if (budgetListe == null || !budgetListe.Any())
@@ -130,30 +96,32 @@ namespace PRJ4.Services
                 throw new Exception($"No budgets found for user with ID {userId}");
             }
 
-            var budgetReturnListe = new List<BudgetGetAllDTO>();
+            var budgetReturnListe = new List<BudgetResponsDTO>();
 
             foreach (var budget in budgetListe)
             {
+                decimal monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
+                decimal savingResult = await CalculateSavingsForCategoryAsync(userId, budget.KategoryId);
                 
-                var budgetReturn = new BudgetGetAllDTO
+                var budgetReturn = new BudgetResponsDTO
                 {
                     BudgetId = budget.BudgetId,
                     KategoryId = budget.KategoryId,
                     BudgetName = budget.BudgetName,
                     SavingsGoal = budget.SavingsGoal,
                     BudgetSlut = budget.BudgetSlut,
+                    MonthlySavingsAmount = monthlysaving,
+                    MoneySaved = savingResult
                 };
 
                 budgetReturnListe.Add(budgetReturn);
             }
 
             return budgetReturnListe;
-
-
         }
 
 
-        public async Task<BudgetCreateUpdateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateUpdateDTO budgetDTO)
+        public async Task<BudgetCreateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateDTO budgetDTO)
         {
             // Validate parameters
             if (budgetDTO == null)
@@ -177,7 +145,6 @@ namespace PRJ4.Services
                 throw new ArgumentException("Budget end date cannot be more than 10 years from today.");
             }
 
-
             // Validate savingGoal
             if (budgetDTO.SavingsGoal <= 0)
             {
@@ -188,8 +155,6 @@ namespace PRJ4.Services
             {
                 throw new ArgumentException("Savings goal cannot exceed 10,000,000.");
             }
-
-        
 
             //New kategory
             var kategoryName = $"Opsparing: {budgetDTO.BudgetName}";
@@ -217,7 +182,7 @@ namespace PRJ4.Services
 
 
             // Map det oprettede budget til BudgetCreateDTO
-            var createdBudgetDTO = new BudgetCreateUpdateDTO
+            var createdBudgetDTO = new BudgetCreateDTO
             {
                 BudgetName = createdBudget.BudgetName,
                 SavingsGoal = createdBudget.SavingsGoal,
@@ -229,7 +194,7 @@ namespace PRJ4.Services
 
         }
 
-        public async Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string user, SavingDTO savingDTO)
+        public async Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string user, BudgetSavingCreateDTO savingDTO)
         {
             // Validate for parameter
             if (savingDTO == null)
@@ -270,7 +235,7 @@ namespace PRJ4.Services
         }
 
 
-        public async Task<BudgetCreateUpdateDTO> UpdateBudgetGoalAsync(int id, BudgetCreateUpdateDTO budgetDTO)
+        public async Task<BudgetUpdateDTO> UpdateBudgetGoalAsync(int id, BudgetUpdateDTO budgetDTO)
         {
             // Validate parameter
             if (budgetDTO == null)
@@ -315,7 +280,7 @@ namespace PRJ4.Services
                 throw new InvalidOperationException("Could not update budget.", ex);
             }
 
-            var updatedBudgetDTO = new BudgetCreateUpdateDTO
+            var updatedBudgetDTO = new BudgetUpdateDTO
             {
                 BudgetName = existingBudget.BudgetName,
                 SavingsGoal = existingBudget.SavingsGoal,
@@ -344,7 +309,7 @@ namespace PRJ4.Services
         }
 
 //Calculations
-        public int CalculateMonthlySavings(int savingsGoal, DateOnly budgetStart, DateOnly budgetSlut)
+        public decimal CalculateMonthlySavings(int savingsGoal, DateOnly budgetStart, DateOnly budgetSlut)
         {
             if (budgetSlut <= budgetStart)
             {

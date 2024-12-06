@@ -1,10 +1,9 @@
-  
+ 
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using PRJ4.Services;
-using PRJ4.Repositories;
 using Microsoft.AspNetCore.Authorization;
-using PRJ4.Models;
+
 
 namespace PRJ4.Controllers;
 
@@ -22,6 +21,7 @@ public class BudgetController : ControllerBase
         _logger = logger;
 
     }
+
     // Retrieves the userId from the claims in the http-request. If no userId is found it returns null.
     private string GetUserId() 
     {
@@ -32,15 +32,7 @@ public class BudgetController : ControllerBase
             return null;
         }
         return userIdClaim.Value;
-    }
-
-    // GET: api/Budget - Get all budgets for all users. Should not be used to check budget - no useridentification
-    [HttpGet]
-    public async Task<IActionResult> GetAllBudgets() 
-    {
-        var budget = await _budgetGoalService.GetAllBudgetGoalsAsync();
-        return Ok(budget);
-    }   
+    }  
 
     // GET: api/Budget/{budgetId} - Get users budget by id
     [HttpGet("{budgetId}")]
@@ -95,7 +87,7 @@ public class BudgetController : ControllerBase
 
     // GET: api/Budget/AllSavings - Get all savings for a user
     [HttpGet("AllSavings")] 
-    public async Task<ActionResult<List<SavingDTO>>> GetSaving(int budgetId) 
+    public async Task<ActionResult<List<BudgetSavingResponsDTO>>> GetSaving(int budgetId) 
     {
         var userId = GetUserId();
         if (userId == null)
@@ -119,7 +111,7 @@ public class BudgetController : ControllerBase
 
     // POST: api/Budget/NewBudget - Create a new budget
     [HttpPost("NewBudget")] 
-    public async Task<ActionResult<BudgetCreateUpdateDTO>> AddBudget(BudgetCreateUpdateDTO budgetDTO) 
+    public async Task<ActionResult<BudgetCreateDTO>> AddBudget(BudgetCreateDTO budgetDTO) 
     {  
         //Get user
         var userId = GetUserId();
@@ -144,7 +136,7 @@ public class BudgetController : ControllerBase
 
     // POST api/Budget/NewSaving/{BudgetId} - Add money to a saving budget.
     [HttpPost("NewSaving/{budgetId}")] 
-    public async Task<ActionResult<VudgifterResponseDTO>> AddSaving( int budgetId, SavingDTO savingDTO) 
+    public async Task<ActionResult<VudgifterResponseDTO>> AddSaving( int budgetId, BudgetSavingCreateDTO savingDTO) 
     {
         var userId = GetUserId();
         if (userId == null)
@@ -168,7 +160,7 @@ public class BudgetController : ControllerBase
 
     // UPDATE: api/Budget/UpdateBudget - Update the values in an existing budget
     [HttpPut("UpdateBudget")]
-    public async Task<ActionResult<BudgetCreateUpdateDTO>> UpdateBudget(int budgetId, BudgetCreateUpdateDTO budgetDTO) 
+    public async Task<ActionResult<BudgetUpdateDTO>> UpdateBudget(int budgetId, BudgetUpdateDTO budgetDTO) 
     {
         // get and check for user.
         var userId = GetUserId();
