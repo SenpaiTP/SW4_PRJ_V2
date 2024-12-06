@@ -143,8 +143,8 @@ public class BudgetController : ControllerBase
     }
 
     // POST api/Budget/NewSaving/{BudgetId} - Add money to a saving budget.
-    [HttpPost("NewSaving/{BudgetId}")] 
-    public async Task<ActionResult<VudgifterResponseDTO>> AddSaving(SavingDTO savingDTO, int budgetId) 
+    [HttpPost("NewSaving/{budgetId}")] 
+    public async Task<ActionResult<VudgifterResponseDTO>> AddSaving( int budgetId, SavingDTO savingDTO) 
     {
         var userId = GetUserId();
         if (userId == null)
@@ -155,7 +155,7 @@ public class BudgetController : ControllerBase
         
         try //Try to add money to saving
         {
-            var saving = await _budgetGoalService.AddSavingAsync(userId, savingDTO, budgetId);
+            var saving = await _budgetGoalService.AddSavingAsync( budgetId, userId, savingDTO);
             return Ok(saving); // Returns statuskode with the saving
         }
         catch (Exception ex) // Returns error message if not possible
@@ -193,7 +193,7 @@ public class BudgetController : ControllerBase
 
     // Delete: api/Budget/DeleteBudget - delete an existing budget
     [HttpDelete("DeleteBudget")]
-    public async Task<ActionResult<BudgetCreateUpdateDTO>> Delete(int budgetId)
+    public async Task<IActionResult> Delete(int budgetId)
     {
         // get and check for user.
         var userId = GetUserId();
@@ -205,8 +205,9 @@ public class BudgetController : ControllerBase
         //Try to delete budget 
         try
         {
-            var budget = await _budgetGoalService.DeleteBudgetAsync(budgetId);
-            return Ok(budget); // Returns statuskode with deleted budget
+            await _budgetGoalService.DeleteBudgetAsync(budgetId);
+            return Ok(new { Message = $"Budget with ID {budgetId} has been successfully deleted." });
+
         }
         catch (Exception ex)
         {

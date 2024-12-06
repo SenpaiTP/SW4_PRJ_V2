@@ -8,17 +8,14 @@ namespace PRJ4.Services
     public class BudgetGoalService: IBudgetGoalService
     {
         private readonly IBudgetRepo _budgetRepository;
-        private readonly IBrugerRepo _brugerRepository;
         private readonly IKategoriRepo _kategoryRepositry;
         private readonly IVudgifterService _vudgifterService;
-
         private readonly IVudgifterRepo _vudgifterRepository;
 
 
-        public BudgetGoalService(IBudgetRepo budgetRepository, IBrugerRepo brugerRepository, IKategoriRepo kategoryRepositry, IVudgifterService vudgifterService, IVudgifterRepo vudgifterRepository)
+        public BudgetGoalService(IBudgetRepo budgetRepository, IKategoriRepo kategoryRepositry, IVudgifterService vudgifterService, IVudgifterRepo vudgifterRepository)
         {
             _budgetRepository = budgetRepository;
-            _brugerRepository = brugerRepository;
             _kategoryRepositry = kategoryRepositry;
             _vudgifterService = vudgifterService;
             _vudgifterRepository = vudgifterRepository;
@@ -26,7 +23,7 @@ namespace PRJ4.Services
         }
 
 
-//Skal ikke bruge denne medtode
+        //Skal ikke bruge denne medtode
         public async Task<List<BudgetGetbyIdDTO>> GetAllBudgetGoalsAsync()
         {
             var budgetListe = await _budgetRepository.GetAllAsync();
@@ -60,18 +57,26 @@ namespace PRJ4.Services
             return budgetReturnListe;
         }
 
-        public async Task<BudgetGetbyIdDTO> GetByIdBudgetGoalAsync(int id, string userId)
+        public async Task<BudgetGetbyIdDTO> GetByIdBudgetGoalAsync(int budgetId, string userId)
         {
-            var budget = await _budgetRepository.GetByIdAsync(id); 
-            if (budget == null)
+            //Validating parameter
+            if (budgetId <= 0)
             {
-                throw new KeyNotFoundException($"Budget with id {id} not found.");
+                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
             }
 
+            // Get budget from repository
+            var budget = await _budgetRepository.GetByIdAsync(budgetId); 
+            if (budget == null)
+            {
+                throw new KeyNotFoundException($"Budget with id {budgetId} not found.");
+            }
+
+            //Calculate monthly savings and money saved
             int monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
-         
             decimal savingResult = await CalculateSavingsForCategoryAsync(userId, budget.KategoryId);
 
+            // Return DTO 
             var budgetReturn = new BudgetGetbyIdDTO
             {
                 BudgetId = budget.BudgetId,
@@ -88,9 +93,18 @@ namespace PRJ4.Services
 
         public async Task<List<SavingDTO>> GetAllSavingsAsync(int budgetId, string userId)
         {
+            // Validate parameter
+            if (budgetId <= 0)
+            {
+                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
+            }
             var budget = await GetByIdBudgetGoalAsync(budgetId, userId);
-            var udgifter = await _vudgifterRepository.GetAllByCategory(userId, budget.KategoryId);
+            if (budget == null)
+            {
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
+            }
 
+            var udgifter = await _vudgifterRepository.GetAllByCategory(userId, budget.KategoryId);
             var udgiftReturnListe = new List<SavingDTO>();
 
             foreach (var udgift in udgifter)
@@ -141,10 +155,38 @@ namespace PRJ4.Services
 
         public async Task<BudgetCreateUpdateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateUpdateDTO budgetDTO)
         {
-            //Check budgetDTO
-            if (budgetDTO == null) 
+            // Validate parameters
+            if (budgetDTO == null)
             {
-                throw new ArgumentException($"Budget med id {budgetDTO} findes ikke. ");
+                throw new ArgumentNullException(nameof(budgetDTO), "Budget data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(budgetDTO.BudgetName) || budgetDTO.BudgetSlut == default)
+            {
+                throw new ArgumentException("Budget name and end date must be provided.");
+            }
+
+            // Validate enddate 
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            if (budgetDTO.BudgetSlut <= today)
+            {
+                throw new ArgumentException("Budget end date must be in the future.");
+            }
+            if (budgetDTO.BudgetSlut > today.AddYears(10))
+            {
+                throw new ArgumentException("Budget end date cannot be more than 10 years from today.");
+            }
+
+
+            // Validate savingGoal
+            if (budgetDTO.SavingsGoal <= 0)
+            {
+                throw new ArgumentException("Savings goal must be greater than zero.");
+            }
+
+            if (budgetDTO.SavingsGoal > 10_000_000)
+            {
+                throw new ArgumentException("Savings goal cannot exceed 10,000,000.");
             }
 
         
@@ -152,6 +194,10 @@ namespace PRJ4.Services
             //New kategory
             var kategoryName = $"Opsparing: {budgetDTO.BudgetName}";
             var kategori = await _kategoryRepositry.NyKategori(kategoryName);
+            if (kategori == null)
+            {
+                throw new InvalidOperationException($"Failed to create or retrieve category '{kategoryName}'.");
+            }
             
             //New budget
             var budget = new Budget
@@ -183,11 +229,30 @@ namespace PRJ4.Services
 
         }
 
-        public async Task<VudgifterResponseDTO> AddSavingAsync(string user, SavingDTO savingDTO, int budgetId)
+        public async Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string user, SavingDTO savingDTO)
         {
+            // Validate for parameter
+            if (savingDTO == null)
+            {
+                throw new ArgumentNullException(nameof(savingDTO), "Saving data cannot be null.");
+            }
+            if (budgetId <= 0)
+            {
+                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
+            }
+
             var budget = await GetByIdBudgetGoalAsync(budgetId, user);
+            if (budget == null)
+            {
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found for user {user}.");
+            }
+            
       
             var kategory = await _kategoryRepositry.GetByIdAsync(budget.KategoryId);
+            if (budget == null)
+            {
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found for user {user}.");
+            }
     
             var saving = new nyVudgifterDTO
             {
@@ -207,15 +272,34 @@ namespace PRJ4.Services
 
         public async Task<BudgetCreateUpdateDTO> UpdateBudgetGoalAsync(int id, BudgetCreateUpdateDTO budgetDTO)
         {
+            // Validate parameter
             if (budgetDTO == null)
             {
                 throw new ArgumentException("Invalid budget data.");
             }
 
+            //Validate budgetName
+            if (string.IsNullOrWhiteSpace(budgetDTO.BudgetName))
+            {
+                throw new ArgumentException("Budget name cannot be empty.");
+            }
+
+            // Validate savingGoal
+            if (budgetDTO.SavingsGoal <= 0)
+            {
+                throw new ArgumentException("Savings goal must be greater than zero.");
+            }
+
+            // Validate enddate
+            if (budgetDTO.BudgetSlut <= DateOnly.FromDateTime(DateTime.Now))
+            {
+                throw new ArgumentException("Budget end date must be in the future.");
+            }
+
             var existingBudget = await _budgetRepository.GetByIdAsync(id);
             if (existingBudget == null)
             {
-                throw new ArgumentException($"Budget with id {id} not found.");
+                throw new KeyNotFoundException($"Budget with ID {id} not found.");
             }
 
             existingBudget.BudgetName = budgetDTO.BudgetName;
@@ -223,8 +307,7 @@ namespace PRJ4.Services
             existingBudget.BudgetSlut = budgetDTO.BudgetSlut;
             
             try
-            {
-                await _budgetRepository.Update(existingBudget); 
+            { 
                 await _budgetRepository.SaveChangesAsync();
             }
             catch(Exception ex)
@@ -243,25 +326,21 @@ namespace PRJ4.Services
 
         }
 
-        public async Task<BudgetCreateUpdateDTO> DeleteBudgetAsync(int id)
+        public async Task DeleteBudgetAsync(int budgetId)
         {
-            var budget = await _budgetRepository.GetByIdAsync(id);
-            if (budget == null)
+            if (budgetId <= 0)
             {
-                throw new KeyNotFoundException($"Budget with id {id} not found.");
+                throw new ArgumentException("Invalid budget ID. ID must be greater than zero.");
             }
 
-            var deletedBudget = await _budgetRepository.Delete(id);
-            await _budgetRepository.SaveChangesAsync();
-
-            var updatedBudgetDTO = new BudgetCreateUpdateDTO
+            var budget = await _budgetRepository.GetByIdAsync(budgetId);
+            if (budget == null)
             {
-                BudgetName = deletedBudget.BudgetName,
-                SavingsGoal = deletedBudget.SavingsGoal,
-                BudgetSlut = deletedBudget.BudgetSlut
-            };
+                 throw new KeyNotFoundException($"The budget with ID {budgetId} does not exist and cannot be deleted.");
+            }
 
-            return updatedBudgetDTO;
+            var deletedBudget = await _budgetRepository.Delete(budgetId);
+            await _budgetRepository.SaveChangesAsync();
         }
 
 //Calculations
@@ -271,14 +350,25 @@ namespace PRJ4.Services
             {
                 throw new ArgumentException("Budget end date must be after start date.");
             }
-            //Find the monthly difference   
-            int monthsToSave = ((budgetSlut.Year - budgetStart.Year) * 12) + budgetSlut.Month - budgetStart.Month;
-           
+            if (savingsGoal <= 0)
+            {
+                throw new ArgumentException("Savings goal must be greater than zero.");
+            }
+
+            // Calculate number of days form start to enddate
+            var startDate = budgetStart.ToDateTime(new TimeOnly(0, 0)); // Konverter startdato til DateTime
+            var endDate = budgetSlut.ToDateTime(new TimeOnly(23, 59));  // Konverter slutdato til DateTime
+
+            var totalDays = (endDate - startDate).Days;
+
+            // Calculate total months
+            var totalMonths = (totalDays / 30.0); // Brug gennemsnit af dage pr. måned (30 dage)
+
             //Check if there are months to save 
-            if (monthsToSave > 0)
+            if (totalMonths > 0)
             {
                 //calculate monthly savings
-                return savingsGoal / monthsToSave;
+                return (int)(savingsGoal / totalMonths);
             }
 
             return 0;
@@ -287,6 +377,17 @@ namespace PRJ4.Services
 
         private async Task<decimal> CalculateSavingsForCategoryAsync(string userId, int categoryId)
         {
+            // Validate parameters
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("UserId cannot be null or empty.");
+            }
+            
+            if (categoryId <= 0)
+            {
+                throw new ArgumentException("CategoryId must be greater than zero.");
+            }
+
             var udgifter = await _vudgifterRepository.GetAllByCategory(userId, categoryId);
 
             decimal savingResult = 0;
