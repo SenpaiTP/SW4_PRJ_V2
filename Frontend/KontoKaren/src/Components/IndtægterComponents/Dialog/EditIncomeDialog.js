@@ -19,9 +19,7 @@ export default function EditIncomeDialog({ open, handleClose}) {
   } = useIndtægterHooks(initialRows);
 
   const [income, setIncome] = useState(null);
-  const id = income?.id;
   const [row, setRow] = useState([]);
-
   const [FindtægtId, setFindtægtId] = useState('');
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -30,13 +28,37 @@ export default function EditIncomeDialog({ open, handleClose}) {
   const [kategoriId, setKategoriId] = useState('');
   const token = localStorage.getItem("authToken");
 
-  const fetchIncomes = async () => {
+  // const fetchIncomes = async () => {
 
+  //   try {
+  //     const response = await fetch('http://localhost:5168/api/Findtægt', {
+  //       method: 'GET',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'content-type': 'application/json', 
+  //       },
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error('Kunne ikke hente findtægter.');
+  //     }
+  
+  //     const data = await response.json();
+  //     const mappedData = mapData(data);
+  //     console.log("Mapped data: ", mappedData);
+  //     setIncome(mappedData);
+  //     setRows(mappedData); // Opdaterer tabellen med data
+  //   } catch (error) {
+  //     console.error('Fejl:', error.message);
+  //   }
+  // };
+
+  const handleIndtægt = async (updatedIncome) => {
     try {
       const response = await fetch('http://localhost:5168/api/Findtægt', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'content-type': 'application/json',
         },
       });
       if (!response.ok) {
@@ -48,65 +70,39 @@ export default function EditIncomeDialog({ open, handleClose}) {
       console.log("Mapped data: ", mappedData);
       setIncome(mappedData);
       setRows(mappedData); // Opdaterer tabellen med data
-    } catch (error) {
-      console.error('Fejl:', error.message);
-    }
-  };
-
-  const handleIndtægt = async (mappedData) => {
-    fetchIncomes(); // Debug
-    console.log("Income in HandleIndtægt: ", mappedData ); // Debug
-    try {
-      const response = await fetch('http://localhost:5168/api/Findtægt', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Kunne ikke hente findtægter.');
-      }
   
-      const data = await response.json();
-      const mappedData = mapData(data);
-      console.log("Mapped data: ", mappedData);
-      setIncome(mappedData);
-      setRows(mappedData); // Opdaterer tabellen med data
-  
-      // After getting the mappedData, make a PUT call for each income (if it's an array)
-      mappedData.forEach(async (income) => {
+      // Find the specific income based on the updatedIncome.id
         try {
-          const response = await fetch(`http://localhost:5168/api/Findtægt?findid=${income.id}`, { // Use income.FindtægtId
+          const response = await fetch(`http://localhost:5168/api/Findtægt?findid=${FindtægtId}`, { // Use incomeToUpdate.id
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify(income),
+            body: JSON.stringify(updatedIncome),
           });
   
-          console.log("Income", income);
+          console.log("Income", updatedIncome);
           console.log("Response", response);
   
-          if (!response.ok) {
+          if (response.status === 204) {
+            console.log('Indkomst opdateret succesfuldt.');
+          } else if (response.ok) {
+            const result = await response.json();
+            console.log('Indkomst gemt:', result);
+          } else {
             throw new Error('Noget gik galt. Kunne ikke gemme indkomst.');
           }
-  
-          const result = await response.json();
-          console.log('Indkomst gemt:', result);
         } catch (error) {
-          console.error('Fejl:', error);
+          console.error('Fejl inde i fetchId:', error);
         }
-      });
-    
     } catch (error) {
-      console.error('Fejl:', error.message);
+      console.error('Fejl i fetch all data:', error.message);
     }
+  };
 
-   };
-
-  useIndtægterHooks(() => {
-    fetchIncomes();
+  useEffect(() => {
+    //fetchIncomes();
   }, []);
 
   const mapData = (data) => {
@@ -120,8 +116,8 @@ export default function EditIncomeDialog({ open, handleClose}) {
     }));
 };
 
-  const handleSubmit = async () => {
-    if (name && price && date && kategoriNavn && kategoriId) {
+  const handleSubmit = async (mapData) => {
+    if ( FindtægtId && name && price && date && kategoriNavn && kategoriId) {
       const updatedIncome = {
         id: FindtægtId, // Use FindtægtId from state
         Tekst: name,
@@ -130,9 +126,18 @@ export default function EditIncomeDialog({ open, handleClose}) {
         KategoriNavn: kategoriNavn,
         KategoriId: kategoriId,
       };
-      await handleIndtægt(updatedIncome);
-      handleSave(updatedIncome);
-      handleClose(); 
+
+      console.log("Rows", rows);
+      console.log("Updated income", updatedIncome);
+      // Find the specific row based on the selected row.id
+      if(updatedIncome.id === FindtægtId) {
+        await handleIndtægt(updatedIncome);
+        handleSave(updatedIncome);
+        handleClose()
+      }
+      else {
+        alert('Den valgte række blev ikke fundet.');
+      }
     } else {
       alert('Alle felter skal udfyldes!');
     }
@@ -144,6 +149,14 @@ export default function EditIncomeDialog({ open, handleClose}) {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Rediger Indtægt</DialogTitle>
       <DialogContent>
+      <TextField
+          label="ID"
+          variant="outlined"
+          fullWidth
+          value={FindtægtId}
+          onChange={(e) => setFindtægtId(e.target.value)}
+          sx={{ marginBottom: 2 }}
+        />
         <TextField
           label="Indtægtsnavn"
           variant="outlined"

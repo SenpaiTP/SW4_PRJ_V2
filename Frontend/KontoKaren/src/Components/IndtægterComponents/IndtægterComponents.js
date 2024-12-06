@@ -91,11 +91,6 @@ const fetchIncomes = async () => {
   };
   const handleCloseEdit = () => setOpenEditDialog(false);
 
-  //håndtering af opdatere tabellen ud fra databasen
-  const handleUpdateTable = (updateIncome) => {
-    fetchIncomes();
-    setOpenAddDialog(false);
-  }
 
 
   // Tilføjer en ny indkomst og lukker dialogen
