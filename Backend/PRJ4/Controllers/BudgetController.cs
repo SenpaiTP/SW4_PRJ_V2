@@ -10,7 +10,7 @@ namespace PRJ4.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class BudgetController : ControllerBase
+public class BudgetController : ControllerBase  
 {
 
     private readonly IBudgetGoalService _budgetGoalService;
@@ -18,7 +18,7 @@ public class BudgetController : ControllerBase
     public BudgetController(IBudgetGoalService budgetGoalService,ILogger<BudgetController> logger)
     {
         _budgetGoalService = budgetGoalService;
-        _logger = logger;
+        _logger = logger;  
 
     }
 

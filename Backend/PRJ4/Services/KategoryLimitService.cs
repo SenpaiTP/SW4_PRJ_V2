@@ -6,70 +6,150 @@ namespace PRJ4.Services
 {
     public class KategoryLimitService: IKategoryLimitService
     {
-        private readonly IKategoryLimitRepo _kategoriLimitRepository;
+        private readonly IKategoryLimitRepo _kategoryLimitRepository;
 
-        private readonly IKategoriRepo _kategoriRepository;
+        private readonly IKategoriRepo _kategoryRepository;
 
-        public KategoryLimitService(IKategoryLimitRepo kategoriLimitRepository, IKategoriRepo kategoriRepository)
+        public KategoryLimitService(IKategoryLimitRepo kategoryLimitRepository, IKategoriRepo kategoryRepository)
         {
-            _kategoriLimitRepository = kategoriLimitRepository;
-            _kategoriRepository = kategoriRepository;
+            _kategoryLimitRepository = kategoryLimitRepository;
+            _kategoryRepository = kategoryRepository;
         }
 
-         public async Task<KategoryLimitGetDTO> GetByIdKategoryLimitAsync(int id)
+        //  public async Task<KategoryLimitResponseDTO> GetByIdKategoryLimitAsync(int id, string userId)
+        // {
+        //     //Check if kategoryLimit with "id" exists and write error message if not.
+        //     var kategoryLimit = await _kategoryLimitRepository.GetKategoryLimitsForUserAsync(userId);
+        //     if (kategoryLimit == null)
+        //     {
+        //         throw new KeyNotFoundException($"Kategorylimit with id {id} not found.");
+        //     }
+
+        //     //Check if kategory with foreign key "KategoryId" exists and write error message if not.
+        //     var kategory = await _kategoryRepository.GetByIdAsync(kategoryLimit.KategoryId);
+        //     if (kategory == null)
+        //     {
+        //         throw new KeyNotFoundException($"Kategory with id {kategoryLimit.KategoryId} not found.");
+        //     }
+
+        //     //Create kategoryLimit DTO to return
+        //     var budgetReturn = new KategoryLimitResponseDTO
+        //     {
+        //         KategoryName = kategory.KategoriNavn,
+        //         Limit = kategoryLimit.Limit
+        //     };
+        //     return budgetReturn;
+        // }
+
+        public async Task<List<KategoryLimitResponseDTO>> GetAllKategoryLimits(string userId)
         {
-            //Check if budget with "id" exists and write error message if not.
-            var budget = await _kategoriLimitRepository.GetByIdAsync(id); 
-            if (budget == null)
+            var limitListe = await _kategoryLimitRepository.GetKategoryLimitsForUserAsync(userId);
+            if (limitListe == null || !limitListe.Any())
             {
-                throw new KeyNotFoundException($"Kategorilimit with id {id} not found.");
+                throw new Exception($"No limits on categories found for user with ID {userId}");
             }
 
-            //Check if kategori with foreign key "KategoryId" exists and write error message if not.
-            var kategori = await _kategoriRepository.GetByIdAsync(budget.KategoryId);
-            if (budget == null)
+            var limitReturnListe = new List<KategoryLimitResponseDTO>();
+
+            foreach( var limit in limitReturnListe)
             {
-                throw new KeyNotFoundException($"Kategory with id {budget.KategoryId} not found.");
+                var limitReturn = new KategoryLimitResponseDTO
+                {
+                    KategoryId = limit.KategoryId,
+                    KategoryName = limit.KategoryName,
+                    Limit = limit.Limit
+                };
+                limitReturnListe.Add(limitReturn);
             }
 
-            //Create kategoriLimit DTO to return
-            var budgetReturn = new KategoryLimitGetDTO
+            return limitReturnListe;
+        }
+
+        public async Task<KategoryLimitResponseDTO> GetByIdKategoryLimits(int kategoryId, string userId)
+        {
+            //Validating parameter
+            if (kategoryId <= 0)
             {
-                KategoryName = kategori.KategoriNavn,
-                Limit = budget.Limit
+                throw new ArgumentException("Invalid kategory ID.", nameof(kategoryId));
+            }
+
+            var limit = await _kategoryLimitRepository.GetKategoryLimitForKategoryAsync(kategoryId, userId);
+            if (limit == null)
+            {
+                throw new Exception($"No limits on category with id {kategoryId} found for user with ID {userId}");
+            }
+
+            var limitReturn = new KategoryLimitResponseDTO
+            {
+                KategoryId = limit.KategoryId,
+                KategoryName = limit.Kategory.KategoriNavn,
+                Limit = limit.Limit
+
             };
-            return budgetReturn;
+
+            return limitReturn;            
         }
 
-        public async Task<KategoryLimitGetDTO> AddKategoryLimitAsync(string brugerId, KategoryLimitReturnDTO limitDTO)
+        public async Task<KategoryLimitResponseDTO> AddKategoryLimitAsync(KategoryLimitCreateDTO kategoryLimitDTO, string userId)
         {
             //Check if kategory exists and write error message if not.
-            var kategory = await _kategoriRepository.GetByIdAsync(limitDTO.KategoryId);
+            var kategory = await _kategoryRepository.GetByIdAsync(kategoryLimitDTO.KategoryId);
             
-            if(kategory == null) {throw new ArgumentException($"Kategorien: {kategory.KategoriNavn} findes ikke.");}
-            
-            //Create new kategoriLimit
+            if(kategory == null) 
+            {
+                throw new ArgumentException($"The category: {kategory.KategoriNavn} does not exist.");
+            }
+
+            //Create new kategoryLimit
             var budget = new KategoryLimit
             {
-                BrugerId = brugerId,
-                KategoryId = limitDTO.KategoryId,
-                Limit = limitDTO.Limit
+                KategoryId = kategory.KategoriId,
+                Limit = kategoryLimitDTO.Limit,
+                BrugerId = userId
+
             };
 
             //Add and save the budget
-            var createdBudget = await _kategoriLimitRepository.AddAsync(budget);
-            await _kategoriLimitRepository.SaveChangesAsync();
+            var createdBudget = await _kategoryLimitRepository.AddAsync(budget);
+            await _kategoryLimitRepository.SaveChangesAsync();
 
-
-            //Create kategoriLimit DTO to return
-            var createdBudgetDTO = new KategoryLimitGetDTO
+            //Create kategoryLimit DTO to return
+            var createdLimitDTO = new KategoryLimitResponseDTO
             {
                 KategoryName = kategory.KategoriNavn,
                 Limit = createdBudget.Limit,
      
             };
-            return createdBudgetDTO;
+            return createdLimitDTO;
         }
+        // public async Task<KategoryLimitResponseDTO> AddKategoryLimitAsync(KategoryLimitReturnDTO limitDTO)
+        // {
+        //     //Check if kategory exists and write error message if not.
+        //     var kategory = await _kategoryRepository.GetByIdAsync(limitDTO.KategoryId);
+            
+        //     if(kategory == null) {throw new ArgumentException($"The category: {kategory.KategoriNavn} does not exist.");}
+            
+        //     //Create new kategoryLimit
+        //     var budget = new KategoryLimit
+        //     {
+        //         KategoryId = limitDTO.KategoryId,
+        //         Limit = limitDTO.Limit
+        //     };
+
+        //     //Add and save the budget
+        //     var createdBudget = await _kategoryLimitRepository.AddAsync(budget);
+        //     await _kategoryLimitRepository.SaveChangesAsync();
+
+
+        //     //Create kategoryLimit DTO to return
+        //     var createdBudgetDTO = new KategoryLimitResponseDTO
+        //     {
+        //         KategoryName = kategory.KategoriNavn,
+        //         Limit = createdBudget.Limit,
+     
+        //     };
+        //     return createdBudgetDTO;
+        // }
 
     }
 }

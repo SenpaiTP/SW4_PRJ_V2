@@ -12,11 +12,18 @@ public class KategoryLimitRepo: TemplateRepo<KategoryLimit>, IKategoryLimitRepo
         _context = context;
     }
 
-    public async Task<List<KategoryLimit>> GetBudgetKategoriesForUserAsync(string userId)
+    public async Task<List<KategoryLimit>> GetKategoryLimitsForUserAsync(string userId)
     {
         return await _context.KategoryLimits
             .Where(b => b.BrugerId == userId)
-            .ToListAsync();
+            .ToListAsync();  
+    }
+
+    public async Task<KategoryLimit> GetKategoryLimitForKategoryAsync(int kategoryId,string userId)
+    {
+        return await _context.KategoryLimits
+            .FirstOrDefaultAsync(b => b.BrugerId == userId && b.KategoryId == kategoryId);
+
     }
     
 }
