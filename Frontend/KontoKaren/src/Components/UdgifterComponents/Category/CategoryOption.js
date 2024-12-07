@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { suggestCategory } from '../../../Services/CategoryService';
 import useUdgifterHooks from '../../../Hooks/UseUdgifterHooks';
 import { initialExpenseRows } from '../Table/UdgifterTableData';
@@ -92,14 +94,9 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
   const handleUdgiftsnavnChange = (e) => {
     const newName = e.target.value;
     console.log('Udgiftsnavn ændret til:', newName);
-    const formattedName = newName
-    .split(' ') // Splitter inputtet op i ord
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Gør første bogstav stort
-    .join(' '); // Samler ordene tilbage sammen til én streng
-
-    setName(formattedName);
+    setName(newName);
     if (onNameChange) {
-      onNameChange(formattedName);
+      onNameChange(newName);
     }
   };
 
@@ -114,6 +111,7 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
     }
   };
 
+  // Handle delete category
   const handleDeleteCategory = (categoryToDelete) => {
     const updatedCategories = categoryOptions.filter(
       (category) => category.categoryName !== categoryToDelete
@@ -122,9 +120,7 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
     localStorage.setItem('categories', JSON.stringify(updatedCategories));
     console.log('Kategori slettet:', categoryToDelete);
   };
-  
 
-  
   return (
     <>
       {/* Udgiftsnavn TextField */}
@@ -170,21 +166,19 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
         selectOnFocus
         clearOnBlur
         handleHomeEndKeys
-        renderOption={(props, option) => <li {...props}>{option.categoryName}</li>}
-        {option.categoryName}
-        <Button
-          variant="outlined"
-          color="error"
-          size="small"
-          onClick={() => handleDeleteCategory(option.categoryName)} // Slet kategori
-        >
-          Slet
-        </Button>
-      </li>
-        
-        
+        renderOption={(props, option) => (
+          <li {...props} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {option.categoryName}
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={() => handleDeleteCategory(option.categoryName)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </li>
+        )}
         freeSolo
-        
         renderInput={(params) => (
           <TextField {...params} label="Kategori" fullWidth />
         )}
