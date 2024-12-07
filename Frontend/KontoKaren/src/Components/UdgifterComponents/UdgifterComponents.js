@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell, TablePagination } from "@mui/material";
+import { Typography, Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell, TablePagination } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import TableBody from "./Table/UdgifterTableBody";
 import TableHeader from "./Table/UdgifterTableHeader";
@@ -9,7 +9,6 @@ import { initialExpenseRows } from "./Table/UdgifterTableData";
 import useUdgifterHooks from "../../Hooks/UseUdgifterHooks";
 import AddExpenseDialog from "./Dialog/AddUdgifterDialog";
 import EditExpenseDialog from "./Dialog/EditUdgifterDialog";
-import { suggestCategory } from "../../Services/CategoryService";
 
 export default function UdgifterTable() {
   const {
@@ -54,23 +53,14 @@ export default function UdgifterTable() {
   }));
 
 
-
-  
-
-//   rows.forEach((row) => {
-//     const descriptionName = { description: row.name };
-//     suggestCategory(descriptionName.description).then((category) => {
-//         if (category) {
-//             console.log(`Navn: ${row.name}, Foreslået kategori: ${category}`);
-//         }
-//     });
-// });
-
-
   return (
     <Container sx={{ display: "flex", paddingLeft: 0, paddingRight: 0 }}>
       <Box sx={{ width: "60%", paddingRight: 2 }}>
+   
         <Paper sx={{ width: "100%", mb: 2, position: "relative", marginTop: 6 }}>
+        <Typography variant="h6" sx={{ marginTop: 10, marginBottom: 1, textAlign: "center"}}>
+          Variable Udgifter
+        </Typography>
           <TableContainer>
             <Table className="table">
               <TableHeader numSelected={selected.length} rowCount={rows.length} />
@@ -89,11 +79,6 @@ export default function UdgifterTable() {
                     <IconButton onClick={() => handleDeleteRow(row.id)}>
                       <Delete />
                     </IconButton>
-
-
-                    
-
-
                     </Box>
 
                   </TableCell>
