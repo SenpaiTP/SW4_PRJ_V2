@@ -10,6 +10,7 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
 
   // Handle saving expense
   const handleSubmit = () => {
+    console.log('Validerer udgift:', { name, category, price, date }); // Debugging
     if (name && category && price && date) {
       handleSave({ name, category, price, date });
       setName('');
@@ -18,7 +19,14 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
       setDate('');
       handleClose();
     } else {
+      console.error('Manglende felter:', {
+        nameMissing: !name,
+        categoryMissing: !category,
+        priceMissing: !price,
+        dateMissing: !date,
+      });
       alert('Alle felter skal udfyldes!');
+      return;
     }
   };
 
@@ -26,20 +34,16 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Tilføj ny Udgift</DialogTitle>
       <DialogContent>
-        {/* { <TextField
-          label="Udgiftsnavn"
-          variant="outlined"
-          fullWidth
-          value={name}
-          //onChange={(e) => setName(e.target.value)}
-          onChange={(e) => setValue(e.target.value)} // Sørg for at opdatere value
-          sx={{ marginBottom: 2, marginTop: 2 }}
-        /> } */}
 
         {/* Pass setCategory and category to CategoryOption */}
         <CategoryOption
           onCategorySelect={(newCategory) => {
+            console.log('Kategori valgt:', newCategory); // Debugging
             setCategory(newCategory);  // Update category
+          }}
+          onNameChange={(newName) => {
+            console.log('Navn ændret:', newName); // Debugging
+            setName(newName);  // Update name
           }}
           selectedCategory={category}  // Pass current category
         />
@@ -49,7 +53,10 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
           variant="outlined"
           fullWidth
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          onChange={(e) => {
+            console.log('Beløb ændret: ', e.target.value);
+            setPrice(e.target.value);
+          }}
           sx={{ marginBottom: 2 }}
         />
         <TextField
@@ -57,7 +64,10 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
           type="date"
           fullWidth
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => {
+            console.log('Dato ændret: ', e.target.value);
+            setDate(e.target.value);
+          }}
           margin="normal"
           InputLabelProps={{
             shrink: true,
