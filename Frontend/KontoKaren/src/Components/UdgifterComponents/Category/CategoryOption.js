@@ -10,12 +10,12 @@ import { initialExpenseRows } from '../Table/UdgifterTableData';
 
 const filter = createFilterOptions();
 
-export default function CategorySet({ onCategorySelect, selectedCategory, onNameChange }) {
+export default function CategorySet({ onCategorySelect, selectedCategory, onNameChange, initialName }) {
   const { rows } = useUdgifterHooks(initialExpenseRows); // Hent rows fra hooket
   const [categories, setCategories] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState(loadCategoriesFromStorage()); // Initial categories
   const [category, setCategory] = useState(selectedCategory || '');
-  const [name, setName] = useState('');
+  const [name, setName] = useState(initialName || '');
   const [suggestedCategory, setSuggestedCategory] = useState(''); // Foreslået kategori
   const [suggestedCategoryText, setSuggestedCategoryText] = useState(''); // Vis tekst for foreslået kategori
 
@@ -92,13 +92,21 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
 
   // Når inputfeltet for udgiftsnavn ændres
   const handleUdgiftsnavnChange = (e) => {
-    const newName = e.target.value;
+    let newName = e.target.value;
     console.log('Udgiftsnavn ændret til:', newName);
-    setName(newName);
+  
+    const formattedName = newName
+      .split(' ') 
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Gør første bogstav stort
+      .join(' '); 
+  
+    setName(formattedName); 
+  
     if (onNameChange) {
-      onNameChange(newName);
+      onNameChange(formattedName); 
     }
   };
+  
 
   // Når knappen til at tilføje foreslået kategori trykkes
   const handleAddSuggestedCategory = () => {
