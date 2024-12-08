@@ -12,6 +12,10 @@ using PRJ4.Services;
 using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Mappings;
+using Serilog;
+using Serilog.Events;
+using MongoDB.Driver;
+using PRJ4.Services;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -102,6 +106,8 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     var client = serviceProvider.GetRequiredService<IMongoClient>();
     return client.GetDatabase(mongoDatabaseName);
 });
+
+
 //Register mapping profiles
 //builder.Services.AddAutoMapper(typeof(FudgifterProfile));
 //builder.Services.AddAutoMapper(typeof(VudgifterProfile));
@@ -111,38 +117,14 @@ var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
 builder.Services.AddAuthorization();
 
-//Old code
-
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuer = true,
-//             ValidateAudience = true,
-//             ValidateLifetime = true,
-//             ValidateIssuerSigningKey = true,
-//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//             ValidAudience = builder.Configuration["Jwt:Audience"],
-//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-//         };
-
-//         // Prevent default claim mapping
-//         options.MapInboundClaims = false;
-//     });
-// builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
-// builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
-//builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
 builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
-//builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
-//builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();
-//builder.Services.AddScoped<IFudgifterService,FudgifterService>();
-//builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+
 
 builder.Services.AddScoped<IFudgifterRepo, FudgifterRepo>();
 
@@ -156,7 +138,7 @@ builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();
 builder.Services.AddScoped<ITemplateRepo<KategoryLimit>,KategoryLimitRepo>();
 builder.Services.AddScoped<IKategoryLimitService,KategoryLimitService>();
 
-builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+builder.Services.AddScoped<IVudgifterRepo, VudgifterRepo>();
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();    
@@ -164,6 +146,11 @@ builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
 builder.Services.AddControllers();
+string openAiKey = builder.Configuration["OpenAI:ApiKey"];
+builder.Services.AddSingleton(new OpenAIClient(openAiKey));
+
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);

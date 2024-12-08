@@ -1,10 +1,7 @@
 using PRJ4.Models;  
-using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using PRJ4.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-
 
 namespace PRJ4.Controllers;
 

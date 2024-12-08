@@ -8,7 +8,7 @@ namespace PRJ4.Models;
 public partial class Bruger
 {
     [Key]
-    public int BrugerId { get; set; }
+    public string BrugerId { get; set; }
 
     public string Fornavn { get; set; } = null!;
     public string Efternavn { get; set; } = null!;

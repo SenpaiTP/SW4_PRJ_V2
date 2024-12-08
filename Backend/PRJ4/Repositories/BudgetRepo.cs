@@ -17,16 +17,12 @@ public class BudgetRepo: TemplateRepo<Budget>, IBudgetRepo
         return await _context.Budgets
             .Where(b => b.BrugerId == userId)
             .ToListAsync();
-    }
+    } 
 
-    // public async Task<List<Fudgifter>> GetExspencesByKategori(int brugerId, string savingName)
-    // {
-    //     // Hent alle udgifter for en bruger med den specifikke kategori
-    //     return await _context.Fudgifters
-    //         .Where(f => f.BrugerId == brugerId && f.Kategori.Navn == savingName)
-    //         .ToListAsync();
-    // }
-
-
-    
+    public async Task<Budget> GetByIdWithKategoriAsync(int id)
+    {
+        return await _context.Budgets
+            .Include(b => b.Kategory)  // Include Kategori-relationen
+            .FirstOrDefaultAsync(b => b.BudgetId == id);  // Find budget med id
+    } 
 }
