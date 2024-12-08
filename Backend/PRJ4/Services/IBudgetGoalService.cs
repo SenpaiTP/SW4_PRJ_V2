@@ -1,16 +1,18 @@
 using PRJ4.DTOs;
-using PRJ4.Models;
+
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace PRJ4.Services
 {
     public interface IBudgetGoalService
     {
-        Task<List<BudgetResponseDTO>> GetAllBudgetGoalsAsync();
-        Task<BudgetResponseDTO> GetByIdBudgetGoalAsync(int id);
-        Task<List<BudgetResponseDTO>> GetByUserIdBudgetGoalAsync(string userId);
+        Task<BudgetResponsDTO> GetByIdBudgetGoalAsync(int budgetId, string userId); //Hent bestemt budget for user
+        Task<List<BudgetResponsDTO>> GetAllByUserIdBudgetGoalAsync(string userId); //Hent alle for bruger
         Task<BudgetCreateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateDTO budgetDTO);
-        Task<BudgetCreateDTO> UpdateBudgetGoalAsync(int id, BudgetCreateDTO budgetDTO);
-        Task<BudgetCreateDTO> DeleteBudgetAsync(int id);
+        Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string user, BudgetSavingCreateDTO savingDTO);
+        Task<List<BudgetSavingResponsDTO>> GetAllSavingsAsync(int budgetId, string userId);
+        Task<BudgetUpdateDTO> UpdateBudgetGoalAsync(int id, BudgetUpdateDTO budgetDTO);
+        Task DeleteBudgetAsync(int budgetId);
     }
 }
