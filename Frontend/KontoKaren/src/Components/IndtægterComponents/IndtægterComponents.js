@@ -30,9 +30,7 @@ export default function IndtægterTabel() {
   const [openEditDialog, setOpenEditDialog] = useState(false); // styrer visningen af dialog for at redigere indkomst
   const [selectedIncome, setSelectedIncome] = useState(null); // holder den valgte indkomst til redigering
   const [income, setIncome] = useState([]); // holder indkomsterne inklusive deres IDs
-  const token = localStorage.getItem("authToken");
- 
-
+  const token = localStorage.getItem("authToken"); 
 // Hent data fra backend
 const fetchIncomes = async () => {
 
@@ -73,12 +71,41 @@ const fetchIncomes = async () => {
     }));
 };
 
+// const updateIncome = async (row) => {
+//   try {
+//     const response = await fetch(`http://localhost:5168/api/Findtægt/${row.id}`, {
+//       method: "PUT",
+//       headers: {
+//         "Content-Type": "application/json",
+//         "Authorization": `Bearer ${token}`,
+//       },
+//       body: JSON.stringify({
+//         FindtægtId: row.id,
+//         Tekst: row.name,
+//         Indtægt: row.price,
+//         Dato: row.date,
+//         KategotiId: row.kategoriId,
+//         KategoriNavn: row.kategoriNavn,
+//       }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Kunne ikke opdatere indkomst.");
+//     }
+
+//     console.log("Indkomst opdateret succesfuldt.");
+//     // Opdater rækken i UI, hvis nødvendigt
+//   } catch (error) {
+//     console.error("Fejl:", error.message);
+//   }
+// };
+
 
   // ppretter data til PieChart
-  // const chartData = rows.map((row) => ({
-  //   name: row.name, // navn på indtægt
-  //   price: row.price, // bløb for indtægt
-  // }));
+  const chartData = rows.map((row) => ({
+    name: row.name, // navn på indtægt
+    price: row.price, // bløb for indtægt
+  }));
 
 
   // håndtering af åbning og lukning af dialoger
@@ -102,6 +129,7 @@ const fetchIncomes = async () => {
   // Redigerer en eksisterende indkomst og lukker dialogen
   const handleEditIncome = (updatedIncome) => {
     handleEditRow(updatedIncome);
+    //updateIncome(updatedIncome);
     setOpenEditDialog(false);
   };
 
@@ -167,10 +195,10 @@ const fetchIncomes = async () => {
         />
       </Box>
 
-      {/* højre side: PieChart
+      {/* højre side: Pie Chart */}
       <Box sx={{ width: "40%" }}>
         <PieChart chartData={chartData} />
-      </Box> */}
+      </Box>
     </Container>
   );
 }

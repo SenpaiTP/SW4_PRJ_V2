@@ -70,10 +70,12 @@ export default function EditIncomeDialog({ open, handleClose}) {
       console.log("Mapped data: ", mappedData);
       setIncome(mappedData);
       setRows(mappedData); // Opdaterer tabellen med data
+
+      const numericFindtægtId = Number(FindtægtId);
   
       // Find the specific income based on the updatedIncome.id
         try {
-          const response = await fetch(`http://localhost:5168/api/Findtægt?findid=${FindtægtId}`, { // Use incomeToUpdate.id
+          const response = await fetch(`http://localhost:5168/api/Findtægt?findid=${numericFindtægtId}`, { // Use incomeToUpdate.id
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -117,7 +119,7 @@ export default function EditIncomeDialog({ open, handleClose}) {
 };
 
   const handleSubmit = async (mapData) => {
-    if ( FindtægtId && name && price && date && kategoriNavn && kategoriId) {
+    if (name && price && date && kategoriNavn && kategoriId) {
       const updatedIncome = {
         id: FindtægtId, // Use FindtægtId from state
         Tekst: name,
@@ -128,6 +130,7 @@ export default function EditIncomeDialog({ open, handleClose}) {
       };
 
       console.log("Rows", rows);
+
       console.log("Updated income", updatedIncome);
       // Find the specific row based on the selected row.id
       if(updatedIncome.id === FindtægtId) {
@@ -149,14 +152,6 @@ export default function EditIncomeDialog({ open, handleClose}) {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Rediger Indtægt</DialogTitle>
       <DialogContent>
-      <TextField
-          label="ID"
-          variant="outlined"
-          fullWidth
-          value={FindtægtId}
-          onChange={(e) => setFindtægtId(e.target.value)}
-          sx={{ marginBottom: 2 }}
-        />
         <TextField
           label="Indtægtsnavn"
           variant="outlined"
