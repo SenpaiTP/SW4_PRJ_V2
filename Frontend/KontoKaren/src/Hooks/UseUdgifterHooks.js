@@ -1,109 +1,106 @@
 import { useState, useEffect } from "react";
 import { createData } from "../Utils/CreateData";
 
-export default function useUdgifterHooks(initialExpenseRows) {
-    const [rows, setRows] = useState(initialExpenseRows);
-    const [selected, setSelected] = useState([]);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [category, setCategory] = useState(localStorage.getItem("selectedCategory") || ''); // Get category from localStorage
+export default function useUdgifterHooks(initialExpenseRows, storageKey) {
+  const [rows, setRows] = useState(initialExpenseRows);
+  const [selected, setSelected] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [category, setCategory] = useState(localStorage.getItem(`${storageKey}-category`) || ''); // Corrected with backticks
 
-    useEffect(() => {
-        const savedRows = JSON.parse(localStorage.getItem("udgifterRows")) || initialExpenseRows;
-        setRows(savedRows);
-    }, [initialExpenseRows]);
+  useEffect(() => {
+    const savedRows = JSON.parse(localStorage.getItem(storageKey)) || initialExpenseRows;
+    setRows(savedRows);
+  }, [initialExpenseRows, storageKey]);
 
-
-  // Update localStorage when category changes
   useEffect(() => {
     if (category) {
-      localStorage.setItem("selectedCategory", category);
+      localStorage.setItem(`${storageKey}-category`, category); // Corrected with backticks
     }
-  }, [category]); // This effect runs whenever `category` changes
+  }, [category, storageKey]);
 
   const addExpense = (expense) => {
-    setRows([...rows, expense]);
-    // You can use `category` in your logic, for example:
-    console.log(category); // Example usage of category
+    setRows((prevRows) => [...prevRows, expense]);
+    setCategory(expense.category); // Update category when adding an expense
   };
 
+  const handleAddRow = (newExpense) => {
+    const newRow = createData(
+      Date.now(),
+      newExpense.name,
+      newExpense.category,
+      newExpense.price,
+      newExpense.date
+    );
+    setRows((prevRows) => [newRow, ...prevRows]); // Add the new row at the top
+  };
 
-    const handleAddRow = (newExpense) => {
-      const newRow = createData (
-        Date.now(),
-        newExpense.name,
-        newExpense.category,
-        newExpense.price,
-        newExpense.date
+  const handleEditRow = (newExpense) => {
+    setRows((prevRows) =>
+      prevRows.map((r) =>
+        r.id === newExpense.id
+          ? { ...r, name: newExpense.name, category: newExpense.category, price: newExpense.price, date: newExpense.date }
+          : r
+      )
+    );
+  };
+
+  const handleDeleteRow = (id) => {
+    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+  };
+
+  const handleClick = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
       );
-      setRows((prevRows) => [newRow, ...prevRows]); // Tilføj den nye række øverst
-    };
+    }
+    setSelected(newSelected);
+  };
 
-    const handleEditRow = (newExpense) => {
-      setRows((prevRows) =>
-        prevRows.map((r) =>
-          r.id === newExpense.id
-            ? { ...r, name: newExpense.name, category: newExpense.category, price: newExpense.price, date: newExpense.date }
-            : r
-        )
-      );
-      console.log("After editing row:", rows);
-    };
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-    const handleDeleteRow = (id) => {
-      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-      console.log("After deleting row:", rows);
-    };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
-    const handleClick = (event, id) => {
-      const selectedIndex = selected.indexOf(id);
-      let newSelected = [];
+  const handleSave = () => {
+    localStorage.setItem(storageKey, JSON.stringify(rows)); // Store rows with unique storageKey
+    alert("Ændringer er gemt");
+  };
 
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selected, id);
-      } else {
-        newSelected = newSelected.concat(
-          selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1)
-        );
-      }
-      setSelected(newSelected);
-    };
+  // Log the updated category whenever it changes
+  useEffect(() => {
+    console.log("Updated category:", category);
+  }, [category]);
 
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
-    };
-
-    const handleSave = () => {
-      localStorage.setItem("udgifterRows", JSON.stringify(rows));
-      alert("Ændringer er gemt");
-    };
-
-    
-
-    return {
-      rows,
-      setRows,
-      selected,
-      setSelected,
-      page,
-      setPage,
-      rowsPerPage,
-      setRowsPerPage,
-      handleClick,
-      handleChangePage,
-      handleChangeRowsPerPage,
-      handleEditRow,
-      handleDeleteRow,
-      handleSave,
-      handleAddRow,
-      category,
-      setCategory,
-      addExpense
-    };
+  return {
+    rows,
+    setRows,
+    selected,
+    setSelected,
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    handleClick,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    handleEditRow,
+    handleDeleteRow,
+    handleSave,
+    handleAddRow,
+    category,
+    setCategory,
+    addExpense
+  };
 }

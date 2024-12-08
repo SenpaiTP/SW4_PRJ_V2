@@ -3,7 +3,6 @@ import { Container, Box, Paper, Table, TableContainer, IconButton, Button, Table
 import { Edit, Delete } from "@mui/icons-material";
 import TableBody from "./Table/UdgifterTableBody";
 import TableHeader from "./Table/UdgifterTableHeader";
-//import PieChartColors from "./PieChartColors";
 import PieChartColors from './PieChart/PieChartColors';
 import './Table/UdgifterTable.css';
 import useUdgifterHooks from "../../Hooks/UseUdgifterHooks";
@@ -23,7 +22,9 @@ export default function UdgifterTableComponent({ title, initialRows, storageKey,
     handleSave,
     handleChangePage,
     handleChangeRowsPerPage,
-  } = useUdgifterHooks(initialRows, storageKey, fetchFunction, createFunction, updateFunction, deleteFunction);
+    category,
+    setCategory
+  } = useUdgifterHooks(initialRows, storageKey); // Pass unique storageKey
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -96,10 +97,10 @@ export default function UdgifterTableComponent({ title, initialRows, storageKey,
         </Paper>
         <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-start", marginTop: 2 }}>
           <Button variant="contained" onClick={handleClickOpenAdd}>
-            Tilføj ny Udgift
+            Tilføj Udgift
           </Button>
           <Button variant="contained" onClick={handleSave}>
-            Gem ændringer
+            Gem Ændringer
           </Button>
         </Box>
         <AddExpenseDialog
