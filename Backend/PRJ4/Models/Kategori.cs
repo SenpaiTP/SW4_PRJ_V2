@@ -10,4 +10,5 @@ public partial class Kategori
     public int KategoriId { get; set; }
     public string KategoriNavn {get; set;}
     public KategoryLimit? KategoryLimit { get; set; }
+
 }
