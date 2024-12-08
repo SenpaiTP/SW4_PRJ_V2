@@ -7,6 +7,7 @@ export default function EditExpenseDialog({ open, handleClose, handleSave, expen
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [date, setDate] = useState('');
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (open && expense) {
@@ -19,16 +20,22 @@ export default function EditExpenseDialog({ open, handleClose, handleSave, expen
   }, [expense, open]);
 
   const handleSubmit = () => {
+    const newErrors = {};
+    if (!name) newErrors.name = 'Navn er påkrævet';
+    if (!category) newErrors.category = 'Kategori er påkrævet';
+    if (!price || isNaN(price) || parseFloat(price) <= 0) newErrors.price = 'Beløb skal være et tal';
+    if (!date) newErrors.date = 'Dato er påkrævet';
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      alert('Alle felter skal udfyldes korrekt!');
+      return;
+    }
+  
     console.log('Submit Data:', { id: expense.id, name, category, price, date });
-    if (name && category && price && date) {
-      if (!expense.id) {
-        console.error('Udgiften har ikke et id, kan ikke gemme.');
-        return;
-      }
-      handleSave({ id: expense.id, name, category, price, date });
+    if (expense.id) {
+      handleSave({ id: expense.id, name, category, price: parseFloat(price), date });
       handleClose();
-    } else {
-      alert('Alle felter skal udfyldes!');
     }
   };
 
@@ -55,6 +62,8 @@ export default function EditExpenseDialog({ open, handleClose, handleSave, expen
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           sx={{ marginBottom: 2 }}
+          error={!!errors.price}
+          helperText={errors.price}
         />
         <TextField
           label="Dato"
@@ -66,6 +75,8 @@ export default function EditExpenseDialog({ open, handleClose, handleSave, expen
           InputLabelProps={{
             shrink: true,
           }}
+          error={!!errors.date}
+          helperText={errors.date}
         />
       </DialogContent>
       <DialogActions>

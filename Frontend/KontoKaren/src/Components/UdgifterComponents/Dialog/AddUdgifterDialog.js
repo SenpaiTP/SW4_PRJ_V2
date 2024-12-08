@@ -13,30 +13,15 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
     let valid = true;
     let newErrors = { name: '', category: '', price: '', date: '' };
 
-    if (!name || typeof name !== 'string') {
-      newErrors.name = 'Udgiftsnavn er påkrævet og skal være en tekst';
-      valid = false;
-    }
-
-    if (!category) {
-      newErrors.category = 'Kategori er påkrævet';
-      valid = false;
-    }
-
-    if (!price || isNaN(price)) {
-      newErrors.price = 'Beløb skal være et tal';
-      valid = false;
-    }
-
-    if (!date) {
-      newErrors.date = 'Dato er påkrævet';
-      valid = false;
-    }
+    if (!name) newErrors.name = 'Navn er påkrævet';
+    if (!category) newErrors.category = 'Kategori er påkrævet';
+    if (!price || isNaN(price) || !((price))) newErrors.price = 'Beløb skal være et tal';
+    if (!date) newErrors.date = 'Dato er påkrævet';
 
     setErrors(newErrors);
 
     if (valid) {
-      handleSave({ name, category, price: parseFloat(price), date });
+      handleSave({ name: String(name), category, price: parseFloat(price), date });
       setName('');
       setCategory('');
       setPrice('');
