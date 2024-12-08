@@ -1,33 +1,43 @@
-import * as React from 'react';
-import { PieChart } from '@mui/x-charts/PieChart';
+import React from 'react';
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
-const generateRandomColor = () => {
-  const randomHue = Math.floor(Math.random() * 360); // generer tilfældig hue-værdi (0 - 360)
-  const randomSaturation = Math.floor(Math.random() * 60) + 40; // random saturation (30 - 80%)
-  const randomLightness = Math.floor(Math.random() * 60) + 40; // random lightness (25 - 75%)
-  const randomAlpha = (Math.random() * 0.5 + 0.5).toFixed(2); // ramdom alfa-værdi (gennemsigtig) mellem 0.5 og 1
-  
-  return `hsla(${randomHue}, ${randomSaturation}%, ${randomLightness}%, ${randomAlpha})`; // bruger HSLA i stedet for HSL for at inkludere alfa (gennemsigtighed)
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+// Function to generate unique colors
+const generateUniqueColors = (numColors) => {
+  const colors = [];
+  for (let i = 0; i < numColors; i++) {
+    const color = `hsl(${Math.floor((360 / numColors) * i)}, 100%, 50%)`;
+    colors.push(color);
+  }
+  return colors;
 };
 
-export default function PieChartColors({ chartData }) {
-  const colors = chartData.map(() => generateRandomColor());
+const PieChartColors = ({ chartData = [] }) => {
+  if (!chartData.length) {
+    return <div>No data available</div>;
+  }
 
-  const data = chartData.map((row, index) => ({
-    label: row.name,
-    value: row.price,
-    color: colors[index],  
-  }));
+  const uniqueColors = generateUniqueColors(chartData.length);
+
+  const data = {
+    labels: chartData.map(item => item.name),
+    datasets: [
+      {
+        data: chartData.map(item => item.price),
+        backgroundColor: uniqueColors,
+      },
+    ],
+  };
 
   return (
     <div className="canvas-container">
       <div className="chart-container">
-        <PieChart
-          series={[{ data }]} 
-          width={400}          
-          height={200}        
-        />
+        <Pie data={data} width={400} height={200} />
       </div>
     </div>
   );
-}
+};
+
+export default PieChartColors;

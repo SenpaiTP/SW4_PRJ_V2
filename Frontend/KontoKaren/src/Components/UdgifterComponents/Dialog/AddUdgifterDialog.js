@@ -7,12 +7,36 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
   const [category, setCategory] = useState(selectedCategory); // Use the passed or default value
   const [price, setPrice] = useState('');
   const [date, setDate] = useState('');
+  const [errors, setErrors] = useState({ name: '', category: '', price: '', date: '' });
 
-  // Handle saving expense
   const handleSubmit = () => {
-    console.log('Validerer udgift:', { name, category, price, date }); // Debugging
-    if (name && category && price && date) {
-      handleSave({ name, category, price, date });
+    let valid = true;
+    let newErrors = { name: '', category: '', price: '', date: '' };
+
+    if (!name || typeof name !== 'string') {
+      newErrors.name = 'Udgiftsnavn er påkrævet og skal være en tekst';
+      valid = false;
+    }
+
+    if (!category) {
+      newErrors.category = 'Kategori er påkrævet';
+      valid = false;
+    }
+
+    if (!price || isNaN(price)) {
+      newErrors.price = 'Beløb skal være et tal';
+      valid = false;
+    }
+
+    if (!date) {
+      newErrors.date = 'Dato er påkrævet';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (valid) {
+      handleSave({ name, category, price: parseFloat(price), date });
       setName('');
       setCategory('');
       setPrice('');
@@ -26,7 +50,6 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
         dateMissing: !date,
       });
       alert('Alle felter skal udfyldes!');
-      return;
     }
   };
 
@@ -34,8 +57,6 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Tilføj ny Udgift</DialogTitle>
       <DialogContent>
-
-        {/* Pass setCategory and category to CategoryOption */}
         <CategoryOption
           onCategorySelect={(newCategory) => {
             console.log('Kategori valgt:', newCategory); // Debugging
@@ -47,7 +68,6 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
           }}
           selectedCategory={category}  // Pass current category
         />
-
         <TextField
           label="Beløb (DKK)"
           variant="outlined"
@@ -58,6 +78,8 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
             setPrice(e.target.value);
           }}
           sx={{ marginBottom: 2 }}
+          error={!!errors.price}
+          helperText={errors.price}
         />
         <TextField
           label="Dato"
@@ -72,6 +94,8 @@ export default function AddExpenseDialog({ open, handleClose, handleSave, select
           InputLabelProps={{
             shrink: true,
           }}
+          error={!!errors.date}
+          helperText={errors.date}
         />
       </DialogContent>
       <DialogActions>
