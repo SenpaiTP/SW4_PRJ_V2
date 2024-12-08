@@ -28,18 +28,23 @@ const SetTheme = () => {
 
         // Update theme in the API
         const token = getAuthToken();
+        const id = 1;
         if (token) {
-            const response = await fetch(`${API_URL}/UpdateTheme`, {
+            const response = await fetch(`${API_URL}/UpdateTheme/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ theme: newChecked }) // Sending the theme as a bool
+                body: JSON.stringify({ 
+                    SetTheme: newChecked 
+                }) // Sending the theme as a bool
             });
+            console.log('NewChecked', JSON.stringify({ SetTheme: newChecked}));
             console.log('body: ', response);
             if (!response.ok) {
-                console.error('Failed to update theme');
+                const error = await response.text(); // or response.json() if applicable
+                console.error('Error response:', error);
             }
         }
     };

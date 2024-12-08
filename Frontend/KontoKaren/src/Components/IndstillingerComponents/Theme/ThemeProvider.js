@@ -29,13 +29,14 @@ const ThemeProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('authToken');
       if (token) {
-        const response = await fetch(`${API_URL}`, {
+        const response = await fetch(`${API_URL}/GetTheme`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
           console.log('response: ', response);
+          
         if (response.ok) {
           const themeData = await response.json();
           const themeFromBackend = themeData.theme ? 'dark' : 'light'; // 'theme' is boolean in the backend
