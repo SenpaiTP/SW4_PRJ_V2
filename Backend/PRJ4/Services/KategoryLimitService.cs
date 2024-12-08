@@ -10,44 +10,32 @@ namespace PRJ4.Services
 
         private readonly IKategoriRepo _kategoryRepository;
 
-        public KategoryLimitService(IKategoryLimitRepo kategoryLimitRepository, IKategoriRepo kategoryRepository)
+         private readonly ILogger<KategoryLimitService> _logger;
+
+        public KategoryLimitService(IKategoryLimitRepo kategoryLimitRepository, IKategoriRepo kategoryRepository, ILogger<KategoryLimitService> logger)
         {
             _kategoryLimitRepository = kategoryLimitRepository;
             _kategoryRepository = kategoryRepository;
+            _logger = logger;
         }
-
-        //  public async Task<KategoryLimitResponseDTO> GetByIdKategoryLimitAsync(int id, string userId)
-        // {
-        //     //Check if kategoryLimit with "id" exists and write error message if not.
-        //     var kategoryLimit = await _kategoryLimitRepository.GetKategoryLimitsForUserAsync(userId);
-        //     if (kategoryLimit == null)
-        //     {
-        //         throw new KeyNotFoundException($"Kategorylimit with id {id} not found.");
-        //     }
-
-        //     //Check if kategory with foreign key "KategoryId" exists and write error message if not.
-        //     var kategory = await _kategoryRepository.GetByIdAsync(kategoryLimit.KategoryId);
-        //     if (kategory == null)
-        //     {
-        //         throw new KeyNotFoundException($"Kategory with id {kategoryLimit.KategoryId} not found.");
-        //     }
-
-        //     //Create kategoryLimit DTO to return
-        //     var budgetReturn = new KategoryLimitResponseDTO
-        //     {
-        //         KategoryName = kategory.KategoriNavn,
-        //         Limit = kategoryLimit.Limit
-        //     };
-        //     return budgetReturn;
-        // }
 
         public async Task<List<KategoryLimitResponseDTO>> GetAllKategoryLimits(string userId)
         {
+            //Validating parameter
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException(nameof(userId), "User ID cannot be null or empty.");
+            }
+
+            // Fetch category limits from repository
             var limitListe = await _kategoryLimitRepository.GetKategoryLimitsForUserAsync(userId);
             if (limitListe == null || !limitListe.Any())
             {
-                throw new Exception($"No limits on categories found for user with ID {userId}");
+                //Returns an empty list if no limits sat
+                return new List<KategoryLimitResponseDTO>();
             }
+
+            _logger.LogInformation($"Successfully fetched category limits for user ID: {userId}.", userId);
 
             var limitReturnListe = new List<KategoryLimitResponseDTO>();
 
@@ -55,6 +43,7 @@ namespace PRJ4.Services
             {
                 var limitReturn = new KategoryLimitResponseDTO
                 {
+                    KategoryLimitId = limit.KategoryLimitId,
                     KategoryId = limit.KategoryId,
                     KategoryName = limit.Kategory.KategoriNavn,
                     Limit = limit.Limit
@@ -68,88 +57,168 @@ namespace PRJ4.Services
         public async Task<KategoryLimitResponseDTO> GetByIdKategoryLimits(int kategoryId, string userId)
         {
             //Validating parameter
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException(nameof(userId), "User ID cannot be null or empty.");
+            }
             if (kategoryId <= 0)
             {
-                throw new ArgumentException("Invalid kategory ID.", nameof(kategoryId));
+                throw new ArgumentException(nameof(kategoryId), "The provided category ID is invalid.");
             }
 
+            // Fetch category limit from repository
             var limit = await _kategoryLimitRepository.GetKategoryLimitForKategoryAsync(kategoryId, userId);
             if (limit == null)
             {
-                throw new Exception($"No limits on category with id {kategoryId} found for user with ID {userId}");
+                throw new KeyNotFoundException($"No category limit found for category ID {kategoryId}.");
             }
 
-            var limitReturn = new KategoryLimitResponseDTO
+            // Log success and return DTO
+            _logger.LogInformation($"Successfully fetched category limit for category ID: {kategoryId} for user ID: {userId}.", kategoryId, userId);
+
+            return new KategoryLimitResponseDTO
             {
+                KategoryLimitId = limit.KategoryLimitId,
                 KategoryId = limit.KategoryId,
                 KategoryName = limit.Kategory.KategoriNavn,
                 Limit = limit.Limit
-
-            };
-
-            return limitReturn;            
+            };         
         }
 
         public async Task<KategoryLimitResponseDTO> AddKategoryLimitAsync(KategoryLimitCreateDTO kategoryLimitDTO, string userId)
         {
-            //Check if kategory exists and write error message if not.
-            var kategory = await _kategoryRepository.GetByIdAsync(kategoryLimitDTO.KategoryId);
-            
-            if(kategory == null) 
+            // Check parameters
+            if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentException($"The category: {kategory.KategoriNavn} does not exist.");
+                throw new ArgumentException( nameof(userId), "User ID cannot be null or empty.");
+            }
+            if (kategoryLimitDTO.Limit < 0)
+            {
+                throw new ArgumentException(nameof(kategoryLimitDTO.Limit), "The limit is out of range");
             }
 
+            var kategory = await _kategoryRepository.GetByIdAsync(kategoryLimitDTO.KategoryId);
+            if(kategory == null) 
+            {
+                throw new ArgumentException($"The specified category does not exist.");
+            }
+
+            
             //Create new kategoryLimit
-            var budget = new KategoryLimit
+            var kategoryLimit = new KategoryLimit
             {
                 KategoryId = kategory.KategoriId,
                 Limit = kategoryLimitDTO.Limit,
                 BrugerId = userId
-
             };
+            
 
             //Add and save the budget
-            var createdBudget = await _kategoryLimitRepository.AddAsync(budget);
-            await _kategoryLimitRepository.SaveChangesAsync();
+            try {
+                var createdBudget = await _kategoryLimitRepository.AddAsync(kategoryLimit);
+                await _kategoryLimitRepository.SaveChangesAsync();
 
-            //Create kategoryLimit DTO to return
-            var createdLimitDTO = new KategoryLimitResponseDTO
-            {
-                KategoryName = kategory.KategoriNavn,
-                Limit = createdBudget.Limit,
-     
-            };
-            return createdLimitDTO;
+                _logger.LogInformation($"Successfully created category limit for category ID: {createdBudget.KategoryId} for user ID: {userId}.");
+
+                //Create kategoryLimit DTO to return
+                return new KategoryLimitResponseDTO
+                {
+                    KategoryLimitId = createdBudget.KategoryLimitId,
+                    KategoryId = createdBudget.KategoryId,
+                    KategoryName = kategory.KategoriNavn,
+                    Limit = createdBudget.Limit
+                };
+            }
+            catch(Exception ex) {
+                _logger.LogError($"Error while saving category limit: {ex.Message}");
+                throw new InvalidOperationException("Could not save the category limit.");
+
+            }
+   
         }
-        // public async Task<KategoryLimitResponseDTO> AddKategoryLimitAsync(KategoryLimitReturnDTO limitDTO)
-        // {
-        //     //Check if kategory exists and write error message if not.
-        //     var kategory = await _kategoryRepository.GetByIdAsync(limitDTO.KategoryId);
+
+        public async Task<KategoryLimitResponseDTO> UpdateKategoryLimitAsync(int kategoryId, string userId, KategoryLimitUpdateDTO kategoryLimitDTO)
+        {
+            // Validating parameters
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException(nameof(userId), "User ID cannot be null or empty.");
+            }
+            if (kategoryId <= 0)
+            {
+                throw new ArgumentException(nameof(kategoryId), "The provided category ID is invalid.");
+            }
+            if (kategoryLimitDTO.Limit < 0)
+            {
+                throw new ArgumentException(nameof(kategoryLimitDTO.Limit), "The limit is out of range.");
+            }
+
+            // Fetch existing category limit from repository
+            var limit = await _kategoryLimitRepository.GetKategoryLimitForKategoryAsync(kategoryId, userId);
+            if (limit == null)
+            {
+                throw new KeyNotFoundException($"No category limit found for category ID {kategoryId}.");
+            }
+
+            // Update the category limit with new values
+            limit.Limit = kategoryLimitDTO.Limit;
+
+            // Try to update the category limit
+            try
+            {
+                await _kategoryLimitRepository.SaveChangesAsync();
+                _logger.LogInformation($"Successfully updated category limit for category ID: {kategoryId} for user ID: {userId}.");
+                
+                // Return updated DTO
+                return new KategoryLimitResponseDTO
+                {
+                    KategoryLimitId = limit.KategoryLimitId,
+                    KategoryId = limit.KategoryId,
+                    KategoryName = limit.Kategory.KategoriNavn,
+                    Limit = limit.Limit
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while updating category limit: {ex.Message}");
+                throw new InvalidOperationException("Could not update the category limit.");
+            }
+        }
+
+
+        public async Task DeleteKategoryLimitAsync(int kategoryId, string userId)
+        {
+            // Validating parameters
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException(nameof(userId), "User ID cannot be null or empty.");
+            }
+            if (kategoryId <= 0)
+            {
+                throw new ArgumentException(nameof(kategoryId), "The provided category ID is invalid.");
+            }
+
+            // Fetch category limit from repository
+            var limit = await _kategoryLimitRepository.GetKategoryLimitForKategoryAsync(kategoryId, userId);
+            if (limit == null)
+            {
+                throw new KeyNotFoundException($"No category limit found for category ID {kategoryId}.");
+            }
+
+            // Try to delete the category limit
+            try
+            {
+                await _kategoryLimitRepository.Delete(limit.KategoryLimitId);
+                await _kategoryLimitRepository.SaveChangesAsync();
+                _logger.LogInformation($"Successfully deleted category limit for category ID: {kategoryId} for user ID: {userId}.");
             
-        //     if(kategory == null) {throw new ArgumentException($"The category: {kategory.KategoriNavn} does not exist.");}
-            
-        //     //Create new kategoryLimit
-        //     var budget = new KategoryLimit
-        //     {
-        //         KategoryId = limitDTO.KategoryId,
-        //         Limit = limitDTO.Limit
-        //     };
-
-        //     //Add and save the budget
-        //     var createdBudget = await _kategoryLimitRepository.AddAsync(budget);
-        //     await _kategoryLimitRepository.SaveChangesAsync();
-
-
-        //     //Create kategoryLimit DTO to return
-        //     var createdBudgetDTO = new KategoryLimitResponseDTO
-        //     {
-        //         KategoryName = kategory.KategoriNavn,
-        //         Limit = createdBudget.Limit,
-     
-        //     };
-        //     return createdBudgetDTO;
-        // }
-
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while deleting category limit: {ex.Message}");
+                throw new InvalidOperationException("Could not delete the category limit.");
+            }
+        }
+        
     }
 }
