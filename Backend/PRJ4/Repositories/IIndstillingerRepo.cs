@@ -5,8 +5,12 @@ namespace PRJ4.Repositories
 {
     public interface IIndstillingerRepo:ITemplateRepo<Indstillinger>
     {
-         Task<List<Indstillinger>> GetAllAsync();
-         Task<Indstillinger> UpdateIndstillingerAsync(IndstillingerDTO indstillingerDTO);  
-         Task<Indstillinger> AddIndstillingerAsync( IndstillingerDTO indstillingerDTO);    
+         Task<IEnumerable<IndstillingerDTO>> GetIndstillingerAsync(string userId);
+         Task<IEnumerable<UpdateThemeDTO>> GetThemeAsync(string userId);
+
+         Task<Indstillinger> UpdateIndstillingerAsync(string userId, int id, IndstillingerDTO indstillingerDTO);  
+         Task<Indstillinger> UpdateThemeAsync(string userId, int id, UpdateThemeDTO updateThemeDTO);
+         Task<Indstillinger> AddIndstillingerAsync( string userId, IndstillingerDTO indstillingerDTO);  
+         Task<Indstillinger> AddThemeAsync( string userId, UpdateThemeDTO updateThemeDTO);    
     }
 }

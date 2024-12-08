@@ -30,8 +30,8 @@ namespace PRJ4.Controllers;
             _indstillingerService = indstillingerService;
         }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<IndstillingerDTO>>> GetAllAsync()
+    [HttpGet("GetIndstillinger")]
+    public async Task<ActionResult<IEnumerable<IndstillingerDTO>>> GetIndstillingerAsync()
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
@@ -39,13 +39,13 @@ namespace PRJ4.Controllers;
         {
             return BadRequest("Invalid user ID");
         }
-        var Indstillinger = await _indstillingerRepo.GetAllAsync();
+        var Indstillinger = await _indstillingerRepo.GetIndstillingerAsync(userIdClaim.Value);
         return Ok(Indstillinger);
 
     }
 
-    [HttpPut]
-    public async Task<IActionResult> UpdateIndstillingerAsync(IndstillingerDTO indstillingerDTO)
+    [HttpPut("UpdateIndstillinger")]
+    public async Task<IActionResult> UpdateIndstillingerAsync([FromQuery] int id, IndstillingerDTO indstillingerDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
@@ -53,7 +53,7 @@ namespace PRJ4.Controllers;
         {
             return BadRequest("Invalid user ID");
         }
-        var result = await _indstillingerService.UpdateIndstillingerAsync(indstillingerDTO);
+        var result = await _indstillingerService.UpdateIndstillingerAsync(userIdClaim.Value, id, indstillingerDTO);
         if (result == null)
         {
             return NotFound();
@@ -61,8 +61,21 @@ namespace PRJ4.Controllers;
         return NoContent();
     }
 
+     [HttpGet("GetTheme")]
+    public async Task<ActionResult<IEnumerable<UpdateThemeDTO>>> GetThemeAsync()
+    {
+        var claims = User.Claims;
+        var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
+        if (userIdClaim == null)
+        {
+            return BadRequest("Invalid user ID");
+        }
+        var Indstillinger = await _indstillingerRepo.GetThemeAsync( userIdClaim.Value);
+        return Ok(Indstillinger);
+    }
+
     [HttpPut("UpdateTheme")]
-    public async Task<IActionResult> UpdateThemeAsync(UpdateThemeDTO updateThemeDTO)
+    public async Task<IActionResult> UpdateThemeAsync([FromQuery] int id, UpdateThemeDTO updateThemeDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last() == "nameidentifier");
@@ -70,13 +83,17 @@ namespace PRJ4.Controllers;
         {
             return BadRequest("Invalid user ID");
         }
+        var result = await _indstillingerService.UpdateThemeAsync(userIdClaim.Value, id, updateThemeDTO);
 
-        bool themeUpdated = updateThemeDTO.SetTheme;
-         return NoContent();
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return NoContent();
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddIndstillingerAsync(IndstillingerDTO indstillingerDTO)
+    [HttpPost("AddIndstillinger")]
+    public async Task<IActionResult> AddIndstillingerAsync( IndstillingerDTO indstillingerDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
@@ -85,7 +102,21 @@ namespace PRJ4.Controllers;
             return BadRequest("Invalid user ID");
         }
 
-        var indstillinger = await _indstillingerService.AddIndstillingerAsync(indstillingerDTO);
+        var indstillinger = await _indstillingerService.AddIndstillingerAsync(userIdClaim.Value, indstillingerDTO);
+        return Ok(indstillinger);
+    }
+
+    [HttpPost("AddTheme")]
+    public async Task<IActionResult> AddThemeAsync( UpdateThemeDTO updateThemeDTO)
+    {
+        var claims = User.Claims;
+        var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
+        if (userIdClaim == null)
+        {
+            return BadRequest("Invalid user ID");
+        }
+
+        var indstillinger = await _indstillingerService.AddThemeAsync(userIdClaim.Value, updateThemeDTO);
         return Ok(indstillinger);
     }
     

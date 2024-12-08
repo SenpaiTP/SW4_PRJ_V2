@@ -15,7 +15,7 @@ namespace PRJ4.Services
             _indstillingerRepository = indstillingerRepo;
         }
 
-        public async Task<List<IndstillingerDTO>> GetAllAsync()
+       /* public async Task<List<IndstillingerDTO>> GetIndstillingerAsync()
         {
             var indstillingerListe = await _indstillingerRepository.GetAllAsync();
 
@@ -37,12 +37,13 @@ namespace PRJ4.Services
             }
 
             return indstillingerReturnListe;
-        }
-        public async Task<IndstillingerDTO> AddIndstillingerAsync( IndstillingerDTO indstillingerDTO){
+        }*/
+
+        public async Task<IndstillingerDTO> AddIndstillingerAsync( string userId, IndstillingerDTO indstillingerDTO){
 
                 var indstillinger = new Indstillinger
                 {
-                    //SetTheme = indstillingerDTO.SetTheme,
+                    BrugerId = userId,
                     SetPieChart = indstillingerDTO.SetPieChart,
                     SetSøjlediagram = indstillingerDTO.SetSøjlediagram,
                     SetIndtægter = indstillingerDTO.SetIndtægter,
@@ -55,7 +56,6 @@ namespace PRJ4.Services
 
                 var createdIndstillingerDTO = new IndstillingerDTO
                 {
-                    //SetTheme = createdIndstillinger.SetTheme,
                     SetPieChart = createdIndstillinger.SetPieChart,
                     SetSøjlediagram = createdIndstillinger.SetSøjlediagram,
                     SetIndtægter = createdIndstillinger.SetIndtægter,
@@ -65,30 +65,69 @@ namespace PRJ4.Services
 
                 return createdIndstillingerDTO;
          }
-
-      /*  public async Task<UpdateThemeDTO> UpdateThemeAsync(UpdateThemeDTO updateThemeDTO)
+        
+        public async Task<Indstillinger> AddThemeAsync(string userId, UpdateThemeDTO updateThemeDTO)
         {
-            var existingTheme = await _indstillingerRepository.
+           /* var indstillinger = new Indstillinger
+            {
+                BrugerId = userId,
+                SetTheme = updateThemeDTO.SetTheme
+            };
+            var createdIndstillinger = await _indstillingerRepository.AddAsync(indstillinger);
+            await _indstillingerRepository.SaveChangesAsync();
+
+            var createdIndstillingerDTO = new UpdateThemeDTO
+            {
+                SetTheme = createdIndstillinger.SetTheme
+            };*/
+
+            return await _indstillingerRepository.AddThemeAsync(userId, updateThemeDTO);
+        }
+
+
+        public async Task<UpdateThemeDTO> UpdateThemeAsync(string userId, int id, UpdateThemeDTO updateThemeDTO)
+        {
+            var indstillinger = await _indstillingerRepository.GetByIdAsync(id);
+
+            indstillinger.SetTheme = updateThemeDTO.SetTheme;
+
+             try
+            {
+                await _indstillingerRepository.Update(indstillinger); 
+                await _indstillingerRepository.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($" Error updating indstillinger: {ex.Message}");
+                return null;
+            }
             
-        }*/
+           var updatedThemeDTO = new UpdateThemeDTO
+           {
+                SetTheme = indstillinger.SetTheme
+           };
+
+            return updatedThemeDTO;  
+        }
          
-        public async Task<IndstillingerDTO> UpdateIndstillingerAsync( IndstillingerDTO indstillingerDTO)
+        public async Task<IndstillingerDTO> UpdateIndstillingerAsync( string userId, int id, IndstillingerDTO indstillingerDTO)
         {
-            var existingIndstillingerList = await _indstillingerRepository.GetAllAsync();
+            var existingIndstillingerList = await _indstillingerRepository.GetByIdAsync(id);
 
-            var existingIndstillinger = existingIndstillingerList.FirstOrDefault();
+            if(indstillingerDTO == null)
+            {
+                throw new Exception("ingen indstillinger");
+            }
 
-
-            //existingIndstillinger.SetTheme = indstillingerDTO.SetTheme;
-            existingIndstillinger.SetPieChart = indstillingerDTO.SetPieChart;
-            existingIndstillinger.SetSøjlediagram = indstillingerDTO.SetSøjlediagram;
-            existingIndstillinger.SetIndtægter = indstillingerDTO.SetIndtægter;
-            existingIndstillinger.SetUdgifter = indstillingerDTO.SetUdgifter;
-            existingIndstillinger.SetBudget = indstillingerDTO.SetBudget;
+            existingIndstillingerList.SetPieChart = indstillingerDTO.SetPieChart;
+            existingIndstillingerList.SetSøjlediagram = indstillingerDTO.SetSøjlediagram;
+            existingIndstillingerList.SetIndtægter = indstillingerDTO.SetIndtægter;
+            existingIndstillingerList.SetUdgifter = indstillingerDTO.SetUdgifter;
+            existingIndstillingerList.SetBudget = indstillingerDTO.SetBudget;
 
             try
             {
-                await _indstillingerRepository.Update(existingIndstillinger); 
+                await _indstillingerRepository.Update(existingIndstillingerList); 
                 await _indstillingerRepository.SaveChangesAsync();
             }
             catch(Exception ex)
@@ -100,11 +139,11 @@ namespace PRJ4.Services
             var updatedIndstillingerDTO = new IndstillingerDTO
             {
                 //SetTheme = existingIndstillinger.SetTheme,
-                SetPieChart = existingIndstillinger.SetPieChart,
-                SetSøjlediagram = existingIndstillinger.SetSøjlediagram,
-                SetIndtægter = existingIndstillinger.SetIndtægter,
-                SetUdgifter = existingIndstillinger.SetUdgifter,
-                SetBudget = existingIndstillinger.SetBudget
+                SetPieChart = existingIndstillingerList.SetPieChart,
+                SetSøjlediagram = existingIndstillingerList.SetSøjlediagram,
+                SetIndtægter = existingIndstillingerList.SetIndtægter,
+                SetUdgifter = existingIndstillingerList.SetUdgifter,
+                SetBudget = existingIndstillingerList.SetBudget
 
             };
 
