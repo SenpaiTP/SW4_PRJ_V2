@@ -15,29 +15,12 @@ namespace PRJ4.Services
             _indstillingerRepository = indstillingerRepo;
         }
 
-       /* public async Task<List<IndstillingerDTO>> GetIndstillingerAsync()
+       public async Task<IndstillingerDTO> GetIndstillingerAsync(string userId)
         {
-            var indstillingerListe = await _indstillingerRepository.GetAllAsync();
+            return await _indstillingerRepository.GetIndstillingerByIdAsync(userId);
+        }
 
-            var indstillingerReturnListe = new List<IndstillingerDTO>();
-            
-            foreach(var indstillinger in indstillingerListe){
-               
-                var indstillingerReturn = new IndstillingerDTO
-                {
-                    //SetTheme = indstillinger.SetTheme,
-                    SetPieChart = indstillinger.SetPieChart,
-                    SetSøjlediagram = indstillinger.SetSøjlediagram,
-                    SetIndtægter = indstillinger.SetIndtægter,
-                    SetUdgifter = indstillinger.SetUdgifter,
-                    SetBudget = indstillinger.SetBudget
-                };
-
-                indstillingerReturnListe.Add(indstillingerReturn);
-            }
-
-            return indstillingerReturnListe;
-        }*/
+        
 
         public async Task<IndstillingerDTO> AddIndstillingerAsync( string userId, IndstillingerDTO indstillingerDTO){
 
@@ -91,7 +74,7 @@ namespace PRJ4.Services
 
             indstillinger.SetTheme = updateThemeDTO.SetTheme;
 
-             try
+            try
             {
                 await _indstillingerRepository.Update(indstillinger); 
                 await _indstillingerRepository.SaveChangesAsync();
@@ -109,8 +92,46 @@ namespace PRJ4.Services
 
             return updatedThemeDTO;  
         }
+
+        public async Task<IndstillingerDTO> UpdateIndstillingerAsync(string userId, int id, IndstillingerDTO indstillingerDTO)
+        {
+                var indstillinger = await _indstillingerRepository.GetByIdAsync(id);
+
+    if (indstillinger == null)
+    {
+        return null;
+    }
+
+    indstillinger.SetPieChart = indstillingerDTO.SetPieChart;
+    indstillinger.SetBudget = indstillingerDTO.SetBudget;
+    indstillinger.SetIndtægter = indstillingerDTO.SetIndtægter;
+    indstillinger.SetUdgifter = indstillingerDTO.SetUdgifter;
+    indstillinger.SetSøjlediagram = indstillingerDTO.SetSøjlediagram;
+
+    try
+    {
+        await _indstillingerRepository.Update(indstillinger); 
+        await _indstillingerRepository.SaveChangesAsync();
+    }
+    catch(Exception ex)
+    {
+        Console.WriteLine($"Error updating indstillinger: {ex.Message}");
+        return null;
+    }
+
+    var updatedIndstillingerDTO = new IndstillingerDTO
+    {
+        SetPieChart = indstillinger.SetPieChart,
+        SetBudget = indstillinger.SetBudget,
+        SetIndtægter = indstillinger.SetIndtægter,
+        SetUdgifter = indstillinger.SetUdgifter,
+        SetSøjlediagram = indstillinger.SetSøjlediagram,
+    };
+
+    return updatedIndstillingerDTO;
+        }
          
-        public async Task<IndstillingerDTO> UpdateIndstillingerAsync( string userId, int id, IndstillingerDTO indstillingerDTO)
+      /*  public async Task<IndstillingerDTO> UpdateIndstillingerAsync( string userId, int id, IndstillingerDTO indstillingerDTO)
         {
             var existingIndstillingerList = await _indstillingerRepository.GetByIdAsync(id);
 
@@ -148,7 +169,7 @@ namespace PRJ4.Services
             };
 
             return updatedIndstillingerDTO;
-        }
+        }*/
     }
 
 }

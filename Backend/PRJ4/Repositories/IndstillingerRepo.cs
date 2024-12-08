@@ -25,30 +25,58 @@ public class IndstillingerRepo:TemplateRepo<Indstillinger>,IIndstillingerRepo
         _context = context;
     }
 
-    public async Task<IEnumerable<IndstillingerDTO>> GetIndstillingerAsync(string userId)
+    public async Task<IndstillingerDTO> GetIndstillingerAsync(string userId)
     {
-        return await _context.Indstillingers
-            .Where(f => f.BrugerId == userId )
-            .Select(f => new IndstillingerDTO
-            {
-                SetPieChart = f.SetPieChart,
-                SetSøjlediagram = f.SetSøjlediagram,
-                SetBudget = f.SetBudget,
-                SetIndtægter = f.SetIndtægter,
-                SetUdgifter = f.SetUdgifter
-            })
-            .ToListAsync();
+        var userSettings = await _context.Indstillingers
+        .FirstOrDefaultAsync(i => i.BrugerId == userId);
+
+        if (userSettings == null)
+            return null;
+
+        return new IndstillingerDTO
+        {
+            SetPieChart = userSettings.SetPieChart,
+            SetBudget = userSettings.SetBudget,
+            SetIndtægter = userSettings.SetIndtægter,
+            SetUdgifter = userSettings.SetUdgifter,
+            SetSøjlediagram = userSettings.SetSøjlediagram
+        };
+    }
+    public async Task<IndstillingerDTO> GetIndstillingerByIdAsync(string userId)
+    {
+         var settings = await _context.Indstillingers
+        .FirstOrDefaultAsync(s => s.BrugerId == userId);
+
+        // Return null if no settings found
+        if (settings == null)
+            return null;
+
+        // Map the entity to a DTO
+        return new IndstillingerDTO
+        {
+            SetPieChart = settings.SetPieChart,
+            SetBudget = settings.SetBudget,
+            SetIndtægter = settings.SetIndtægter,
+            SetUdgifter = settings.SetUdgifter,
+            SetSøjlediagram = settings.SetSøjlediagram
+        };
     }
 
-    public async Task<IEnumerable<UpdateThemeDTO>> GetThemeAsync(string userId) 
+    public async Task<UpdateThemeDTO> GetThemeAsync(string userId) 
     {   
-        return await _context.Indstillingers
-            .Where(f => f.BrugerId == userId )
-            .Select(f => new UpdateThemeDTO
-            {
-                SetTheme = f.SetTheme
-            })
-            .ToListAsync();
+       var indstillinger = await _context.Indstillingers
+        .FirstOrDefaultAsync(s => s.BrugerId == userId);
+
+        if (indstillinger == null)
+        {
+            return null;
+        }
+
+        return new UpdateThemeDTO
+        {
+            SetTheme = indstillinger.SetTheme
+        };
+
     }
 
     public async Task<Indstillinger> UpdateThemeAsync(string userId, int id, UpdateThemeDTO updateThemeDTO)
@@ -70,7 +98,7 @@ public class IndstillingerRepo:TemplateRepo<Indstillinger>,IIndstillingerRepo
     public async Task<Indstillinger> UpdateIndstillingerAsync(string userId, int id, IndstillingerDTO indstillingerDTO)
     {
         var indstillinger = await _context.Indstillingers
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(i => i.BrugerId == userId);
 
         //indstillinger.SetTheme = indstillingerDTO.SetTheme;
         indstillinger.SetPieChart = indstillingerDTO.SetPieChart;

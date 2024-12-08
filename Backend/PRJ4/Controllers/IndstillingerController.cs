@@ -44,8 +44,8 @@ namespace PRJ4.Controllers;
 
     }
 
-    [HttpPut("UpdateIndstillinger")]
-    public async Task<IActionResult> UpdateIndstillingerAsync([FromQuery] int id, IndstillingerDTO indstillingerDTO)
+    [HttpPut("UpdateIndstillinger/{id}")]
+    public async Task<IActionResult> UpdateIndstillingerAsync(int id, [FromBody] IndstillingerDTO indstillingerDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last()=="nameidentifier");
@@ -53,6 +53,7 @@ namespace PRJ4.Controllers;
         {
             return BadRequest("Invalid user ID");
         }
+        
         var result = await _indstillingerService.UpdateIndstillingerAsync(userIdClaim.Value, id, indstillingerDTO);
         if (result == null)
         {
@@ -74,8 +75,8 @@ namespace PRJ4.Controllers;
         return Ok(Indstillinger);
     }
 
-    [HttpPut("UpdateTheme")]
-    public async Task<IActionResult> UpdateThemeAsync([FromQuery] int id, UpdateThemeDTO updateThemeDTO)
+    [HttpPut("UpdateTheme/{id}")]
+    public async Task<IActionResult> UpdateThemeAsync(int id, UpdateThemeDTO updateThemeDTO)
     {
         var claims = User.Claims;
         var userIdClaim = claims.FirstOrDefault(c => c.Type.Split('/').Last() == "nameidentifier");

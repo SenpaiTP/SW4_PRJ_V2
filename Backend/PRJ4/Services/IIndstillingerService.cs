@@ -11,6 +11,6 @@ namespace PRJ4.Services
         Task<IndstillingerDTO> AddIndstillingerAsync(string userId, IndstillingerDTO indstillingerDTO);
          Task<Indstillinger> AddThemeAsync(string userId, UpdateThemeDTO updateThemeDTO);
         Task<UpdateThemeDTO> UpdateThemeAsync(string userId, int id, UpdateThemeDTO updateThemeDTO);
-
+        Task<IndstillingerDTO> GetIndstillingerAsync(string userId);
     }
 }
