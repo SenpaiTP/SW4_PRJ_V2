@@ -16,8 +16,7 @@ using PRJ4.Test.Setup;
 using PRJ4.Repositories;
 using PRJ4.Models;
 using PRJ4.Mappings;
-
-
+using AutoMapper;
 
 namespace PRJ4.Test.SystemTest
 {
@@ -26,63 +25,100 @@ namespace PRJ4.Test.SystemTest
         private readonly IFudgifterService _fudgifterService;
         private readonly Mock<ILogger<FudgifterController>> _loggerControllerMock;
         private readonly Mock<ILogger<FudgifterService>> _loggerServiceMock;
+        private readonly IMapper _mapper;
         private readonly FudgifterController _controller;
         private readonly IKategoriRepo _kategoriRepo;
-        private readonly IFudgifter _fudgifterRepo;
+        private readonly IFudgifterRepo _fudgifterRepo;
         private ApplicationDbContext _context;
+
         public FudgifterSystemTest()
         {
             _loggerControllerMock = new Mock<ILogger<FudgifterController>>();
-             _loggerServiceMock = new Mock<ILogger<FudgifterService>>();
+            _loggerServiceMock = new Mock<ILogger<FudgifterService>>();
+
+            var fudgifterProfile = new FudgifterProfile();
+            var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile(fudgifterProfile));
+            _mapper = new Mapper(mapperConfig);
+
+            _context = CreateContext();
             _kategoriRepo = new KategoriRepo(_context);
             _fudgifterRepo = new FudgifterRepo(_context);
-            _fudgifterService = new FudgifterService(_fudgifterRepo,_kategoriRepo, _loggerServiceMock.Object, );
-            
+
+            _fudgifterService = new FudgifterService(
+                _fudgifterRepo,
+                _kategoriRepo,
+                _loggerServiceMock.Object,
+                _mapper
+            );
+
             _controller = new FudgifterController(_fudgifterService, _loggerControllerMock.Object);
         }
+
         private void SetupUserContext(string userId)
         {
-            var claims = new List<Claim> { new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", userId) };
+            var claims = new List<Claim> 
+            { 
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", userId) 
+            };
             var identity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(identity);
             var httpContext = new DefaultHttpContext { User = principal };
             _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
         }
-        [SetUp] // This runs before each test
-        public void Setup()
-        {
-            _context = CreateContext(); // Initialize the context for each test
-        }
 
-        [TearDown] // This runs after each test
-        public void Dispose()
+        [SetUp]
+        public void Setup() => _context = CreateContext();
+
+        [TearDown]
+        public void Dispose() => _context?.Dispose();
+
+        // Controller Tests
+
+        [Test]
+        public async Task GetAllByUser_ReturnsOk_WhenDataExists()
         {
-            _context?.Dispose(); // Dispose of the context properly
+            SetupUserContext("user-1");
+
+            var kategori = new Kategori { KategoriId = 1, KategoriNavn = "Utilities" };
+            _context.Kategorier.Add(kategori);
+            _context.Fudgifters.AddRange(
+                new Fudgifter { Tekst = "Expense1", Pris = 100, BrugerId = "user-1", Kategori = kategori },
+                new Fudgifter { Tekst = "Expense2", Pris = 200, BrugerId = "user-1", Kategori = kategori }
+            );
+            await _context.SaveChangesAsync();
+
+            var result = await _controller.GetAllByUser();
+
+            result.Result.Should().BeOfType<OkObjectResult>();
+            var okResult = result.Result as OkObjectResult;
+            var returnedList = okResult?.Value as List<FudgifterResponseDTO>;
+
+            returnedList.Should().NotBeNull();
+            returnedList.Count.Should().Be(2);
         }
 
         [Test]
-        public async Task AddFudgifter_ReturnsOk_WhithNewDataExists()
+        public async Task Add_ReturnsCreatedAtAction_WhenSuccess()
         {
-            // Arrange
-            const string userId = "user-1";
-            SetupUserContext(userId);
+            SetupUserContext("user-1");
 
-            var nyFudgifterDTO = new nyFudgifterDTO { Pris = 5000, Tekst = "Monthly rent", Dato = DateTime.Now };
+            var nyFudgifterDTO = new nyFudgifterDTO 
+            { 
+                Pris = 500, 
+                Tekst = "New Expense", 
+                KategoriNavn = "Groceries" 
+            };
 
-            // Act
             var result = await _controller.Add(nyFudgifterDTO);
 
-            // Assert
             result.Result.Should().BeOfType<CreatedAtActionResult>();
-
             var createdAtResult = result.Result as CreatedAtActionResult;
-            createdAtResult.Should().NotBeNull();
 
-            // Verify the response data
-            var responseDTO = createdAtResult.Value as FudgifterResponseDTO;
+            var responseDTO = createdAtResult?.Value as FudgifterResponseDTO;
             responseDTO.Should().NotBeNull();
-            responseDTO.Pris.Should().Be(nyFudgifterDTO.Pris);
             responseDTO.Tekst.Should().Be(nyFudgifterDTO.Tekst);
+            responseDTO.Pris.Should().Be(nyFudgifterDTO.Pris);
         }
+
     }
 }
