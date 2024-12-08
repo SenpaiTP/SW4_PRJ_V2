@@ -16,6 +16,7 @@ public class KategoryLimitRepo: TemplateRepo<KategoryLimit>, IKategoryLimitRepo
     {
         return await _context.KategoryLimits
             .Where(b => b.BrugerId == userId)
+            .Include(b => b.Kategory)
             .ToListAsync();  
     }
 
@@ -23,6 +24,7 @@ public class KategoryLimitRepo: TemplateRepo<KategoryLimit>, IKategoryLimitRepo
     {
         return await _context.KategoryLimits
             .FirstOrDefaultAsync(b => b.BrugerId == userId && b.KategoryId == kategoryId);
+          
 
     }
     

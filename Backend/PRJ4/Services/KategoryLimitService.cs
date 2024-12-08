@@ -51,12 +51,12 @@ namespace PRJ4.Services
 
             var limitReturnListe = new List<KategoryLimitResponseDTO>();
 
-            foreach( var limit in limitReturnListe)
+            foreach( var limit in limitListe)
             {
                 var limitReturn = new KategoryLimitResponseDTO
                 {
                     KategoryId = limit.KategoryId,
-                    KategoryName = limit.KategoryName,
+                    KategoryName = limit.Kategory.KategoriNavn,
                     Limit = limit.Limit
                 };
                 limitReturnListe.Add(limitReturn);

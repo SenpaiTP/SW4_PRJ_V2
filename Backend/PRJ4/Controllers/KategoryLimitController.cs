@@ -22,22 +22,35 @@ public class KategoryLimitController : ControllerBase
         return userIdClaim.Value;
     }  
     private readonly IKategoryLimitService _kategoryLimitService;
-    public KategoryLimitController(IKategoryLimitService kategoryLimitService)
+    private readonly ILogger<KategoryLimitController> _logger;
+    public KategoryLimitController(IKategoryLimitService kategoryLimitService, ILogger<KategoryLimitController> logger)
     {
         _kategoryLimitService = kategoryLimitService;
+        _logger = logger; 
     }
 
-    // GET: api/KategoryLimit/{Id}
+    // GET
     [HttpGet()]
-    public async Task<ActionResult<List<KategoryLimitResponseDTO>>> GetAll()
+    public async Task<IActionResult> GetAll()
     {
         var userId = GetUserId();
         if (userId == null)
         {
             return Unauthorized(new { Message = "User not authenticated" });
         }
-        var kategoryLimit = await _kategoryLimitService.GetAllKategoryLimits(userId); 
-        return kategoryLimit; 
+
+        //Try to get all category limits
+        try
+        {
+            var kategoryLimit = await _kategoryLimitService.GetAllKategoryLimits(userId);
+            return Ok(kategoryLimit); // Returns statuskode a list of all category limits
+        }
+        catch (Exception ex)
+        {
+            // Returns error message.
+            _logger.LogError(ex, $"An error occurred while getting category limit by user with id: {userId}.", userId);
+            return StatusCode(500, new { Message = "An error occurred while getting category limits"});
+        }
     }  
   
 
@@ -48,10 +61,22 @@ public class KategoryLimitController : ControllerBase
         var userId = GetUserId();
         if (userId == null)
         {
+            _logger.LogWarning("User ID is null.");
             return Unauthorized(new { Message = "User not authenticated" });
         }
-        var kategoryLimit = await _kategoryLimitService.GetByIdKategoryLimits(id, userId); 
-        return kategoryLimit; 
+
+        //Try to get category limit by id
+        try
+        {
+            var kategoryLimit = await _kategoryLimitService.GetByIdKategoryLimits(id, userId); 
+            return Ok(kategoryLimit); // Returns statuskode a list of all category limits
+        }
+        catch (Exception ex)
+        {
+            // Returns error message.
+            _logger.LogError(ex, $"An error occurred while getting category limit with id {id} by user with id: {userId}.", id , userId);
+            return StatusCode(500, new { Message = "An error occurred while getting category limit."});
+        }
     }  
 
     // POST
@@ -63,10 +88,18 @@ public class KategoryLimitController : ControllerBase
         {
             return Unauthorized(new { Message = "User not authenticated" });
         }
-    
-        var kategoryLimit = await _kategoryLimitService.AddKategoryLimitAsync(limitDTO, userId);
-        
-        return kategoryLimit;
+
+        try
+        {
+            var kategoryLimit = await _kategoryLimitService.AddKategoryLimitAsync(limitDTO, userId); 
+            return Ok(kategoryLimit); // Returns statuskode a list of all category limits
+        }
+        catch (Exception ex)
+        {
+            // Returns error message.
+            _logger.LogError(ex, $"An error occurred while creating category limit by user with id: {userId}.", userId);
+            return StatusCode(500, new { Message = "An error occurred while creating category limit."});
+        }
     }
 
 }
