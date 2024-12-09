@@ -9,7 +9,7 @@ const getAuthToken = () => localStorage.getItem('authToken');
 
 function Budget() {
   const [rows, setRows] = useState([]);
-  const [newRow, setNewRow] = useState({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
+  const [newRow, setNewRow] = useState({ id: "", categoryName: "", price: "", goalEndDate: "", saved: 0 });
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
@@ -68,7 +68,7 @@ function Budget() {
       });
     }
     fetchBudgets();
-    setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
+    setNewRow({ id: "", categoryName: "", price: "", goalEndDate: "", saved: 0 });
     setOpen(false);
     setEditMode(false);
   };
@@ -80,7 +80,7 @@ function Budget() {
   const handleClose = () => {
     setOpen(false);
     setEditMode(false);
-    setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
+    setNewRow({ id: "", categoryName: "", price: "", goalEndDate: "", saved: 0 });
   };
 
   const handleRowClick = async (row) => {

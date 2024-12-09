@@ -29,6 +29,11 @@ namespace PRJ4.Controllers
             {
                 return BadRequest("Description cannot be empty.");
             }
+
+            //så name = descption, når frontend og backend sættes sammen
+             //descriptionInput.Name = descriptionInput.Description;
+
+
             //string suggestedCategory = descriptionInput.Description;
             // Step 1: Get category suggestion from OpenAI
             var currentCategories = await _kategorirepo.GetAllAsync();

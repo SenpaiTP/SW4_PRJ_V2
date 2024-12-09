@@ -7,12 +7,10 @@ namespace PRJ4.Services
 {
     public interface IBudgetGoalService
     {
-        Task<BudgetResponsDTO> GetByIdBudgetGoalAsync(int budgetId, string userId); //Hent bestemt budget for user
-        Task<List<BudgetResponsDTO>> GetAllByUserIdBudgetGoalAsync(string userId); //Hent alle for bruger
-        Task<BudgetCreateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateDTO budgetDTO);
-        Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string user, BudgetSavingCreateDTO savingDTO);
-        Task<List<BudgetSavingResponsDTO>> GetAllSavingsAsync(int budgetId, string userId);
-        Task<BudgetUpdateDTO> UpdateBudgetGoalAsync(int id, BudgetUpdateDTO budgetDTO);
-        Task DeleteBudgetAsync(int budgetId);
+        Task<BudgetResponseDTO> GetBudgetByIdAsync(int budgetId, string userId);
+        Task<List<BudgetResponseDTO>> GetAllBudgetsAsync(string userId);
+        Task<BudgetResponseDTO> AddBudgetAsync(string userId, BudgetCreateDTO budgetDTO);
+        Task<BudgetResponseDTO> UpdateBudgetAsync(int budgetId, string userId, BudgetUpdateDTO budgetUpdateDTO);
+        Task DeleteBudgetAsync(int budgetId, string userId);
     }
 }
