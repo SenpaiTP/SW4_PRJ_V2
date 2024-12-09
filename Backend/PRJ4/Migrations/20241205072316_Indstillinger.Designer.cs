@@ -12,8 +12,8 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241205142730_Kategorylimits")]
-    partial class Kategorylimits
+    [Migration("20241205072316_Indstillinger")]
+    partial class Indstillinger
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,8 +229,11 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Bruger", b =>
                 {
-                    b.Property<string>("BrugerId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("BrugerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BrugerId"));
 
                     b.Property<string>("Efternavn")
                         .IsRequired()
@@ -265,8 +268,8 @@ namespace PRJ4.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("BrugerId1")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("BrugerId1")
+                        .HasColumnType("int");
 
                     b.Property<string>("BudgetName")
                         .IsRequired()
@@ -278,9 +281,6 @@ namespace PRJ4.Migrations
                     b.Property<DateOnly>("BudgetStart")
                         .HasColumnType("date");
 
-                    b.Property<int>("KategoryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("SavingsGoal")
                         .HasColumnType("int");
 
@@ -289,8 +289,6 @@ namespace PRJ4.Migrations
                     b.HasIndex("BrugerId");
 
                     b.HasIndex("BrugerId1");
-
-                    b.HasIndex("KategoryId");
 
                     b.ToTable("Budgets");
                 });
@@ -360,6 +358,37 @@ namespace PRJ4.Migrations
                     b.HasIndex("KategoriId");
 
                     b.ToTable("Fudgifters");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.Indstillinger", b =>
+                {
+                    b.Property<int>("IndstillingerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IndstillingerId"));
+
+                    b.Property<bool>("SetBudget")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SetIndtægter")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SetPieChart")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SetSøjlediagram")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SetTheme")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SetUdgifter")
+                        .HasColumnType("bit");
+
+                    b.HasKey("IndstillingerId");
+
+                    b.ToTable("Indstillingers");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Kategori", b =>
@@ -474,7 +503,7 @@ namespace PRJ4.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Dato")
+                    b.Property<DateTime?>("Dato")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("KategoriId")
@@ -558,15 +587,7 @@ namespace PRJ4.Migrations
                         .WithMany("Budgets")
                         .HasForeignKey("BrugerId1");
 
-                    b.HasOne("PRJ4.Models.Kategori", "Kategory")
-                        .WithMany()
-                        .HasForeignKey("KategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Bruger");
-
-                    b.Navigation("Kategory");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
