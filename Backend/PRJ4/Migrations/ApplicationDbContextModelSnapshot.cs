@@ -224,32 +224,6 @@ namespace PRJ4.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("PRJ4.Models.Bruger", b =>
-                {
-                    b.Property<string>("BrugerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Efternavn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Fornavn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("BrugerId");
-
-                    b.ToTable("Brugers", (string)null);
-                });
-
             modelBuilder.Entity("PRJ4.Models.Budget", b =>
                 {
                     b.Property<int>("BudgetId")
@@ -260,9 +234,6 @@ namespace PRJ4.Migrations
 
                     b.Property<string>("BrugerId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BrugerId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BudgetName")
@@ -282,9 +253,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("BrugerId");
 
-                    b.HasIndex("BrugerId1");
-
-                    b.ToTable("Budgets", (string)null);
+                    b.ToTable("Budgets");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
@@ -318,7 +287,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Findtægter", (string)null);
+                    b.ToTable("Findtægter");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Fudgifter", b =>
@@ -351,7 +320,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Fudgifters", (string)null);
+                    b.ToTable("Fudgifters");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Kategori", b =>
@@ -368,7 +337,7 @@ namespace PRJ4.Migrations
 
                     b.HasKey("KategoriId");
 
-                    b.ToTable("Kategorier", (string)null);
+                    b.ToTable("Kategorier");
                 });
 
             modelBuilder.Entity("PRJ4.Models.KategoryLimit", b =>
@@ -396,7 +365,7 @@ namespace PRJ4.Migrations
                     b.HasIndex("KategoryId")
                         .IsUnique();
 
-                    b.ToTable("KategoryLimits", (string)null);
+                    b.ToTable("KategoryLimits");
                 });
 
             modelBuilder.Entity("PRJ4.Models.LoginModel", b =>
@@ -417,7 +386,7 @@ namespace PRJ4.Migrations
 
                     b.HasKey("LoginId");
 
-                    b.ToTable("LoginModels", (string)null);
+                    b.ToTable("LoginModels");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Saving", b =>
@@ -475,7 +444,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Vindtægter", (string)null);
+                    b.ToTable("Vindtægter");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Vudgifter", b =>
@@ -508,7 +477,7 @@ namespace PRJ4.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Vudgifters", (string)null);
+                    b.ToTable("Vudgifters");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -569,10 +538,6 @@ namespace PRJ4.Migrations
                         .HasForeignKey("BrugerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("PRJ4.Models.Bruger", null)
-                        .WithMany("Budgets")
-                        .HasForeignKey("BrugerId1");
 
                     b.Navigation("Bruger");
                 });
@@ -688,11 +653,6 @@ namespace PRJ4.Migrations
                     b.Navigation("Vindtægter");
 
                     b.Navigation("Vudgifters");
-                });
-
-            modelBuilder.Entity("PRJ4.Models.Bruger", b =>
-                {
-                    b.Navigation("Budgets");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Budget", b =>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PRJ4.Migrations
 {
     /// <inheritdoc />
-    public partial class Kategorylimits : Migration
+    public partial class _001InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,21 +49,6 @@ namespace PRJ4.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Brugers",
-                columns: table => new
-                {
-                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Fornavn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Efternavn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Brugers", x => x.BrugerId);
                 });
 
             migrationBuilder.CreateTable(
@@ -207,11 +192,9 @@ namespace PRJ4.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    KategoryId = table.Column<int>(type: "int", nullable: false),
                     SavingsGoal = table.Column<int>(type: "int", nullable: false),
                     BudgetStart = table.Column<DateOnly>(type: "date", nullable: false),
-                    BudgetSlut = table.Column<DateOnly>(type: "date", nullable: false),
-                    BrugerId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    BudgetSlut = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -221,17 +204,6 @@ namespace PRJ4.Migrations
                         column: x => x.BrugerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Budgets_Brugers_BrugerId1",
-                        column: x => x.BrugerId1,
-                        principalTable: "Brugers",
-                        principalColumn: "BrugerId");
-                    table.ForeignKey(
-                        name: "FK_Budgets_Kategorier_KategoryId",
-                        column: x => x.KategoryId,
-                        principalTable: "Kategorier",
-                        principalColumn: "KategoriId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -298,8 +270,8 @@ namespace PRJ4.Migrations
                 {
                     KategoryLimitId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     KategoryId = table.Column<int>(type: "int", nullable: false),
+                    BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Limit = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -375,6 +347,27 @@ namespace PRJ4.Migrations
                         principalColumn: "KategoriId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Savings",
+                columns: table => new
+                {
+                    SavingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BudgetId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Savings", x => x.SavingId);
+                    table.ForeignKey(
+                        name: "FK_Savings_Budgets_BudgetId",
+                        column: x => x.BudgetId,
+                        principalTable: "Budgets",
+                        principalColumn: "BudgetId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -420,16 +413,6 @@ namespace PRJ4.Migrations
                 column: "BrugerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Budgets_BrugerId1",
-                table: "Budgets",
-                column: "BrugerId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Budgets_KategoryId",
-                table: "Budgets",
-                column: "KategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Findtægter_BrugerId",
                 table: "Findtægter",
                 column: "BrugerId");
@@ -459,6 +442,11 @@ namespace PRJ4.Migrations
                 table: "KategoryLimits",
                 column: "KategoryId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Savings_BudgetId",
+                table: "Savings",
+                column: "BudgetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vindtægter_BrugerId",
@@ -500,9 +488,6 @@ namespace PRJ4.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Budgets");
-
-            migrationBuilder.DropTable(
                 name: "Findtægter");
 
             migrationBuilder.DropTable(
@@ -515,6 +500,9 @@ namespace PRJ4.Migrations
                 name: "LoginModels");
 
             migrationBuilder.DropTable(
+                name: "Savings");
+
+            migrationBuilder.DropTable(
                 name: "Vindtægter");
 
             migrationBuilder.DropTable(
@@ -524,13 +512,13 @@ namespace PRJ4.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Brugers");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Budgets");
 
             migrationBuilder.DropTable(
                 name: "Kategorier");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

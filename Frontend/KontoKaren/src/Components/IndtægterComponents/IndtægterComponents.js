@@ -4,15 +4,11 @@ import { Edit, Delete } from "@mui/icons-material";
 import TableBody from "./Table/IndtægterTableBody"; 
 import TableHeader from "./Table/IndtægterTableHeader"; 
 import PieChart from "./PieChart/PieChart"; 
-import { initialRows } from "./Table/TableData"; 
-import AddIncomeDialog from "./Dialog/AddIncomeDialog"; 
-import EditIncomeDialog from "./Dialog/EditIncomeDialog"; 
-import useIndtægterHooks from "../../Hooks/IndtægterHooks"; 
-import './Table/IndtægterTable.css'
 import { initialRows } from "./Table/IndtægterTableData"; 
 import AddIncomeDialog from "./Dialog/AddIndtægterDialog"; 
 import EditIncomeDialog from "./Dialog/EditIndtægterDialog"; 
 import useIndtægterHooks from "../../Hooks/UseIndtægterHooks"; 
+import './Table/IndtægterTable.css';
 
 export default function IndtægterTable() {
   // bruger hooks til at håndtere logikken i tabellen
