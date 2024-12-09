@@ -5,6 +5,8 @@ const API_URL = 'http://localhost:5168/api/Indstillinger'; // Update with the ac
 
 const getAuthToken = () => localStorage.getItem('authToken'); // Make sure you have an auth token saved in localStorage
 
+
+
 function DesignFrontPage() {
     // State for each setting
     const [settings, setSettings] = useState({
@@ -14,6 +16,8 @@ function DesignFrontPage() {
         showUdgifter: true,
         showSøjlediagram: false,
     });
+    const [hasPostedDefaults, setHasPostedDefaults] = useState(false); // Ensure default POST happens once
+   // const [currentId, setCurrentId] = useState(null);
 
     // Fetch settings from the backend or localStorage
     useEffect(() => {
@@ -22,11 +26,48 @@ function DesignFrontPage() {
             if (savedSettings) {
                 setSettings(JSON.parse(savedSettings));
             } else {
+                await postDefaultSettings();
                 await fetchSettingsFromBackend();
             }
         };
         fetchSettings();
     }, []);
+
+    const postDefaultSettings = async () => {
+        if (hasPostedDefaults) return; // Ensure it only runs once
+
+        try {
+            const token = getAuthToken();
+            if (token) {
+                const response = await fetch(`${API_URL}/AddIndstillinger`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        SetPieChart: false,
+                        SetBudget: false,
+                        SetIndtægter: false,
+                        SetUdgifter: true,
+                        SetSøjlediagram: false,
+                    }),
+                });
+
+                if (response.ok) {
+                   // const createdRecord = await response.json(); // Assuming the API returns the created record
+                   // setCurrentId(createdRecord.id); 
+                    console.log('Default settings posted');
+                    setHasPostedDefaults(true); // Mark as completed
+                } else {
+                    console.error('Failed to post default settings');
+                }
+            }
+        } catch (error) {
+            console.error('Error posting default settings:', error);
+        }
+    };
+
 
     const fetchSettingsFromBackend = async () => {
         try {
@@ -38,9 +79,11 @@ function DesignFrontPage() {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
+                console.log('FetchSettingsFromBackend: ', response);
 
                 if (response.ok) {
                     const data = await response.json();
+                    //const latestSettings = data[0];
                     const settingsFromBackend = {
                         showPieChart: data.showPieChart ?? false,
                         showBudget: data.showBudget ?? false,
@@ -48,7 +91,9 @@ function DesignFrontPage() {
                         showUdgifter: data.showUdgifter ?? false,
                         showSøjlediagram: data.showSøjlediagram ?? false,
                     };
+
                     setSettings(settingsFromBackend);
+                    //setCurrentId(latestSettings?.indstillingerId || null);
                     console.log('settings fetched from backend: ', settingsFromBackend);
                     localStorage.setItem('designSettings', JSON.stringify(settingsFromBackend)); // Cache settings locally
                 } else {
@@ -65,11 +110,12 @@ function DesignFrontPage() {
         try {
             const token = getAuthToken();
             const id = 1; // **** Sat til X, der er X indstillinger - lorteløsning:)
-            if (token) {
+            if (token ) {
                 const response = await fetch(`${API_URL}/UpdateIndstillinger/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
                     body: JSON.stringify({
@@ -95,6 +141,7 @@ function DesignFrontPage() {
                     localStorage.setItem('designSettings', JSON.stringify(settings)); // Update local cache
                 } else {
                     console.error('Failed to save settings');
+                    await postDefaultSettings();  ///***** */
                 }
             }
         } catch (error) {

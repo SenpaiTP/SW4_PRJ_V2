@@ -7,27 +7,24 @@ import { lightTheme, darkTheme } from './theme';
 export const ThemeContext = createContext();
 
 const API_URL = 'http://localhost:5168/api/Indstillinger';
+const getAuthToken = () => localStorage.getItem('authToken'); // Make sure you have an auth token saved in localStorage
+
 
 const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    // Default to 'light' if nothing is saved in localStorage
-    return localStorage.getItem('theme') || 'light';
-  });
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
-    // Fetch theme from localStorage, or backend if necessary
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setTheme(savedTheme);
     } else {
-      // Fetch theme from backend if not found in localStorage
       fetchThemeFromBackend();
     }
-  }, []); // Only run once on mount
+  }, []);
 
   const fetchThemeFromBackend = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = getAuthToken();
       if (token) {
         const response = await fetch(`${API_URL}/GetTheme`, {
           method: 'GET',
@@ -35,29 +32,82 @@ const ThemeProvider = ({ children }) => {
             'Authorization': `Bearer ${token}`,
           },
         });
-          console.log('response: ', response);
-          
+
         if (response.ok) {
           const themeData = await response.json();
-          const themeFromBackend = themeData.theme ? 'dark' : 'light'; // 'theme' is boolean in the backend
+          const themeFromBackend = themeData.theme ? 'dark' : 'light'; // Assuming backend sends a boolean
           setTheme(themeFromBackend);
-          localStorage.setItem('theme', themeFromBackend); // Save theme to localStorage
+          localStorage.setItem('theme', themeFromBackend);
         }
       }
     } catch (error) {
       console.error('Error fetching theme from backend:', error);
+      postDefaultThemeToBackend();
+    }
+  };
+
+  const saveThemeToBackend = async (newTheme) => {
+    try {
+      const token = getAuthToken();
+      const themeBoolean = newTheme === 'dark'; // Convert theme to boolean for backend
+      const id = 1; // Assume your backend requires an ID
+      
+      if (token) {
+        const response = await fetch(`${API_URL}/UpdateTheme/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ SetTheme: themeBoolean }),
+        });
+          console.log('Update theme:', response);
+        if (!response.ok) {
+          console.error('Error saving theme to backend:', await response.text());
+        }
+      }
+    } catch (error) {
+      console.error('Error saving theme to backend:', error);
+    }
+  };
+
+  const postDefaultThemeToBackend = async () => {
+    try {
+      const token = getAuthToken();
+      if (token) {
+        const response = await fetch(`${API_URL}/AddTheme`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ SetTheme: false }), // Default theme is light (false)
+        });
+
+        if (!response.ok) {
+          console.error('Error posting default theme to backend:', await response.text());
+        }
+      }
+    } catch (error) {
+      console.error('Error posting default theme to backend:', error);
     }
   };
 
   useEffect(() => {
-    // Persist theme in localStorage when it changes
+    // Update the background color when the theme changes
+    document.body.style.backgroundColor =
+      theme === 'light'
+        ? lightTheme.palette.background.default
+        : darkTheme.palette.background.default;
     localStorage.setItem('theme', theme);
-    document.body.style.backgroundColor = theme === 'light' ? lightTheme.palette.background.default : darkTheme.palette.background.default;
   }, [theme]);
+
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
+    saveThemeToBackend(newTheme); // Sync with backend
+    localStorage.setItem('theme', newTheme); // Sync with localStorage
   };
 
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
@@ -70,5 +120,6 @@ const ThemeProvider = ({ children }) => {
     </MuiThemeProvider>
   );
 };
+
 
 export default ThemeProvider;
