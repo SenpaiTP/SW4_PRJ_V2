@@ -9,7 +9,7 @@ const getAuthToken = () => localStorage.getItem('authToken');
 
 function Budget() {
   const [rows, setRows] = useState([]);
-  const [newRow, setNewRow] = useState({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
+  const [newRow, setNewRow] = useState({ id: "", categoryName: "", price: "", goalEndDate: "", saved: 0 });
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
@@ -68,7 +68,7 @@ function Budget() {
       });
     }
     fetchBudgets();
-    setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
+    setNewRow({ id: "", categoryName: "", price: "", goalEndDate: "", saved: 0 });
     setOpen(false);
     setEditMode(false);
   };
@@ -80,7 +80,7 @@ function Budget() {
   const handleClose = () => {
     setOpen(false);
     setEditMode(false);
-    setNewRow({ id: "", name: "", price: "", goalEndDate: "", saved: 0 });
+    setNewRow({ id: "", categoryName: "", price: "", goalEndDate: "", saved: 0 });
   };
 
   const handleRowClick = async (row) => {
@@ -168,13 +168,13 @@ function Budget() {
 
   return (
     <Container>
-      <Typography variant="h1" component="h2" gutterBottom>
+      <Typography variant="h1" component="h2" gutterBottom color="text.primary">
         Welcome to Budget
       </Typography>
 
       <Box display="flex" flexDirection="row" marginTop="20px">
         <Box flex={1} display="flex" flexDirection="column" alignItems="flex-start">
-          <Typography variant="h3" gutterBottom>Liste over opsparingsmål</Typography>
+          <Typography variant="h3" gutterBottom color="text.primary">Liste over opsparingsmål</Typography>
           <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
             <Table>
               <TableHead>
@@ -209,7 +209,7 @@ function Budget() {
 
         {selectedGoal && (
           <Box flex={1} marginLeft="20px">
-            <Typography variant="h4" gutterBottom>Progress for {selectedGoal.name}</Typography>
+            <Typography variant="h4" gutterBottom color="text.primary">Progress for {selectedGoal.name}</Typography>
             <Box height="20px" marginTop="10px">
               <LinearProgress variant="determinate" value={calculateProgress(selectedGoal.saved, selectedGoal.price)} style={{ height: '20px' }} />
             </Box>

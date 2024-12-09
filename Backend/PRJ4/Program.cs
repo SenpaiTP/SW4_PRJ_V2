@@ -9,6 +9,7 @@ using PRJ4.Repositories;
 using PRJ4.Data;
 using PRJ4.Models;
 using PRJ4.Services;
+using PRJ4.Services; // Add this line if BudgetGoalService is in the PRJ4.Services.Budget namespace
 using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Mappings;
@@ -133,26 +134,25 @@ var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
-builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
-//builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
 builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
-//builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
-//builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();
-//builder.Services.AddScoped<IFudgifterService,FudgifterService>();
-//builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+
 
 builder.Services.AddScoped<IFudgifterRepo, FudgifterRepo>();
+
+// Build Indstillinger:
+builder.Services.AddScoped<IIndstillingerRepo, IndstillingerRepo>();
+builder.Services.AddScoped<IIndstillingerService, IndstillingerService>();
 
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
-builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
+builder.Services.AddScoped<IBudgetGoalService,BudgetService>();
 builder.Services.AddScoped<IRevocationService,RevocationService>();
 
 //Build Kategory Limit

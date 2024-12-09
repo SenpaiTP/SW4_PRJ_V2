@@ -15,7 +15,7 @@ public class BudgetUpdateDTO
     public DateOnly BudgetSlut { get; set; }
 }
 
-public class BudgetResponsDTO
+public class BudgetResponseDTO
 {
     public int BudgetId { get; set; }
     public required string BudgetName { get; set; }
@@ -26,23 +26,7 @@ public class BudgetResponsDTO
     public decimal MoneySaved { get; set; } 
 }
 
-public class BudgetGetAllDTO
-{
-    public int BudgetId { get; set; }
-    public int KategoryId { get; set; }
-    public required string BudgetName { get; set; }
-    public int SavingsGoal { get; set; }
-    public DateOnly BudgetSlut { get; set; }
 
-}
-
-
-public class BudgetSavingCreateDTO
-{
-    public decimal Saving { get; set; }
-    public DateTime Date {get;set;}
-
-}
 
 
 public class BudgetSavingResponsDTO

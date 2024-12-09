@@ -1,22 +1,20 @@
 import React, { useState } from "react"; 
-import { Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell } from "@mui/material"; 
+import { Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell, TablePagination} from "@mui/material"; 
 import { Edit, Delete } from "@mui/icons-material"; 
-import TableBody from "./Table/TableBody"; 
-import TableHeader from "./Table/TableHeader"; 
+import TableBody from "./Table/IndtægterTableBody"; 
+import TableHeader from "./Table/IndtægterTableHeader"; 
 import PieChart from "./PieChart/PieChart"; 
-import './Table/Table.css'; 
-import { initialRows } from "./Table/TableData"; 
-import AddIncomeDialog from "./Dialog/AddIncomeDialog"; 
-import EditIncomeDialog from "./Dialog/EditIncomeDialog"; 
-import useIndtægterHooks from "../../Hooks/IndtægterHooks"; 
+import './Table/IndtægterTable.css'
+import { initialRows } from "./Table/IndtægterTableData"; 
+import AddIncomeDialog from "./Dialog/AddIndtægterDialog"; 
+import EditIncomeDialog from "./Dialog/EditIndtægterDialog"; 
+import useIndtægterHooks from "../../Hooks/UseIndtægterHooks"; 
 
-export default function IndtægterTabel() {
+export default function IndtægterTable() {
   // bruger hooks til at håndtere logikken i tabellen
   const {
     rows, // data i tabellen
     selected, // valgte rækker
-    page, // sktuel side
-    rowsPerPage, // antal rækker pr. side
     handleClick, // håndtering af klik på rækker
     handleAddRow, // tilføjelse af en ny række
     handleEditRow, // redigering af en række
@@ -27,6 +25,8 @@ export default function IndtægterTabel() {
   const [openAddDialog, setOpenAddDialog] = useState(false); // styrer visningen af dialog for at tilføje indkomst
   const [openEditDialog, setOpenEditDialog] = useState(false); // styrer visningen af dialog for at redigere indkomst
   const [selectedIncome, setSelectedIncome] = useState(null); // holder den valgte indkomst til redigering
+  const [page, setPage] = useState(0); // current page
+  const [rowsPerPage, setRowsPerPage] = useState(5); // rows per page
 
   // ppretter data til PieChart
   const chartData = rows.map((row) => ({
@@ -53,6 +53,18 @@ export default function IndtægterTabel() {
   const handleEditIncome = (updatedIncome) => {
     handleEditRow(updatedIncome);
     setOpenEditDialog(false);
+  };
+
+
+   // Handle changing pages in pagination
+   const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle changing rows per page
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when changing rows per page
   };
 
   return (
@@ -83,6 +95,19 @@ export default function IndtægterTabel() {
               />
             </Table>
           </TableContainer>
+
+              {/* Pagination Controls */}
+              <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Rækker per side" // Custom label
+
+          />
         </Paper>
 
         {/* knapper til at tilføje eller gemme ændringer */}

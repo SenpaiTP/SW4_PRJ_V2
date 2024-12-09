@@ -1,0 +1,24 @@
+
+.table-container {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tableCell {
+    padding: 1px; /* Reducer padding */
+    width: 100%;
+    height: 50%;
+    text-align: left;
+  }
+ 
+  
+  

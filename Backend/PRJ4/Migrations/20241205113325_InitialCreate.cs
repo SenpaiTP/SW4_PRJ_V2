@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PRJ4.Migrations
 {
     /// <inheritdoc />
-    public partial class Kategorylimits : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -207,7 +207,6 @@ namespace PRJ4.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    KategoryId = table.Column<int>(type: "int", nullable: false),
                     SavingsGoal = table.Column<int>(type: "int", nullable: false),
                     BudgetStart = table.Column<DateOnly>(type: "date", nullable: false),
                     BudgetSlut = table.Column<DateOnly>(type: "date", nullable: false),
@@ -227,12 +226,6 @@ namespace PRJ4.Migrations
                         column: x => x.BrugerId1,
                         principalTable: "Brugers",
                         principalColumn: "BrugerId");
-                    table.ForeignKey(
-                        name: "FK_Budgets_Kategorier_KategoryId",
-                        column: x => x.KategoryId,
-                        principalTable: "Kategorier",
-                        principalColumn: "KategoriId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -355,7 +348,7 @@ namespace PRJ4.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Pris = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Tekst = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Dato = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Dato = table.Column<DateTime>(type: "datetime2", nullable: true),
                     BrugerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     KategoriId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -423,11 +416,6 @@ namespace PRJ4.Migrations
                 name: "IX_Budgets_BrugerId1",
                 table: "Budgets",
                 column: "BrugerId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Budgets_KategoryId",
-                table: "Budgets",
-                column: "KategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Findtægter_BrugerId",
