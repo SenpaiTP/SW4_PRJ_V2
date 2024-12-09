@@ -5,6 +5,9 @@ import { initialExpenseRows } from "../../Components/UdgifterComponents/Table/Va
 import { initialFixedExpenseRows } from "../../Components/UdgifterComponents/Table/FasteUdgifterTableData";
 import { getVudgifter, createVudgifter, updateVudgifter, deleteVudgifter } from "../../Services/VariableUdgifterService";
 import { getFudgifter, createFudgifter, updateFudgifter, deleteFudgifter } from "../../Services/FasteUdgifterService";
+import AmountLimitComponent from "../../Components/UdgifterComponents/AmountLimitComponent";
+
+
 
 function Udgifter() {
   return (
@@ -12,6 +15,9 @@ function Udgifter() {
       <Typography variant="h1" component="h2" padding="10" align="left">
         Udgifter
       </Typography>
+
+
+      <AmountLimitComponent/>
 
       <UdgifterTableComponent
         title="Variable Udgifter"
