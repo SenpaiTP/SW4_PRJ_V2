@@ -10,7 +10,7 @@ namespace PRJ4.Services
 
         private readonly IKategoriRepo _kategoryRepository;
 
-         private readonly ILogger<KategoryLimitService> _logger;
+        private readonly ILogger<KategoryLimitService> _logger;
 
         public KategoryLimitService(IKategoryLimitRepo kategoryLimitRepository, IKategoriRepo kategoryRepository, ILogger<KategoryLimitService> logger)
         {

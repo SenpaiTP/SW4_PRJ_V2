@@ -275,9 +275,6 @@ namespace PRJ4.Migrations
                     b.Property<DateOnly>("BudgetStart")
                         .HasColumnType("date");
 
-                    b.Property<int>("KategoryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("SavingsGoal")
                         .HasColumnType("int");
 
@@ -286,8 +283,6 @@ namespace PRJ4.Migrations
                     b.HasIndex("BrugerId");
 
                     b.HasIndex("BrugerId1");
-
-                    b.HasIndex("KategoryId");
 
                     b.ToTable("Budgets");
                 });
@@ -425,6 +420,30 @@ namespace PRJ4.Migrations
                     b.ToTable("LoginModels");
                 });
 
+            modelBuilder.Entity("PRJ4.Models.Saving", b =>
+                {
+                    b.Property<int>("SavingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SavingId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("BudgetId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SavingId");
+
+                    b.HasIndex("BudgetId");
+
+                    b.ToTable("Savings");
+                });
+
             modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
                 {
                     b.Property<int>("VindtægtId")
@@ -555,15 +574,7 @@ namespace PRJ4.Migrations
                         .WithMany("Budgets")
                         .HasForeignKey("BrugerId1");
 
-                    b.HasOne("PRJ4.Models.Kategori", "Kategory")
-                        .WithMany()
-                        .HasForeignKey("KategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Bruger");
-
-                    b.Navigation("Kategory");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
@@ -621,6 +632,17 @@ namespace PRJ4.Migrations
                     b.Navigation("Kategory");
                 });
 
+            modelBuilder.Entity("PRJ4.Models.Saving", b =>
+                {
+                    b.HasOne("PRJ4.Models.Budget", "Budget")
+                        .WithMany("Savings")
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Budget");
+                });
+
             modelBuilder.Entity("PRJ4.Models.Vindtægt", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -671,6 +693,11 @@ namespace PRJ4.Migrations
             modelBuilder.Entity("PRJ4.Models.Bruger", b =>
                 {
                     b.Navigation("Budgets");
+                });
+
+            modelBuilder.Entity("PRJ4.Models.Budget", b =>
+                {
+                    b.Navigation("Savings");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Kategori", b =>
