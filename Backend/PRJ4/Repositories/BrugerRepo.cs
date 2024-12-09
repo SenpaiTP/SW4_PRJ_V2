@@ -16,6 +16,16 @@ namespace PRJ4.Repositories
             _context = context;
         }
 
+    public async Task<Bruger> GetByIdAsync(string id)
+    {
+        var bruger = await _context.Brugers.FindAsync(id);
+        if (bruger == null)
+        {
+            throw new KeyNotFoundException($"Bruger med id {id} blev ikke fundet.");
+        }
+        return bruger; 
+    }
+
         public async Task<Bruger> AuthenticateAsync(string email, string password)
         {
             var bruger = await _context.Brugers.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
