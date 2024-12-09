@@ -20,13 +20,9 @@ export async function getVudgifter() {
     });
 
     if (!response.ok) {
-      // Handle error response
       const errorText = await response.text();
       throw new Error(`Server error: ${errorText}`);
     }
-
-    // Check the content type of the response
-    //const contentType = response.headers.get("Content-Type");
 
     const data = await response.json(); // Parse the response data
     return data;
@@ -55,12 +51,11 @@ export async function createVudgifter(vudgiftId, pris, tekst, kategoriNavn, dato
         body: JSON.stringify({vudgiftId, pris, tekst, kategoriNavn, dato}),
         });
         if (!response.ok) {
-          // Handle error response
           const errorText = await response.text();
           throw new Error(`Server error: ${errorText}`);
         }
 
-        const data = await response.json(); // Parse the response data
+        const data = await response.json(); 
         return data;
     } catch (error) {
       console.error("Error creating Vudgifter:", error);
@@ -87,12 +82,11 @@ export async function createVudgifter(vudgiftId, pris, tekst, kategoriNavn, dato
         body: JSON.stringify({pris, tekst, dato, kategoriId, kategoriNavn}),
         });
         if (!response.ok) {
-          // Handle error response
           const errorText = await response.text();
           throw new Error(`Server error: ${errorText}`);
         }
 
-        const data = await response.json(); // Parse the response data
+        const data = await response.json(); 
         return data;
     } catch (error) {
       console.error("Error uptading Vudgifter:", error);
@@ -120,12 +114,11 @@ export async function deleteVudgifter(id) {
       });
   
       if (!response.ok) {
-        // Handle error response
         const errorText = await response.text();
         throw new Error(`Server error: ${errorText}`);
       }
   
-      const data = await response.json(); // Parse the response data
+      const data = await response.json(); 
       return data;
     } catch (error) {
       console.error("Error deleting Vudgift:", error);

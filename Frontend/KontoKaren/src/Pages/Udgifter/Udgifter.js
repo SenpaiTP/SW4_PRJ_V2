@@ -16,7 +16,6 @@ function Udgifter() {
         Udgifter
       </Typography>
 
-
       <AmountLimitComponent/>
 
       <UdgifterTableComponent

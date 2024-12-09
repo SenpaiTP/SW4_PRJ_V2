@@ -30,7 +30,6 @@ const AmountLimitComponent = () => {
     console.log('Result:', result);
     if (result) {
       setMessage(isUpdating ? 'Limit updated successfully!' : 'Limit set successfully!');
-      // Refresh the limits after setting or updating a limit
       const data = await getAmountLimit();
       if (data) {
         setLimits(data);
@@ -54,7 +53,6 @@ const AmountLimitComponent = () => {
     console.log('Delete Result:', result);
     if (result) {
       setMessage('Limit deleted successfully!');
-      // Refresh the limits after deleting a limit
       const data = await getAmountLimit();
       if (data) {
         setLimits(data);
@@ -66,7 +64,7 @@ const AmountLimitComponent = () => {
 
   return (
     <div>
-      <h2>{isUpdating ? 'Update Amount Limit' : 'Set Amount Limit'}</h2>
+      <h2>{isUpdating ? 'Update Amount Limit' : 'Sæt beløbsgrænse for kategori'}</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>
@@ -76,7 +74,7 @@ const AmountLimitComponent = () => {
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               required
-              readOnly={isUpdating} // Make the category ID read-only when updating
+              readOnly={isUpdating} 
             />
           </label>
         </div>
@@ -94,7 +92,6 @@ const AmountLimitComponent = () => {
         <button type="submit">{isUpdating ? 'Update Limit' : 'Sæt Beløbsgrænse'}</button>
       </form>
       {message && <p>{message}</p>}
-      <h2>Eksisterende Beløbsgrænser</h2>
       <ul>
         {limits.map((limit) => (
           <li key={limit.kategoryId}>

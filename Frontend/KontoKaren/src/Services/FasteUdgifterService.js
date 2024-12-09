@@ -20,15 +20,11 @@ export async function getFudgifter() {
     });
 
     if (!response.ok) {
-      // Handle error response
       const errorText = await response.text();
       throw new Error(`Server error: ${errorText}`);
     }
 
-    // Check the content type of the response
-    //const contentType = response.headers.get("Content-Type");
-
-    const data = await response.json(); // Parse the response data
+    const data = await response.json(); 
     return data;
   } catch (error) {
     console.error("Error fetching Fudgifter:", error);
@@ -55,13 +51,11 @@ export async function createFudgifter(fudgiftId, pris, tekst, kategoriNavn, dato
         body: JSON.stringify({fudgiftId, pris, tekst, kategoriNavn, dato}),
         });
         if (!response.ok) {
-          // Handle error response
           const errorText = await response.text();
           throw new Error(`Server error: ${errorText}`);
         }
 
-        const data = await response.json(); // Parse the response data
-        return data;
+        const data = await response.json(); 
     } catch (error) {
       console.error("Error creating Fudgifter:", error);
       return null;
@@ -87,12 +81,11 @@ export async function createFudgifter(fudgiftId, pris, tekst, kategoriNavn, dato
         body: JSON.stringify({pris, tekst, dato, kategoriId, kategoriNavn}),
         });
         if (!response.ok) {
-          // Handle error response
           const errorText = await response.text();
           throw new Error(`Server error: ${errorText}`);
         }
 
-        const data = await response.json(); // Parse the response data
+        const data = await response.json(); 
         return data;
     } catch (error) {
       console.error("Error uptading Fudgifter:", error);
@@ -120,12 +113,11 @@ export async function deleteFudgifter(id) {
       });
   
       if (!response.ok) {
-        // Handle error response
         const errorText = await response.text();
         throw new Error(`Server error: ${errorText}`);
       }
   
-      const data = await response.json(); // Parse the response data
+      const data = await response.json(); 
       return data;
     } catch (error) {
       console.error("Error deleting Fudgift:", error);

@@ -1,5 +1,5 @@
 import React from "react";
-import { TableHead, TableRow, TableCell, Typography } from "@mui/material";
+import { TableHead, TableRow, TableCell } from "@mui/material";
 
 export default function TableHeader({ numSelected }) {
   return (

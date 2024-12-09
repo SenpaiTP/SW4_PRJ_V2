@@ -22,9 +22,7 @@ export default function UdgifterTableComponent({ title, initialRows, storageKey,
     handleSave,
     handleChangePage,
     handleChangeRowsPerPage,
-    category,
-    setCategory
-  } = useUdgifterHooks(initialRows, storageKey); // Pass unique storageKey
+  } = useUdgifterHooks(initialRows, storageKey); 
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);

@@ -5,21 +5,17 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { suggestCategory } from '../../../Services/CategoryService';
-import useUdgifterHooks from '../../../Hooks/UseUdgifterHooks';
-import { initialExpenseRows } from '../Table/UdgifterTableData';
 
 const filter = createFilterOptions();
 
 export default function CategorySet({ onCategorySelect, selectedCategory, onNameChange, initialName }) {
-  const { rows } = useUdgifterHooks(initialExpenseRows); // Hent rows fra hooket
-  const [categories, setCategories] = useState([]);
-  const [categoryOptions, setCategoryOptions] = useState(loadCategoriesFromStorage()); // Initial categories
+  const [categoryOptions, setCategoryOptions] = useState(loadCategoriesFromStorage()); 
   const [category, setCategory] = useState(selectedCategory || '');
   const [name, setName] = useState(initialName || '');
-  const [suggestedCategory, setSuggestedCategory] = useState(''); // Foreslået kategori
-  const [suggestedCategoryText, setSuggestedCategoryText] = useState(''); // Vis tekst for foreslået kategori
+  const [suggestedCategory, setSuggestedCategory] = useState(''); // foreslået kategori
+  const [suggestedCategoryText, setSuggestedCategoryText] = useState(''); // vis tekst for foreslået kategori
 
-  // Load categories from localStorage or default categories
+  // load categories fra localStorage eller default categories
   function loadCategoriesFromStorage() {
     const savedCategories = localStorage.getItem('categories');
     return savedCategories
@@ -31,7 +27,7 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
         ];
   }
 
-  // Fjern dubletter og gem kategorier
+  // fjern dubletter og gem kategorier
   useEffect(() => {
     const uniqueCategories = categoryOptions.filter(
       (value, index, self) =>
@@ -42,22 +38,17 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
         )
     );
 
-    // Gem unikke kategorier i localStorage
+    // gem unikke kategorier i localStorage
     localStorage.setItem('categories', JSON.stringify(uniqueCategories));
   }, [categoryOptions]);
 
-  // Debugging log for opdateret state
-  useEffect(() => {
-    console.log('Opdateret state:', { name, category });
-  }, [name, category]);
-
-  // Opdater kategori baseret på forældreprops
+  // opdater kategori baseret på forældreprops
   useEffect(() => {
     console.log('Opdaterer kategori til:', selectedCategory);
     setCategory(selectedCategory || '');
   }, [selectedCategory]);
 
-  // Foreslå kategorier baseret på beskrivelse
+  // foreslå kategorier baseret på beskrivelse
   const handleSuggestCategories = (description) => {
     if (!description || description.trim() === '') {
       console.error('Ingen tekst angivet til kategoriforslag.');
@@ -90,14 +81,14 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
       );
   };
 
-  // Når inputfeltet for udgiftsnavn ændres
+  // når inputfeltet for udgiftsnavn ændres
   const handleUdgiftsnavnChange = (e) => {
     let newName = e.target.value;
     console.log('Udgiftsnavn ændret til:', newName);
   
     const formattedName = newName
       .split(' ') 
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Gør første bogstav stort
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // gør første bogstav stort
       .join(' '); 
   
     setName(formattedName); 
@@ -108,18 +99,18 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
   };
   
 
-  // Når knappen til at tilføje foreslået kategori trykkes
+  // når knappen til at tilføje foreslået kategori trykkes
   const handleAddSuggestedCategory = () => {
     if (suggestedCategory) {
-      setCategory(suggestedCategory); // Tilføj den foreslåede kategori til kategori-inputfeltet
-      setSuggestedCategoryText(''); // Fjern den foreslåede tekst
+      setCategory(suggestedCategory); // tilføj den foreslåede kategori til kategori-inputfeltet
+      setSuggestedCategoryText(''); // fjern den foreslåede tekst
       if (onCategorySelect) {
         onCategorySelect(suggestedCategory);
       }
     }
   };
 
-  // Handle delete category
+  // fandle delete category
   const handleDeleteCategory = (categoryToDelete) => {
     const updatedCategories = categoryOptions.filter(
       (category) => category.categoryName !== categoryToDelete
@@ -140,7 +131,6 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
         onChange={handleUdgiftsnavnChange}
         sx={{ marginBottom: 2, marginTop: 2 }}
       />
-      {console.log('Nuvarande værdi af name:', name)}
 
       {/* Autocomplete til kategorier */}
       <Autocomplete
@@ -192,7 +182,7 @@ export default function CategorySet({ onCategorySelect, selectedCategory, onName
         )}
       />
 
-      {/* Button to suggest categories */}
+      {/* Button til at foreslå categories */}
       <Button
         variant="contained"
         onClick={() => handleSuggestCategories(name)}

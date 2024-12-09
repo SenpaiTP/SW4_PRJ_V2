@@ -15,28 +15,23 @@ export async function suggestCategory(description) {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ description }), // Send only description
+      body: JSON.stringify({ description }), 
     });
 
     if (!response.ok) {
-      // Handle error response
       const errorText = await response.text();
       throw new Error(`Server error: ${errorText}`);
     }
 
-    // Check the content type of the response
     const contentType = response.headers.get("Content-Type");
 
     let suggestedCategory;
 
     if (contentType && contentType.includes("application/json")) {
-      // If the response is JSON, try to parse it
       suggestedCategory = await response.json();
     } else if (contentType && contentType.includes("text/plain")) {
-      // If the response is plain text (like "Miscellaneous"), return it as a string
       suggestedCategory = await response.text();
     } else {
-      // Handle unexpected content types
       throw new Error("Unexpected response format: Neither JSON nor plain text.");
     }
 
@@ -55,22 +50,19 @@ export const handleSuggestCategoriesService = (rows, categoryOptions, setCategor
     return;
   }
 
-  // Ensure categoryOptions is an array
   if (!Array.isArray(categoryOptions)) {
     console.error('categoryOptions er ikke et array!');
-    setCategoryOptions([]); // Reset categoryOptions to an empty array if it's not
+    setCategoryOptions([]); 
     return;
   }
 
   rows.forEach((row) => {
-    // Use row.name as description, as they are the same
     const descriptionName = { description: row.name };
 
     suggestCategory(descriptionName.description).then((category) => {
       if (category) {
         console.log(`Navn: ${row.name}, Foreslået kategori: ${category}`);
 
-        // Check if the category already exists
         const categoryExists = categoryOptions.some(
           (existingCategory) => existingCategory.categoryName.toLowerCase() === category.toLowerCase()
         );
