@@ -19,10 +19,9 @@ public class BudgetRepo: TemplateRepo<Budget>, IBudgetRepo
             .ToListAsync();
     } 
 
-    public async Task<Budget> GetByIdWithKategoriAsync(int id)
-    {
-        return await _context.Budgets
-            .Include(b => b.Kategory)  // Include Kategori-relationen
-            .FirstOrDefaultAsync(b => b.BudgetId == id);  // Find budget med id
-    } 
+    // public async Task<Budget> GetByIdWithKategoriAsync(int id)
+    // {
+    //     return await _context.Budgets // Include Kategori-relationen
+    //         .FirstOrDefaultAsync(b => b.BudgetId == id);  // Find budget med id
+    // } 
 }

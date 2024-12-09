@@ -1,372 +1,244 @@
-using PRJ4.Models;  
+using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PRJ4.Services
 {
-    public class BudgetGoalService: IBudgetGoalService
+    public class BudgetService : IBudgetGoalService
     {
         private readonly IBudgetRepo _budgetRepository;
-        private readonly IKategoriRepo _kategoryRepositry;
-        private readonly IVudgifterService _vudgifterService;
-        private readonly IVudgifterRepo _vudgifterRepository;
+        private readonly ISavingRepo _savingRepository;
+        private readonly ILogger<BudgetService> _logger;
 
-
-        public BudgetGoalService(IBudgetRepo budgetRepository, IKategoriRepo kategoryRepositry, IVudgifterService vudgifterService, IVudgifterRepo vudgifterRepository)
+        public BudgetService(IBudgetRepo budgetRepository, ISavingRepo savingRepository, ILogger<BudgetService> logger)
         {
             _budgetRepository = budgetRepository;
-            _kategoryRepositry = kategoryRepositry;
-            _vudgifterService = vudgifterService;
-            _vudgifterRepository = vudgifterRepository;
-
+            _savingRepository = savingRepository;
+            _logger = logger;
         }
 
-        public async Task<BudgetResponsDTO> GetByIdBudgetGoalAsync(int budgetId, string userId)
+        // Add a new budget
+        public async Task<BudgetResponseDTO> AddBudgetAsync(string userId, BudgetCreateDTO budgetDTO)
         {
-            //Validating parameter
-            if (budgetId <= 0)
-            {
-                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
-            }
-
-            // Get budget from repository
-            var budget = await _budgetRepository.GetByIdAsync(budgetId); 
-            if (budget == null)
-            {
-                throw new KeyNotFoundException($"Budget with id {budgetId} not found.");
-            }
-
-            //Calculate monthly savings and money saved
-            decimal monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
-            decimal savingResult = await CalculateSavingsForCategoryAsync(userId, budget.KategoryId);
-
-            // Return DTO 
-            var budgetReturn = new BudgetResponsDTO
-            {
-                BudgetId = budget.BudgetId,
-                BudgetName = budget.BudgetName,
-                KategoryId = budget.KategoryId,
-                SavingsGoal = budget.SavingsGoal,
-                BudgetSlut = budget.BudgetSlut,
-                MonthlySavingsAmount = monthlysaving,
-                MoneySaved = savingResult
-            };
-
-            return budgetReturn;
-        }
-
-        public async Task<List<BudgetSavingResponsDTO>> GetAllSavingsAsync(int budgetId, string userId)
-        {
-            // Validate parameter
-            if (budgetId <= 0)
-            {
-                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
-            }
-            var budget = await GetByIdBudgetGoalAsync(budgetId, userId);
-            if (budget == null)
-            {
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
-            }
-
-            var udgifter = await _vudgifterRepository.GetAllByCategory(userId, budget.KategoryId);
-            var udgiftReturnListe = new List<BudgetSavingResponsDTO>();
-
-            foreach (var udgift in udgifter)
-            {
-                var saving = new BudgetSavingResponsDTO
-                {
-                    Saving = udgift.Pris,
-                    KategoryId = udgift.KategoriId ?? 0,
-                    Date = udgift.Dato
-                };
-                udgiftReturnListe.Add(saving);
-
-            }
-
-            return udgiftReturnListe;
-
-        }
-
-        public async Task<List<BudgetResponsDTO>> GetAllByUserIdBudgetGoalAsync(string userId)
-        {
-            var budgetListe = await _budgetRepository.GetBudgetsForUserAsync(userId);
-            if (budgetListe == null || !budgetListe.Any())
-            {
-                throw new Exception($"No budgets found for user with ID {userId}");
-            }
-
-            var budgetReturnListe = new List<BudgetResponsDTO>();
-
-            foreach (var budget in budgetListe)
-            {
-                decimal monthlysaving = CalculateMonthlySavings(budget.SavingsGoal,budget.BudgetStart,budget.BudgetSlut);
-                decimal savingResult = await CalculateSavingsForCategoryAsync(userId, budget.KategoryId);
-                
-                var budgetReturn = new BudgetResponsDTO
-                {
-                    BudgetId = budget.BudgetId,
-                    KategoryId = budget.KategoryId,
-                    BudgetName = budget.BudgetName,
-                    SavingsGoal = budget.SavingsGoal,
-                    BudgetSlut = budget.BudgetSlut,
-                    MonthlySavingsAmount = monthlysaving,
-                    MoneySaved = savingResult
-                };
-
-                budgetReturnListe.Add(budgetReturn);
-            }
-
-            return budgetReturnListe;
-        }
-
-
-        public async Task<BudgetCreateDTO> AddBudgetGoalAsync(string brugerId, BudgetCreateDTO budgetDTO)
-        {
-            // Validate parameters
             if (budgetDTO == null)
-            {
-                throw new ArgumentNullException(nameof(budgetDTO), "Budget data cannot be null.");
-            }
+                throw new ArgumentException(nameof(budgetDTO), "Budget data cannot be null.");
 
-            if (string.IsNullOrWhiteSpace(budgetDTO.BudgetName) || budgetDTO.BudgetSlut == default)
+            if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentException("Budget name and end date must be provided.");
+                throw new ArgumentException(nameof(userId), "User ID cannot be null or empty.");
             }
-
-            // Validate enddate 
-            var today = DateOnly.FromDateTime(DateTime.Now);
-            if (budgetDTO.BudgetSlut <= today)
-            {
-                throw new ArgumentException("Budget end date must be in the future.");
-            }
-            if (budgetDTO.BudgetSlut > today.AddYears(10))
-            {
-                throw new ArgumentException("Budget end date cannot be more than 10 years from today.");
-            }
-
-            // Validate savingGoal
-            if (budgetDTO.SavingsGoal <= 0)
-            {
-                throw new ArgumentException("Savings goal must be greater than zero.");
-            }
-
-            if (budgetDTO.SavingsGoal > 10_000_000)
-            {
-                throw new ArgumentException("Savings goal cannot exceed 10,000,000.");
-            }
-
-            //New kategory
-            var kategoryName = $"Opsparing: {budgetDTO.BudgetName}";
-            var kategori = await _kategoryRepositry.NyKategori(kategoryName);
-            if (kategori == null)
-            {
-                throw new InvalidOperationException($"Failed to create or retrieve category '{kategoryName}'.");
-            }
+            if (string.IsNullOrEmpty(budgetDTO.BudgetName))
+                throw new ArgumentException("Budget name cannot be null or empty.", nameof(budgetDTO.BudgetName));
             
-            //New budget
+            if (budgetDTO.SavingsGoal < 0)
+                throw new ArgumentOutOfRangeException(nameof(budgetDTO.SavingsGoal), "Savings goal cannot be negative.");
+
+            if (budgetDTO.BudgetSlut < DateOnly.FromDateTime(DateTime.Now))
+                throw new ArgumentOutOfRangeException(nameof(budgetDTO.BudgetSlut), "Budget end date cannot be in the past.");
+
             var budget = new Budget
             {
                 BudgetName = budgetDTO.BudgetName,
-                KategoryId = kategori.KategoriId,
-                BrugerId = brugerId,
+                BrugerId = userId,
                 SavingsGoal = budgetDTO.SavingsGoal,
-                BudgetStart =  DateOnly.FromDateTime(DateTime.Now),
-                BudgetSlut = budgetDTO.BudgetSlut
+                BudgetStart = DateOnly.FromDateTime(DateTime.Now),
+                BudgetSlut = budgetDTO.BudgetSlut,
+                Savings = new List<Saving>() // Initialize the collection of savings
             };
 
-          
-            //Add and save the budget
-            var createdBudget = await _budgetRepository.AddAsync(budget);
-            await _budgetRepository.SaveChangesAsync();
-
-
-            // Map det oprettede budget til BudgetCreateDTO
-            var createdBudgetDTO = new BudgetCreateDTO
-            {
-                BudgetName = createdBudget.BudgetName,
-                SavingsGoal = createdBudget.SavingsGoal,
-                BudgetSlut = createdBudget.BudgetSlut
-            };
-
-            //Return created budget
-            return createdBudgetDTO;
-
-        }
-
-        public async Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string user, BudgetSavingCreateDTO savingDTO)
-        {
-            // Validate for parameter
-            if (savingDTO == null)
-            {
-                throw new ArgumentNullException(nameof(savingDTO), "Saving data cannot be null.");
-            }
-            if (budgetId <= 0)
-            {
-                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
-            }
-
-            var budget = await GetByIdBudgetGoalAsync(budgetId, user);
-            if (budget == null)
-            {
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found for user {user}.");
-            }
-            
-      
-            var kategory = await _kategoryRepositry.GetByIdAsync(budget.KategoryId);
-            if (budget == null)
-            {
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found for user {user}.");
-            }
-    
-            var saving = new nyVudgifterDTO
-            {
-                KategoriNavn = kategory.KategoriNavn,
-                KategoriId = budget.KategoryId,
-                Pris = savingDTO.Saving, 
-                Dato = savingDTO.Date
-            };
-            
-            var savingAdded = await _vudgifterService.AddVudgifter(user, saving); 
-            await _budgetRepository.SaveChangesAsync();
-            
-            return savingAdded;
-
-        }
-
-
-        public async Task<BudgetUpdateDTO> UpdateBudgetGoalAsync(int id, BudgetUpdateDTO budgetDTO)
-        {
-            // Validate parameter
-            if (budgetDTO == null)
-            {
-                throw new ArgumentException("Invalid budget data.");
-            }
-
-            //Validate budgetName
-            if (string.IsNullOrWhiteSpace(budgetDTO.BudgetName))
-            {
-                throw new ArgumentException("Budget name cannot be empty.");
-            }
-
-            // Validate savingGoal
-            if (budgetDTO.SavingsGoal <= 0)
-            {
-                throw new ArgumentException("Savings goal must be greater than zero.");
-            }
-
-            // Validate enddate
-            if (budgetDTO.BudgetSlut <= DateOnly.FromDateTime(DateTime.Now))
-            {
-                throw new ArgumentException("Budget end date must be in the future.");
-            }
-
-            var existingBudget = await _budgetRepository.GetByIdAsync(id);
-            if (existingBudget == null)
-            {
-                throw new KeyNotFoundException($"Budget with ID {id} not found.");
-            }
-
-            existingBudget.BudgetName = budgetDTO.BudgetName;
-            existingBudget.SavingsGoal = budgetDTO.SavingsGoal;
-            existingBudget.BudgetSlut = budgetDTO.BudgetSlut;
-            
             try
-            { 
+            {
+                await _budgetRepository.AddAsync(budget); // Assuming AddAsync is a method in the repo
                 await _budgetRepository.SaveChangesAsync();
+
+                _logger.LogInformation($"Successfully added budget {budget.BudgetName} for user {userId}.");
+                return new BudgetResponseDTO
+                {
+                    BudgetId = budget.BudgetId,
+                    BudgetName = budget.BudgetName,
+                    SavingsGoal = budget.SavingsGoal,
+                    BudgetSlut = budget.BudgetSlut
+                };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("Could not update budget.", ex);
+                _logger.LogError($"Error while adding budget: {ex.Message}");
+                throw new InvalidOperationException("Could not save the new budget.");
             }
-
-            var updatedBudgetDTO = new BudgetUpdateDTO
-            {
-                BudgetName = existingBudget.BudgetName,
-                SavingsGoal = existingBudget.SavingsGoal,
-                BudgetSlut = existingBudget.BudgetSlut
-            };
-
-            return updatedBudgetDTO;
-
         }
 
-        public async Task DeleteBudgetAsync(int budgetId)
+        // Get a specific budget by ID
+        public async Task<BudgetResponseDTO> GetBudgetByIdAsync(int budgetId, string userId)
         {
             if (budgetId <= 0)
-            {
-                throw new ArgumentException("Invalid budget ID. ID must be greater than zero.");
-            }
+                throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
 
             var budget = await _budgetRepository.GetByIdAsync(budgetId);
-            if (budget == null)
-            {
-                 throw new KeyNotFoundException($"The budget with ID {budgetId} does not exist and cannot be deleted.");
-            }
+            if (budget == null || budget.BrugerId != userId) 
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
 
-            var deletedBudget = await _budgetRepository.Delete(budgetId);
-            await _budgetRepository.SaveChangesAsync();
+            try
+            {
+                decimal monthlyAmount = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut);
+                decimal result = await CalculateMoneySaved(budget.BudgetId);
+                return new BudgetResponseDTO
+                {
+                    BudgetId = budget.BudgetId,
+                    BudgetName = budget.BudgetName,
+                    SavingsGoal = budget.SavingsGoal,
+                    BudgetSlut = budget.BudgetSlut,
+                    MonthlySavingsAmount = monthlyAmount,
+                    MoneySaved = result
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while retrieving budget with ID {budgetId}: {ex.Message}");
+                throw new InvalidOperationException("Could not retrieve the budget.");
+            }
         }
 
-//Calculations
-        public decimal CalculateMonthlySavings(int savingsGoal, DateOnly budgetStart, DateOnly budgetSlut)
+        // Get all budgets for a user
+        public async Task<List<BudgetResponseDTO>> GetAllBudgetsAsync(string userId)
+        {
+            
+                var budgets = await _budgetRepository.GetBudgetsForUserAsync(userId);
+                if (budgets == null || !budgets.Any())
+                    throw new KeyNotFoundException($"No budgets found for user {userId}.");
+                if (budgets.Any(b => b.BrugerId != userId))
+                    throw new UnauthorizedAccessException($"One or more budgets do not belong to user {userId}.");
+
+
+            try
+            {
+                var budgetResponses = new List<BudgetResponseDTO>();
+
+                // Brug en foreach-loop til at bearbejde hvert budget og beregne MoneySaved
+                foreach (var budget in budgets)
+                {
+                    var moneySaved = await CalculateMoneySaved(budget.BudgetId);
+
+                    var budgetResponse = new BudgetResponseDTO
+                    {
+                        BudgetId = budget.BudgetId,
+                        BudgetName = budget.BudgetName,
+                        SavingsGoal = budget.SavingsGoal,
+                        BudgetSlut = budget.BudgetSlut,
+                        MonthlySavingsAmount = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut),
+                        MoneySaved = moneySaved
+                    };
+
+                    budgetResponses.Add(budgetResponse);
+                }
+                            return budgetResponses.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while retrieving all budgets for user {userId}: {ex.Message}");
+                throw new InvalidOperationException("Could not retrieve the budgets.");
+            }
+        }
+
+        // Update a budget's details
+        public async Task<BudgetResponseDTO> UpdateBudgetAsync(int budgetId, string userId, BudgetUpdateDTO budgetUpdateDTO)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+
+            if (budgetUpdateDTO == null)
+                throw new ArgumentException(nameof(budgetUpdateDTO), "Budget data cannot be null.");
+            
+            var budget = await _budgetRepository.GetByIdAsync(budgetId);
+            if (budget == null)
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
+
+            if (budget.BrugerId != userId)
+                throw new UnauthorizedAccessException($"Budget with ID {budgetId} does not belong to user {userId}.");
+
+            if (string.IsNullOrEmpty(budgetUpdateDTO.BudgetName))
+                throw new ArgumentException("Budget name cannot be null or empty.", nameof(budgetUpdateDTO.BudgetName));
+
+            if (budgetUpdateDTO.SavingsGoal < 0)
+                throw new ArgumentException(nameof(budgetUpdateDTO.SavingsGoal), "Savings goal cannot be negative.");
+
+            if (budgetUpdateDTO.BudgetSlut <= DateOnly.FromDateTime(DateTime.Now))
+                throw new ArgumentException(nameof(budgetUpdateDTO.BudgetSlut), "Budget end date must be in the future.");
+
+            try
+            {
+                budget.BudgetName = budgetUpdateDTO.BudgetName;
+                budget.SavingsGoal = budgetUpdateDTO.SavingsGoal;
+                budget.BudgetSlut = budgetUpdateDTO.BudgetSlut;
+
+                await _budgetRepository.SaveChangesAsync();
+
+                return new BudgetResponseDTO
+                {
+                    BudgetId = budget.BudgetId,
+                    BudgetName = budget.BudgetName,
+                    SavingsGoal = budget.SavingsGoal,
+                    BudgetSlut = budget.BudgetSlut
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while updating budget with ID {budgetId}: {ex.Message}");
+                throw new InvalidOperationException("Could not update the budget.");
+            }
+        }
+
+        // Delete a budget
+        public async Task DeleteBudgetAsync(int budgetId, string userId)
+        {
+            if (budgetId <= 0)
+                throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
+
+            var budget = await _budgetRepository.GetByIdAsync(budgetId);
+            if (budget == null || budget.BrugerId != userId) 
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
+
+            try
+            {
+                await _budgetRepository.Delete(budget.BudgetId);
+                await _budgetRepository.SaveChangesAsync();
+
+                _logger.LogInformation($"Successfully deleted budget with ID {budgetId} for user {userId}.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while deleting budget with ID {budgetId}: {ex.Message}");
+                throw new InvalidOperationException("Could not delete the budget.");
+            }
+        }
+
+        public int CalculateMonthlySavings(int savingsGoal, DateOnly budgetStart, DateOnly budgetSlut)
         {
             if (budgetSlut <= budgetStart)
             {
                 throw new ArgumentException("Budget end date must be after start date.");
             }
-            if (savingsGoal <= 0)
-            {
-                throw new ArgumentException("Savings goal must be greater than zero.");
-            }
-
-            // Calculate number of days form start to enddate
-            var startDate = budgetStart.ToDateTime(new TimeOnly(0, 0)); // Konverter startdato til DateTime
-            var endDate = budgetSlut.ToDateTime(new TimeOnly(23, 59));  // Konverter slutdato til DateTime
-
-            var totalDays = (endDate - startDate).Days;
-
-            // Calculate total months
-            var totalMonths = (totalDays / 30.0); // Brug gennemsnit af dage pr. måned (30 dage)
-
+            //Find the monthly difference   
+            int monthsToSave = ((budgetSlut.Year - budgetStart.Year) * 12) + budgetSlut.Month - budgetStart.Month;
+           
             //Check if there are months to save 
-            if (totalMonths > 0)
+            if (monthsToSave > 0)
             {
                 //calculate monthly savings
-                return (int)(savingsGoal / totalMonths);
+                return savingsGoal / monthsToSave;
             }
 
             return 0;
         }
 
-
-        private async Task<decimal> CalculateSavingsForCategoryAsync(string userId, int categoryId)
+        public async Task<decimal> CalculateMoneySaved(int budgetId)
         {
-            // Validate parameters
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentException("UserId cannot be null or empty.");
-            }
-            
-            if (categoryId <= 0)
-            {
-                throw new ArgumentException("CategoryId must be greater than zero.");
-            }
 
-            var udgifter = await _vudgifterRepository.GetAllByCategory(userId, categoryId);
+            // Hent udgifterne for opsparingen
+            var fudgifter = await _savingRepository.GetAllByBudgetIdAsync(budgetId);
 
-            decimal savingResult = 0;
-            foreach (var udgift in udgifter)
-            {
-                savingResult += udgift.Pris;
-            }
-
-            return savingResult;
+            // Beregn summen af opsparingsbeløbet
+            return fudgifter.Sum(f => f.Amount);
         }
-
-      
-
-
-
     }
 }
