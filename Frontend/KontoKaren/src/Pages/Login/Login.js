@@ -26,7 +26,7 @@ function Login({ setUserFullName }) {
     Object.keys(formErrors).forEach((key) => (formErrors[key] = ''));
 
     // Tjek om email er gyldig
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$/;
     if (!email) {
       formErrors.email = 'Email er påkrævet';
       formValid = false;
