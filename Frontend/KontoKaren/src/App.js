@@ -13,6 +13,7 @@ import ResetPassword from './Pages/Login/ResetPassword';
   import Indstillinger from './Pages/Indstillinger/Indstillinger';
   import ThemeProvider from './Pages/Indstillinger/ThemeProvider';
 import LoggedInPage from './Pages/LoggedInPage/test';
+import Udgifter from './Pages/Udgifter/Udgifter';
 
 function App() {
   const [userFullName, setUserFullName] = useState(null);
@@ -47,7 +48,8 @@ function App() {
         <Header userFullName={userFullName} />
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/indtægter" element={<Indtægter />} />
+          <Route path="/Indtægter" element={<Indtægter />} />
+          <Route path="/Udgifter" element={<Udgifter />} />
           <Route path="/Budget" element={<Budget />} />
           <Route path="/Login" element={<Login setUserFullName={setUserFullName} />} />
           <Route path="/Indstillinger" element={<Indstillinger />} />

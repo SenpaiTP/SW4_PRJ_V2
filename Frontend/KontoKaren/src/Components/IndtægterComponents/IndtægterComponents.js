@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from "react"; 
-import { Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell } from "@mui/material"; 
+import React, { useState } from "react"; 
+import { Container, Box, Paper, Table, TableContainer, IconButton, Button, TableCell, TablePagination} from "@mui/material"; 
 import { Edit, Delete } from "@mui/icons-material"; 
-import TableBody from "./Table/TableBody"; 
-import TableHeader from "./Table/TableHeader"; 
+import TableBody from "./Table/IndtægterTableBody"; 
+import TableHeader from "./Table/IndtægterTableHeader"; 
 import PieChart from "./PieChart/PieChart"; 
-import './Table/Table.css'; 
 import { initialRows } from "./Table/TableData"; 
 import AddIncomeDialog from "./Dialog/AddIncomeDialog"; 
 import EditIncomeDialog from "./Dialog/EditIncomeDialog"; 
 import useIndtægterHooks from "../../Hooks/IndtægterHooks"; 
-import fetchIncomes from "./Dialog/FetchAllIndtægt";
+import './Table/IndtægterTable.css'
+import { initialRows } from "./Table/IndtægterTableData"; 
+import AddIncomeDialog from "./Dialog/AddIndtægterDialog"; 
+import EditIncomeDialog from "./Dialog/EditIndtægterDialog"; 
+import useIndtægterHooks from "../../Hooks/UseIndtægterHooks"; 
 
-export default function IndtægterTabel() {
+export default function IndtægterTable() {
   // bruger hooks til at håndtere logikken i tabellen
   const {
     rows, // data i tabellen
     selected, // valgte rækker
-    page, // sktuel side
-    rowsPerPage, // antal rækker pr. side
     handleClick, // håndtering af klik på rækker
     handleAddRow, // tilføjelse af en ny række
     handleEditRow, // redigering af en række
@@ -100,6 +101,8 @@ const fetchIncomes = async () => {
 //   }
 // };
 
+  const [page, setPage] = useState(0); // current page
+  const [rowsPerPage, setRowsPerPage] = useState(5); // rows per page
 
   // ppretter data til PieChart
   const chartData = rows.map((row) => ({
@@ -133,6 +136,18 @@ const fetchIncomes = async () => {
     setOpenEditDialog(false);
   };
 
+
+   // Handle changing pages in pagination
+   const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle changing rows per page
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when changing rows per page
+  };
+
   return (
     <Container sx={{ display: "flex", paddingLeft: 0, paddingRight: 0 }}>
       {/* venstre side: tabel og knapper */}
@@ -161,6 +176,19 @@ const fetchIncomes = async () => {
               />
             </Table>
           </TableContainer>
+
+              {/* Pagination Controls */}
+              <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Rækker per side" // Custom label
+
+          />
         </Paper>
 
         {/* knapper til at tilføje eller gemme ændringer */}

@@ -1,17 +1,16 @@
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using PRJ4.Data;
-using PRJ4.Models;
+// using Microsoft.EntityFrameworkCore;
+// using System;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Threading.Tasks;
+// using PRJ4.Data;
+// using PRJ4.Models;
 
-namespace PRJ4.Repositories
-{
-    public interface IBrugerRepo : ITemplateRepo<Bruger>
-    {
-        Task<Bruger> AuthenticateAsync(string email, string password);
-        Task<Bruger> GetByIdAsync(string id);
-        // Task<Bruger> GetByEmailAsync(string email);
-    }
-}
+// namespace PRJ4.Repositories
+// {
+//     public interface IBrugerRepo : ITemplateRepo<Bruger>
+//     {
+//         Task<Bruger> AuthenticateAsync(string email, string password);
+//         // Task<Bruger> GetByEmailAsync(string email);
+//     }
+// }
