@@ -9,6 +9,7 @@ using PRJ4.Repositories;
 using PRJ4.Data;
 using PRJ4.Models;
 using PRJ4.Services;
+using PRJ4.Services; // Add this line if BudgetGoalService is in the PRJ4.Services.Budget namespace
 using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Mappings;
@@ -17,6 +18,8 @@ using Serilog.Events;
 using MongoDB.Driver;
 using PRJ4.Services;
 using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using DnsClient.Protocol;
 
 
 
@@ -67,8 +70,11 @@ builder.Services.AddIdentity<ApiUser, IdentityRole>(options =>
         options.Password.RequireNonAlphanumeric = true;
         options.Password.RequiredLength = 2;
         })
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
+    o.TokenLifespan = TimeSpan.FromHours(2));
 builder.Services.AddAuthentication(options=>
     {
     options.DefaultAuthenticateScheme =
@@ -89,14 +95,26 @@ builder.Services.AddAuthentication(options=>
         };
     options.Events = new JwtBearerEvents
     {
-        OnTokenValidated = context =>
+        OnTokenValidated = async context =>
         {
-            var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
-            foreach (var claim in claims)
+            var token =context.SecurityToken as JwtSecurityToken;
+            if (token !=null)
             {
-                Console.WriteLine(claim);  // Log claims to verify them
+                var TokenId=token.RawData;
+                var revocationService=context.HttpContext.RequestServices.GetRequiredService<IRevocationService>();
+                var tokenIsRevoked=await revocationService.IsTokenRevokedAsync(TokenId);
+
+                if(tokenIsRevoked)
+                {
+                    context.Fail("Token is revoked");
+                }
             }
-            return Task.CompletedTask;
+            // var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
+            // foreach (var claim in claims)
+            // {
+            //     Console.WriteLine(claim);  // Log claims to verify them
+            // }
+            // return Task.CompletedTask;
         }
     };
     });
@@ -107,7 +125,6 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     return client.GetDatabase(mongoDatabaseName);
 });
 
-
 //Register mapping profiles
 //builder.Services.AddAutoMapper(typeof(FudgifterProfile));
 //builder.Services.AddAutoMapper(typeof(VudgifterProfile));
@@ -117,29 +134,29 @@ var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
-builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
-//builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
 builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
-//builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
-//builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+builder.Services.AddScoped<ISavingRepo,SavingRepo>();
+builder.Services.AddScoped<ITemplateRepo<Saving>,SavingRepo>();
+builder.Services.AddScoped<ISavingService,SavingService>();
+
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();
-//builder.Services.AddScoped<IFudgifterService,FudgifterService>();
-//builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+
 
 builder.Services.AddScoped<IFudgifterRepo, FudgifterRepo>();
+
+// Build Indstillinger:
+builder.Services.AddScoped<IIndstillingerRepo, IndstillingerRepo>();
+builder.Services.AddScoped<IIndstillingerService, IndstillingerService>();
 
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
 builder.Services.AddScoped<IBudgetGoalService,BudgetService>();
-builder.Services.AddScoped<ISavingRepo,SavingRepo>();
-builder.Services.AddScoped<ITemplateRepo<Saving>,SavingRepo>();
-builder.Services.AddScoped<ISavingService,SavingService>();
+builder.Services.AddScoped<IRevocationService,RevocationService>();
 
 //Build Kategory Limit
 builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();
@@ -153,6 +170,12 @@ builder.Services.AddScoped<IVindtægtService, VindtægtService>();
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
+builder.Services.AddSingleton(provider =>
+    new EmailService(
+        "MailGun:ApiKey", // Replace with your Mailgun API key
+        "sandboxf55113ec9eef4f6580a316b419167ded.mailgun.org" // Replace with your Mailgun domain
+    )
+);
 builder.Services.AddControllers();
 string openAiKey = builder.Configuration["OpenAI:ApiKey"];
 builder.Services.AddSingleton(new OpenAIClient(openAiKey));
@@ -180,3 +203,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+    

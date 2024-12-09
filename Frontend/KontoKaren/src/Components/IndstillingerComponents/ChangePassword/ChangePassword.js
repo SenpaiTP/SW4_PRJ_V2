@@ -3,6 +3,10 @@ import { Typography, TextField, Button, Box } from "@mui/material";
 //import React from "react";
 import React, { useState } from 'react';
 
+/*const API_URL = 'http://localhost:5168/api';
+
+const getAuthToken = () => localStorage.getItem('authToken');*/
+
 function ChangePassword()
  {
   const [email, setEmail] = useState('');
@@ -70,16 +74,20 @@ function ChangePassword()
     setLoading(true); // Start loading
     setSuccessMessage(''); // Reset success message
     try {
-      const response = await fetch('https://your-backend-api-url.com/change-password', {
+      const response = await fetch('http://localhost:5168/Account/changepassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Assuming a token is stored in localStorage
         },
-        body: JSON.stringify({ email, currentPassword, newPassword }),
+        body: JSON.stringify({ 
+          CurrentPassword: currentPassword,
+          NewPassword: newPassword,
+          ConfirmPassword:confirmNewPassword 
+        }),
       });
 
-      const data = await response.json();
+      const data = await response.text();
 
       if (response.ok) {
         setSuccessMessage('Password changed successfully!');
@@ -101,7 +109,7 @@ function ChangePassword()
   return (
     <Box sx={{ maxWidth: 400, margin: '0 auto', padding: 2 }}>
       <Typography variant="h5" gutterBottom>
-        Change Password
+        Ændre kodeord
       </Typography>
       {successMessage && (
         <Typography color="success.main" gutterBottom>
@@ -122,7 +130,7 @@ function ChangePassword()
         <TextField
           fullWidth
           margin="normal"
-          label="Current Password"
+          label="Nuværende kodeord"
           type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
@@ -132,7 +140,7 @@ function ChangePassword()
         <TextField
           fullWidth
           margin="normal"
-          label="New Password"
+          label="Nyt kodeord"
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
@@ -142,7 +150,7 @@ function ChangePassword()
         <TextField
           fullWidth
           margin="normal"
-          label="Confirm New Password"
+          label="Gentag nyt kodeord"
           type="password"
           value={confirmNewPassword}
           onChange={(e) => setConfirmNewPassword(e.target.value)}
@@ -157,7 +165,7 @@ function ChangePassword()
           disabled={loading}
           sx={{ mt: 2 }}
         >
-          {loading ? 'Changing...' : 'Change Password'}
+          {loading ? 'Ændrer...' : 'Gem nyt kodeord'}
         </Button>
       </form>
     </Box>

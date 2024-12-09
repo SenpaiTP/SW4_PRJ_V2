@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 function Header({ userFullName }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const token = localStorage.getItem('authToken');
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -14,7 +15,30 @@ function Header({ userFullName }) {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try{
+      const response = await fetch(('http://localhost:5168/Account/Logout'), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },  
+        method: 'POST',
+      });
+
+      console.log({token});
+      console.log("Stored Token:", localStorage.getItem('authToken'));
+      
+
+    if(response.ok){
+      localStorage.removeItem('authToken'); // Remove token on logout
+      window.location.reload();
+      navigate('/'); // Redirect to login page after logout
+      
+    }
+    
+    }catch(error){
+      console.error('Logout failed:', error);
+    }
+
     localStorage.removeItem('authToken'); // Remove token on logout
     navigate('/login'); // Redirect to login page after logout
     handleClose();
@@ -32,8 +56,11 @@ function Header({ userFullName }) {
         <Button color="inherit" component={Link} to="/">
           Home
         </Button>
-        <Button color="inherit" component={Link} to="/indtægter">
+        <Button color="inherit" component={Link} to="/Indtægter">
           Indtægter
+        </Button>
+        <Button color="inherit" component={Link} to="/Udgifter">
+          Udgifter
         </Button>
         <Button color="inherit" component={Link} to="/Budget">
           Budget

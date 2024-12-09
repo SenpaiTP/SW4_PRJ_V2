@@ -11,8 +11,9 @@ import ResetPassword from './Pages/Login/ResetPassword';
 
   // Indstillinger page
   import Indstillinger from './Pages/Indstillinger/Indstillinger';
-  import ThemeProvider from './Pages/Indstillinger/ThemeProvider';
-import LoggedInPage from './Pages/LoggedInPage/test';
+  import ThemeProvider from './Components/IndstillingerComponents/Theme/ThemeProvider';
+  import LoggedInPage from './Pages/LoggedInPage/test';
+  import Udgifter from './Pages/Udgifter/Udgifter';
 
 function App() {
   const [userFullName, setUserFullName] = useState(null);
@@ -41,13 +42,14 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
+    <ThemeProvider >
     <Router>
       <div className="App">
         <Header userFullName={userFullName} />
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/indtægter" element={<Indtægter />} />
+          <Route path="/Indtægter" element={<Indtægter />} />
+          <Route path="/Udgifter" element={<Udgifter />} />
           <Route path="/Budget" element={<Budget />} />
           <Route path="/Login" element={<Login setUserFullName={setUserFullName} />} />
           <Route path="/Indstillinger" element={<Indstillinger />} />
@@ -59,6 +61,7 @@ function App() {
       </div>
     </Router>
     </ThemeProvider>
+    
   );
 }
 
