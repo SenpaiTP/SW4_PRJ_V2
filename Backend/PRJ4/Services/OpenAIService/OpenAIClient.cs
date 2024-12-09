@@ -16,21 +16,23 @@ namespace PRJ4.Services
 
         public OpenAIClient(string apiKey)
         {
-           
+
             // Initialize the OpenAI client with the provided API key
             ChatClient client = new(model: "gpt-4o", apiKey: apiKey);
             _client = client;
         }
 
-        public async Task<string> GetCategorySuggestion(string description,  IEnumerable<Kategori> currentCategories)
+        public async Task<string> GetCategorySuggestion(string description, IEnumerable<Kategori> currentCategories)
         {
             string categoriesList = string.Join(", ", currentCategories.Select(c => c.KategoriNavn));
-            var prompt = $"Suggest a category with a 1 word respone, for the following expense or income: '{description}', if a existing category all ready exist from this list of categories use that or create a new one that matches better {categoriesList}.";
+            var prompt = $"Foreslå en kategori med 1 ord svar, for følgende udgift eller indtægt: '{description}', hvis en eksisterende kategori allerede eksisterer fra denne liste over kategorier, skal du bruge den eller oprette en ny, der passer bedre {categoriesList}. Svar på dansk.";
+
+            
 
             // Create a request for chat completion
-            var chatRequest = _client.CompleteChat("{promt}",prompt);
+            var chatRequest = _client.CompleteChat("{promt}", prompt);
             var repsonsechat = chatRequest.Value.Content[0].Text;
-            if(repsonsechat == null)
+            if (repsonsechat == null)
             {
                 return null;
             }
