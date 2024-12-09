@@ -11,6 +11,7 @@ namespace PRJ4.Repositories
     public interface IBrugerRepo : ITemplateRepo<Bruger>
     {
         Task<Bruger> AuthenticateAsync(string email, string password);
+        Task<Bruger> GetByIdAsync(string id);
         // Task<Bruger> GetByEmailAsync(string email);
     }
 }
