@@ -1,8 +1,4 @@
-
-// Function to create data
-export function createData(id, name, price, date) {
-  return { id, name, price, date };
-}
+import { createData } from "../../../Utils/CreateData";
 
 // Initial data example
 export const initialRows = [
