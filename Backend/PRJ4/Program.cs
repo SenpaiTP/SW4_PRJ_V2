@@ -117,26 +117,24 @@ var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IBrugerRepo, BrugerRepo>();
-builder.Services.AddScoped<ITemplateRepo<Bruger>, BrugerRepo>();
-//builder.Services.AddScoped<IBrugerService, BrugerService>();
 builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
 builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
-//builder.Services.AddScoped<IFudgifter, FudgifterRepo>();
-//builder.Services.AddScoped<IVudgifter, VudgifterRepo>();
+
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();
-//builder.Services.AddScoped<IFudgifterService,FudgifterService>();
-//builder.Services.AddScoped<IVudgifterService,VudgifterService>();
+
 
 builder.Services.AddScoped<IFudgifterRepo, FudgifterRepo>();
 
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
-builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
+builder.Services.AddScoped<IBudgetGoalService,BudgetService>();
+builder.Services.AddScoped<ISavingRepo,SavingRepo>();
+builder.Services.AddScoped<ITemplateRepo<Saving>,SavingRepo>();
+builder.Services.AddScoped<ISavingService,SavingService>();
 
 //Build Kategory Limit
 builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();

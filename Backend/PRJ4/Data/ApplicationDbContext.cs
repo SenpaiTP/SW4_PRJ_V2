@@ -23,12 +23,13 @@ public partial class ApplicationDbContext : IdentityDbContext<ApiUser>
     public DbSet<Findtægt> Findtægter { get; set; }
     // public DbSet<Vindtægter> Vindtægters { get; set; }
     public DbSet<Vudgifter> Vudgifters { get; set; }
-    public DbSet<Bruger> Brugers { get; set; }
+    //public DbSet<Bruger> Brugers { get; set; }
     public DbSet<ApiUser> ApiUsers { get; set; }
     public DbSet<LoginModel> LoginModels { get; set; }
     public DbSet<Budget> Budgets { get; set; }
 
     public DbSet<KategoryLimit> KategoryLimits { get; set; }
+     public DbSet<Saving> Savings { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
   

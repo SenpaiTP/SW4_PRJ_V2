@@ -6,8 +6,12 @@ namespace PRJ4.Services
 {
     public interface IKategoryLimitService
     {
-        Task<KategoryLimitGetDTO> GetByIdKategoryLimitAsync(int id);
-        Task<KategoryLimitGetDTO> AddKategoryLimitAsync(string brugerId, KategoryLimitReturnDTO limitDTO);
+        Task<List<KategoryLimitResponseDTO>> GetAllKategoryLimits(string userId);
+        Task<KategoryLimitResponseDTO> GetByIdKategoryLimits(int kategoryId, string userId);
+        Task<KategoryLimitResponseDTO> AddKategoryLimitAsync(KategoryLimitCreateDTO kategoryLimitDTO, string userId);
+        Task<KategoryLimitResponseDTO> UpdateKategoryLimitAsync(int kategoryId, string userId, KategoryLimitUpdateDTO kategoryLimitDTO);
+        Task DeleteKategoryLimitAsync(int kategoryId, string userId);
+
   
     }
 }

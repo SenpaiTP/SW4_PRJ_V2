@@ -12,8 +12,8 @@ using PRJ4.Data;
 namespace PRJ4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241202103830_001-InitialCreate")]
-    partial class _001InitialCreate
+    [Migration("20241206111818_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,11 +229,8 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Bruger", b =>
                 {
-                    b.Property<int>("BrugerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BrugerId"));
+                    b.Property<string>("BrugerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Efternavn")
                         .IsRequired()
@@ -268,8 +265,8 @@ namespace PRJ4.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("BrugerId1")
-                        .HasColumnType("int");
+                    b.Property<string>("BrugerId1")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BudgetName")
                         .IsRequired()
