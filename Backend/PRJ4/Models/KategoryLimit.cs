@@ -7,15 +7,15 @@ public partial class KategoryLimit
 {
     [Key]
     public int KategoryLimitId { get; set; }
-    public int KategoryId { get; set; }
     public string BrugerId { get; set; }
+    public int KategoryId { get; set; }
     public int Limit { get; set; }
     
 //ForeignKeys
+    [ForeignKey(nameof(BrugerId))]
+    public ApiUser Bruger { get; set; }
+
     [ForeignKey(nameof(KategoryId))]
     public Kategori Kategory { get; set; }
-
-    [ForeignKey(nameof(BrugerId))]
-    public ApiUser? Bruger { get; set; }
 
 }

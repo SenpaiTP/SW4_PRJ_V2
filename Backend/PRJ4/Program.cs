@@ -136,10 +136,7 @@ builder.Services.AddScoped<IFudgifterRepo, FudgifterRepo>();
 //Build Budgets
 builder.Services.AddScoped<IBudgetRepo,BudgetRepo>();
 builder.Services.AddScoped<ITemplateRepo<Budget>,BudgetRepo>();
-builder.Services.AddScoped<IBudgetGoalService,BudgetService>();
-builder.Services.AddScoped<ISavingRepo,SavingRepo>();
-builder.Services.AddScoped<ITemplateRepo<Saving>,SavingRepo>();
-builder.Services.AddScoped<ISavingService,SavingService>();
+builder.Services.AddScoped<IBudgetGoalService,BudgetGoalService>();
 
 //Build Kategory Limit
 builder.Services.AddScoped<IKategoryLimitRepo,KategoryLimitRepo>();
