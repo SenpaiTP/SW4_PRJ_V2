@@ -17,9 +17,30 @@ function LoggedInPage() {
     <div>
       <h1>Welcome to the User Dashboard!</h1>
       <p>You are logged in and can access this page.</p>
-      <button onClick={() => {
-        localStorage.removeItem('authToken'); // Remove token on logout
-        navigate('/login'); // Redirect to login page after logout
+      <button onClick={async () => {
+        try{
+          const response = await fetch(('http://localhost:5168/Account/Logout'), {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },  
+            method: 'POST',
+          });
+
+          console.log({token});
+          console.log("Stored Token:", localStorage.getItem('authToken'));
+
+        if(response.ok){
+          localStorage.removeItem('authToken'); // Remove token on logout
+          navigate('/login'); // Redirect to login page after logout
+          
+        }
+        
+        }catch(error){
+          console.error('Logout failed:', error);
+        }
+
+        // localStorage.removeItem('authToken'); // Remove token on logout
+        // navigate('/login'); // Redirect to login page after logout
       }}>
         Log Out
       </button>
