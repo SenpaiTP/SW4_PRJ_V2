@@ -74,11 +74,7 @@ function ChangePassword()
     setLoading(true); // Start loading
     setSuccessMessage(''); // Reset success message
     try {
-<<<<<<< HEAD:Frontend/KontoKaren/src/Pages/Indstillinger/ChangePassword.js
       const response = await fetch('http://localhost:5168/Account/changepassword', {
-=======
-      const response = await fetch('https://localhist:5168/change-password', {
->>>>>>> main:Frontend/KontoKaren/src/Components/IndstillingerComponents/ChangePassword/ChangePassword.js
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
