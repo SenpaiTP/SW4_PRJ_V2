@@ -8,6 +8,7 @@ ChartJS.register(ArcElement, Tooltip, Legend); // registrerer moduler til brug i
 export default function PieChartColors({ chartData }) {
   // genererer en unik farve baseret på en string
   const generateColor = (name) => {
+    if (!name) return 'hsl(0, 0%, 80%)'; // default color for invalid names
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
