@@ -12,7 +12,6 @@ public partial class Budget
     public string BudgetName { get; set; }
     [Required]
     public string BrugerId { get; set; }
-    public int KategoryId { get; set; }
     public int SavingsGoal { get; set; }
     public DateOnly BudgetStart { get; set; }
     public DateOnly BudgetSlut { get; set; }
@@ -20,7 +19,6 @@ public partial class Budget
     [ForeignKey(nameof(BrugerId))]
     public ApiUser Bruger { get; set; } 
 
-    [ForeignKey(nameof(KategoryId))]
-    public Kategori Kategory { get; set; }
+    public virtual ICollection<Saving> Savings { get; set; }
 
 }
