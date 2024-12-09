@@ -6,7 +6,7 @@ using OpenAI.Chat;
 using PRJ4.Models;
 using PRJ4.Repositories;
 using PRJ4.Repositories;
-using System.Threading.Tasks;
+using System.Threading.Tasks;   
 
 namespace PRJ4.Services
 {
