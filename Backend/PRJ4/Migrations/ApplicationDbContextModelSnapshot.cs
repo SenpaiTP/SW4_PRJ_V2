@@ -226,11 +226,8 @@ namespace PRJ4.Migrations
 
             modelBuilder.Entity("PRJ4.Models.Bruger", b =>
                 {
-                    b.Property<int>("BrugerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BrugerId"));
+                    b.Property<string>("BrugerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Efternavn")
                         .IsRequired()
@@ -265,8 +262,8 @@ namespace PRJ4.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("BrugerId1")
-                        .HasColumnType("int");
+                    b.Property<string>("BrugerId1")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BudgetName")
                         .IsRequired()
@@ -278,6 +275,9 @@ namespace PRJ4.Migrations
                     b.Property<DateOnly>("BudgetStart")
                         .HasColumnType("date");
 
+                    b.Property<int>("KategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SavingsGoal")
                         .HasColumnType("int");
 
@@ -286,6 +286,8 @@ namespace PRJ4.Migrations
                     b.HasIndex("BrugerId");
 
                     b.HasIndex("BrugerId1");
+
+                    b.HasIndex("KategoryId");
 
                     b.ToTable("Budgets");
                 });
@@ -506,7 +508,7 @@ namespace PRJ4.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("Dato")
+                    b.Property<DateTime>("Dato")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("KategoriId")
@@ -590,7 +592,15 @@ namespace PRJ4.Migrations
                         .WithMany("Budgets")
                         .HasForeignKey("BrugerId1");
 
+                    b.HasOne("PRJ4.Models.Kategori", "Kategory")
+                        .WithMany()
+                        .HasForeignKey("KategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Bruger");
+
+                    b.Navigation("Kategory");
                 });
 
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>

@@ -12,7 +12,7 @@ public partial class Vudgifter
     public decimal Pris { get; set; }
 
     public string? Tekst { get; set; }
-    public DateTime? Dato { get; set; }
+    public DateTime Dato { get; set; }
 
     public string BrugerId { get; set; }
 

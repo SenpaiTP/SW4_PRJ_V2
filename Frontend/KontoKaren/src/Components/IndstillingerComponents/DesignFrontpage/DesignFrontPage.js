@@ -64,7 +64,7 @@ function DesignFrontPage() {
     const handleSaveSettings = async () => {
         try {
             const token = getAuthToken();
-            const id = 4; // **** Sat til 4, der er 4 indstillinger - lorteløsning:)
+            const id = 1; // **** Sat til X, der er X indstillinger - lorteløsning:)
             if (token) {
                 const response = await fetch(`${API_URL}/UpdateIndstillinger/${id}`, {
                     method: 'PUT',
