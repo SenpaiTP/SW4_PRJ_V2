@@ -11,9 +11,9 @@ import ResetPassword from './Pages/Login/ResetPassword';
 
   // Indstillinger page
   import Indstillinger from './Pages/Indstillinger/Indstillinger';
-  import ThemeProvider from './Pages/Indstillinger/ThemeProvider';
-import LoggedInPage from './Pages/LoggedInPage/test';
-import Udgifter from './Pages/Udgifter/Udgifter';
+  import ThemeProvider from './Components/IndstillingerComponents/Theme/ThemeProvider';
+  import LoggedInPage from './Pages/LoggedInPage/test';
+  import Udgifter from './Pages/Udgifter/Udgifter';
 
 function App() {
   const [userFullName, setUserFullName] = useState(null);
@@ -42,7 +42,7 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
+    <ThemeProvider >
     <Router>
       <div className="App">
         <Header userFullName={userFullName} />
@@ -61,6 +61,7 @@ function App() {
       </div>
     </Router>
     </ThemeProvider>
+    
   );
 }
 

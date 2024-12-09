@@ -32,6 +32,8 @@ public partial class ApplicationDbContext : IdentityDbContext<ApiUser>
      public DbSet<Saving> Savings { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 
+    public DbSet<Indstillinger> Indstillingers {get; set;}
+
   
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
     //     {

@@ -13,6 +13,8 @@ namespace PRJ4.Models
         public ICollection<Findtægt> Findtægter { get; set; }
         public ICollection<Vindtægt> Vindtægter { get; set; }
 
+        public ICollection<Indstillinger> Indstillingers { get; set;}
+
         public virtual ICollection<Vudgifter> Vudgifters { get; set; } = new List<Vudgifter>();
         public virtual ICollection<Fudgifter> Fudgifters { get; set; } = new List<Fudgifter>();
         public ICollection<Budget>? Budgets { get; set; }
