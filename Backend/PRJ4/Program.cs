@@ -136,6 +136,9 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IFindtægtRepo, FindtægtRepo>();
 builder.Services.AddScoped<IVindtægtRepo, VindtægtRepo>();
+builder.Services.AddScoped<ISavingRepo,SavingRepo>();
+builder.Services.AddScoped<ITemplateRepo<Saving>,SavingRepo>();
+builder.Services.AddScoped<ISavingService,SavingService>();
 
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
 //builder.Services.AddScoped<TokenProvider>();
