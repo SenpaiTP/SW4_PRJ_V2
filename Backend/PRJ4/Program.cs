@@ -124,10 +124,6 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
     return client.GetDatabase(mongoDatabaseName);
 });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> main
 //Register mapping profiles
 //builder.Services.AddAutoMapper(typeof(FudgifterProfile));
 //builder.Services.AddAutoMapper(typeof(VudgifterProfile));
@@ -173,7 +169,7 @@ builder.Services.AddScoped<IVudgifterService,VudgifterService>();
 builder.Services.AddScoped<ILogQueryService, LogQueryService>();
 builder.Services.AddSingleton(provider =>
     new EmailService(
-        "3f60840382a09172c229cac33ddd7e63-f55d7446-6c90d163", // Replace with your Mailgun API key
+        "MailGun:ApiKey", // Replace with your Mailgun API key
         "sandboxf55113ec9eef4f6580a316b419167ded.mailgun.org" // Replace with your Mailgun domain
     )
 );
