@@ -10,7 +10,6 @@ using PRJ4.Data;
 using PRJ4.Models;
 using PRJ4.Services;
 using PRJ4.Services; // Add this line if BudgetService is in the PRJ4.Services.Budget namespace
-using PRJ4.Infrastructure;
 using PRJ4.ServiceCollectionExtension;
 using PRJ4.Mappings;
 using Serilog;
@@ -126,8 +125,6 @@ builder.Services.AddScoped<IMongoDatabase>(serviceProvider =>
 });
 
 //Register mapping profiles
-//builder.Services.AddAutoMapper(typeof(FudgifterProfile));
-//builder.Services.AddAutoMapper(typeof(VudgifterProfile));
 builder.Services.AddAutoMapper(typeof(LogMappingProfile));
 // Add services to the container
 var conn = builder.Configuration["ConnectionStrings:DefaultConnection"];
@@ -141,7 +138,6 @@ builder.Services.AddScoped<ITemplateRepo<Saving>,SavingRepo>();
 builder.Services.AddScoped<ISavingService,SavingService>();
 
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
-//builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IFindtægtService, FindtægtService>();
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();
 
@@ -165,7 +161,7 @@ builder.Services.AddScoped<ICategoryLimitService,CategoryLimitService>();
 
 builder.Services.AddScoped<IVudgifterRepo, VudgifterRepo>();
 builder.Services.AddScoped<IKategoriRepo, KategoriRepo>();
-//builder.Services.AddScoped<TokenProvider>();
+
 builder.Services.AddScoped<IVindtægtService, VindtægtService>();    
 builder.Services.AddScoped<IFudgifterService,FudgifterService>();
 builder.Services.AddScoped<IVudgifterService,VudgifterService>();
