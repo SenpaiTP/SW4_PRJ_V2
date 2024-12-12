@@ -24,8 +24,8 @@ export async function getAmountLimit() {
 
     const data = await response.json();
     return data.map(limit => ({
-      kategoryId: limit.kategoryId,
-      kategoryName: limit.kategoryName,
+      CategoryId: limit.CategoryId,
+      CategoryName: limit.CategoryName,
       limit: limit.limit
     }));
   } catch (error) {
@@ -59,8 +59,8 @@ export async function getIDAmountLimit(id) {
 
     const data = await response.json();
     return {
-      kategoryId: data.kategoryId,
-      kategoryName: data.kategoryName,
+      CategoryId: data.CategoryId,
+      CategoryName: data.CategoryName,
       limit: data.limit
     };
   } catch (error) {
@@ -70,7 +70,7 @@ export async function getIDAmountLimit(id) {
 }
 
 // post funktion
-export async function setAmountLimit(kategoryId, limit) {
+export async function setAmountLimit(CategoryId, limit) {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -85,7 +85,7 @@ export async function setAmountLimit(kategoryId, limit) {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ kategoryId, limit }),
+      body: JSON.stringify({ CategoryId, limit }),
     });
 
     console.log('Response:', response);
@@ -104,7 +104,7 @@ export async function setAmountLimit(kategoryId, limit) {
 }
 
 // put funktion
-export async function updateAmountLimit(kategoryId, limit) {
+export async function updateAmountLimit(CategoryId, limit) {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -113,7 +113,7 @@ export async function updateAmountLimit(kategoryId, limit) {
   }
 
   try {
-    const response = await fetch(`${API_URL}/${kategoryId}`, {
+    const response = await fetch(`${API_URL}/${CategoryId}`, {
       method: "PUT",
       headers: {
         "Authorization": `Bearer ${token}`,
