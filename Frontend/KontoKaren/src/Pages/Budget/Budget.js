@@ -73,7 +73,7 @@ function Budget() {
   
     try {
       // Determine if we're in edit mode and set the URL accordingly
-      const url = editMode ? `${API_URL}/Budget/${newRow.id}/UpdateBudget` : `${API_URL}/Budget/NewBudget`;
+      const url = editMode ? `${API_URL}/Budget/${newRow.id}/Budget` : `${API_URL}/Budget/NewBudget`;
       
       const response = await fetch(url, {
         method: editMode ? 'PUT' : 'POST',
@@ -159,7 +159,7 @@ function Budget() {
 
   const handleDeleteGoal = async (id) => {
     try {
-        const response = await fetch(`${API_URL}/Budget/${id}/DeleteBudget`, {
+        const response = await fetch(`${API_URL}/Budget/${id}/Budget`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${getAuthToken()}`,

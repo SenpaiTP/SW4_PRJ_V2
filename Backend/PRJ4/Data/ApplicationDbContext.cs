@@ -28,7 +28,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApiUser>
     public DbSet<LoginModel> LoginModels { get; set; }
     public DbSet<Budget> Budgets { get; set; }
 
-    public DbSet<KategoryLimit> KategoryLimits { get; set; }
+    public DbSet<CategoryLimit> CategoryLimits { get; set; }
      public DbSet<Saving> Savings { get; set; }
     // public DbSet<LoginModel> LoginModels { get; set; }
 

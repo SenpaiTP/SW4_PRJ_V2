@@ -18,10 +18,4 @@ public class BudgetRepo: TemplateRepo<Budget>, IBudgetRepo
             .Where(b => b.BrugerId == userId)
             .ToListAsync();
     } 
-
-    // public async Task<Budget> GetByIdWithKategoriAsync(int id)
-    // {
-    //     return await _context.Budgets // Include Kategori-relationen
-    //         .FirstOrDefaultAsync(b => b.BudgetId == id);  // Find budget med id
-    // } 
 }
