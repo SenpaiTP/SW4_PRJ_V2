@@ -21,7 +21,7 @@ function Udgifter() {
       <UdgifterTableComponent
         title="Variable Udgifter"
         initialRows={initialExpenseRows}
-        storageKey="variableUdgifterRows" // Unique storageKey for variable
+        storageKey="variableExpenseRows" 
         fetchFunction={getVudgifter}
         createFunction={createVudgifter}
         updateFunction={updateVudgifter}
@@ -30,7 +30,7 @@ function Udgifter() {
       <UdgifterTableComponent
         title="Faste Udgifter"
         initialRows={initialFixedExpenseRows}
-        storageKey="fasteUdgifterRows" // Unique storageKey for fixed
+        storageKey="fixedExpenseRows" 
         fetchFunction={getFudgifter}
         createFunction={createFudgifter}
         updateFunction={updateFudgifter}
