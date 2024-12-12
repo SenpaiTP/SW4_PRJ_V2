@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PRJ4.Models;
 
-public partial class KategoryLimit
+public partial class CategoryLimit
 {
     [Key]
-    public int KategoryLimitId { get; set; }
-    public int KategoryId { get; set; }
+    public int CategoryLimitId { get; set; }
+    public int CategoryId { get; set; }
     public string BrugerId { get; set; }
     public int Limit { get; set; }
     
 //ForeignKeys
-    [ForeignKey(nameof(KategoryId))]
-    public Kategori Kategory { get; set; }
+    [ForeignKey(nameof(CategoryId))]
+    public Kategori Category { get; set; }
 
     [ForeignKey(nameof(BrugerId))]
     public ApiUser? Bruger { get; set; }

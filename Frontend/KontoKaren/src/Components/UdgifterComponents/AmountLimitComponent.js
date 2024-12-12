@@ -43,13 +43,13 @@ const AmountLimitComponent = () => {
   };
 
   const handleEdit = (limit) => {
-    setCategoryId(limit.kategoryId);
+    setCategoryId(limit.CategoryId);
     setLimit(limit.limit);
     setIsUpdating(true);
   };
 
-  const handleDelete = async (kategoryId) => {
-    const result = await deleteAmountLimit(kategoryId);
+  const handleDelete = async (CategoryId) => {
+    const result = await deleteAmountLimit(CategoryId);
     console.log('Delete Result:', result);
     if (result) {
       setMessage('Limit deleted successfully!');
@@ -94,10 +94,10 @@ const AmountLimitComponent = () => {
       {message && <p>{message}</p>}
       <ul>
         {limits.map((limit) => (
-          <li key={limit.kategoryId}>
-            {limit.kategoryName}: {limit.limit}
+          <li key={limit.CategoryId}>
+            {limit.CategoryName}: {limit.limit}
             <button onClick={() => handleEdit(limit)}>Edit</button>
-            <button onClick={() => handleDelete(limit.kategoryId)}>Delete</button>
+            <button onClick={() => handleDelete(limit.CategoryId)}>Delete</button>
           </li>
         ))}
       </ul>

@@ -11,8 +11,8 @@ namespace PRJ4.Repositories
     public interface IVudgifterRepo:ITemplateRepo<Vudgifter>
     {
         Task<IEnumerable<Vudgifter>> GetAllByUserId(string brugerId);
-        Task<IEnumerable<Vudgifter>> GetAllByCategory(string brugerId, int kategoryId);
+        Task<IEnumerable<Vudgifter>> GetAllByCategory(string brugerId, int CategoryId);
         Task<IEnumerable<Vudgifter>> GetAllByDate(string brugerId, DateTime from, DateTime end);
-        Task<IEnumerable<Vudgifter>> GetAllByCategoryADate(string brugerId, int kategoryId, DateTime from, DateTime end);
+        Task<IEnumerable<Vudgifter>> GetAllByCategoryADate(string brugerId, int CategoryId, DateTime from, DateTime end);
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PRJ4.Services
 {
-    public class BudgetService : IBudgetGoalService
+    public class BudgetService : IBudgetService
     {
         private readonly IBudgetRepo _budgetRepository;
         private readonly ISavingRepo _savingRepository;
@@ -19,14 +19,14 @@ namespace PRJ4.Services
         }
 
         // Add a new budget
-        public async Task<BudgetResponseDTO> AddBudgetAsync(string userId, BudgetCreateDTO budgetDTO)
+        public async Task<BudgetAllResponseDTO> AddBudgetAsync(string userId, BudgetCreateDTO budgetDTO)
         {
             if (budgetDTO == null)
                 throw new ArgumentException(nameof(budgetDTO), "Budget data cannot be null.");
 
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentException(nameof(userId), "User ID cannot be null or empty.");
+                throw new ArgumentException("User ID cannot be null or empty.");
             }
             if (string.IsNullOrEmpty(budgetDTO.BudgetName))
                 throw new ArgumentException("Budget name cannot be null or empty.", nameof(budgetDTO.BudgetName));
@@ -44,16 +44,16 @@ namespace PRJ4.Services
                 SavingsGoal = budgetDTO.SavingsGoal,
                 BudgetStart = DateOnly.FromDateTime(DateTime.Now),
                 BudgetSlut = budgetDTO.BudgetSlut,
-                Savings = new List<Saving>() // Initialize the collection of savings
+                Savings = new List<Saving>() 
             };
 
             try
             {
-                await _budgetRepository.AddAsync(budget); // Assuming AddAsync is a method in the repo
+                await _budgetRepository.AddAsync(budget); 
                 await _budgetRepository.SaveChangesAsync();
 
                 _logger.LogInformation($"Successfully added budget {budget.BudgetName} for user {userId}.");
-                return new BudgetResponseDTO
+                return new BudgetAllResponseDTO
                 {
                     BudgetId = budget.BudgetId,
                     BudgetName = budget.BudgetName,
@@ -75,21 +75,24 @@ namespace PRJ4.Services
                 throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
 
             var budget = await _budgetRepository.GetByIdAsync(budgetId);
-            if (budget == null || budget.BrugerId != userId) 
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
-
+            if (budget == null) 
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
+            if (budget.BrugerId != userId) 
+                throw new InvalidOperationException($"Budget with ID {budgetId} does not belong to the user.");
             try
             {
-                decimal monthlyAmount = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut);
-                decimal result = await CalculateMoneySaved(budget.BudgetId);
+                
+                decimal moneySaved = await CalculateMoneySaved(budget.BudgetId);
+                var monthlySavings = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut, moneySaved);
+
                 return new BudgetResponseDTO
                 {
                     BudgetId = budget.BudgetId,
                     BudgetName = budget.BudgetName,
                     SavingsGoal = budget.SavingsGoal,
                     BudgetSlut = budget.BudgetSlut,
-                    MonthlySavingsAmount = monthlyAmount,
-                    MoneySaved = result
+                    MonthlySavingsAmount = monthlySavings,
+                    MoneySaved = moneySaved
                 };
             }
             catch (Exception ex)
@@ -100,33 +103,28 @@ namespace PRJ4.Services
         }
 
         // Get all budgets for a user
-        public async Task<List<BudgetResponseDTO>> GetAllBudgetsAsync(string userId)
+        public async Task<List<BudgetAllResponseDTO>> GetAllBudgetsAsync(string userId)
         {
             
                 var budgets = await _budgetRepository.GetBudgetsForUserAsync(userId);
                 if (budgets == null || !budgets.Any())
-                    throw new KeyNotFoundException($"No budgets found for user {userId}.");
+                    throw new KeyNotFoundException($"No budgets found for user");
                 if (budgets.Any(b => b.BrugerId != userId))
-                    throw new UnauthorizedAccessException($"One or more budgets do not belong to user {userId}.");
+                    throw new UnauthorizedAccessException($"One or more budgets do not belong to user");
 
 
             try
             {
-                var budgetResponses = new List<BudgetResponseDTO>();
-
-                // Brug en foreach-loop til at bearbejde hvert budget og beregne MoneySaved
+                var budgetResponses = new List<BudgetAllResponseDTO>();
                 foreach (var budget in budgets)
                 {
-                    var moneySaved = await CalculateMoneySaved(budget.BudgetId);
-
-                    var budgetResponse = new BudgetResponseDTO
+                    
+                    var budgetResponse = new BudgetAllResponseDTO
                     {
                         BudgetId = budget.BudgetId,
                         BudgetName = budget.BudgetName,
                         SavingsGoal = budget.SavingsGoal,
                         BudgetSlut = budget.BudgetSlut,
-                        MonthlySavingsAmount = CalculateMonthlySavings(budget.SavingsGoal, budget.BudgetStart, budget.BudgetSlut),
-                        MoneySaved = moneySaved
                     };
 
                     budgetResponses.Add(budgetResponse);
@@ -135,16 +133,16 @@ namespace PRJ4.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error while retrieving all budgets for user {userId}: {ex.Message}");
+                _logger.LogError($"Error while retrieving all budgets for user: {ex.Message}");
                 throw new InvalidOperationException("Could not retrieve the budgets.");
             }
         }
 
         // Update a budget's details
-        public async Task<BudgetResponseDTO> UpdateBudgetAsync(int budgetId, string userId, BudgetUpdateDTO budgetUpdateDTO)
+        public async Task<BudgetAllResponseDTO> UpdateBudgetAsync(int budgetId, string userId, BudgetUpdateDTO budgetUpdateDTO)
         {
             if (string.IsNullOrEmpty(userId))
-                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+                throw new ArgumentException("User ID cannot be null or empty.");
 
             if (budgetUpdateDTO == null)
                 throw new ArgumentException(nameof(budgetUpdateDTO), "Budget data cannot be null.");
@@ -154,7 +152,7 @@ namespace PRJ4.Services
                 throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
 
             if (budget.BrugerId != userId)
-                throw new UnauthorizedAccessException($"Budget with ID {budgetId} does not belong to user {userId}.");
+                throw new UnauthorizedAccessException($"Budget with ID {budgetId} does not belong to user");
 
             if (string.IsNullOrEmpty(budgetUpdateDTO.BudgetName))
                 throw new ArgumentException("Budget name cannot be null or empty.", nameof(budgetUpdateDTO.BudgetName));
@@ -162,18 +160,23 @@ namespace PRJ4.Services
             if (budgetUpdateDTO.SavingsGoal < 0)
                 throw new ArgumentException(nameof(budgetUpdateDTO.SavingsGoal), "Savings goal cannot be negative.");
 
-            if (budgetUpdateDTO.BudgetSlut <= DateOnly.FromDateTime(DateTime.Now))
+            if (budgetUpdateDTO.BudgetSlut < DateOnly.FromDateTime(DateTime.Now))
                 throw new ArgumentException(nameof(budgetUpdateDTO.BudgetSlut), "Budget end date must be in the future.");
 
             try
             {
-                budget.BudgetName = budgetUpdateDTO.BudgetName;
-                budget.SavingsGoal = budgetUpdateDTO.SavingsGoal;
-                budget.BudgetSlut = budgetUpdateDTO.BudgetSlut;
+                if (budgetUpdateDTO.BudgetName != null)
+                    budget.BudgetName = budgetUpdateDTO.BudgetName;
+
+                if (budgetUpdateDTO.SavingsGoal != 0)
+                    budget.SavingsGoal = budgetUpdateDTO.SavingsGoal;
+
+                if (budgetUpdateDTO.BudgetSlut != DateOnly.FromDateTime(DateTime.Now))
+                        budget.BudgetSlut = budgetUpdateDTO.BudgetSlut;
 
                 await _budgetRepository.SaveChangesAsync();
 
-                return new BudgetResponseDTO
+                return new BudgetAllResponseDTO
                 {
                     BudgetId = budget.BudgetId,
                     BudgetName = budget.BudgetName,
@@ -196,14 +199,14 @@ namespace PRJ4.Services
 
             var budget = await _budgetRepository.GetByIdAsync(budgetId);
             if (budget == null || budget.BrugerId != userId) 
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user");
 
             try
             {
                 await _budgetRepository.Delete(budget.BudgetId);
                 await _budgetRepository.SaveChangesAsync();
 
-                _logger.LogInformation($"Successfully deleted budget with ID {budgetId} for user {userId}.");
+                _logger.LogInformation($"Successfully deleted budget with ID {budgetId} for user");
             }
             catch (Exception ex)
             {
@@ -212,7 +215,7 @@ namespace PRJ4.Services
             }
         }
 
-        public int CalculateMonthlySavings(int savingsGoal, DateOnly budgetStart, DateOnly budgetSlut)
+        public decimal CalculateMonthlySavings(int savingsGoal, DateOnly budgetStart, DateOnly budgetSlut, decimal moneySaved)
         {
             if (budgetSlut <= budgetStart)
             {
@@ -221,11 +224,14 @@ namespace PRJ4.Services
             //Find the monthly difference   
             int monthsToSave = ((budgetSlut.Year - budgetStart.Year) * 12) + budgetSlut.Month - budgetStart.Month;
            
+           //Money already saved
+           decimal results = savingsGoal - moneySaved;
+
             //Check if there are months to save 
             if (monthsToSave > 0)
             {
                 //calculate monthly savings
-                return savingsGoal / monthsToSave;
+                return results / monthsToSave;
             }
 
             return 0;

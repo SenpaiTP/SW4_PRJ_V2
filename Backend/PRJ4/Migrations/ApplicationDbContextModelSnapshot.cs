@@ -256,6 +256,36 @@ namespace PRJ4.Migrations
                     b.ToTable("Budgets");
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("PRJ4.Models.CategoryLimit", b =>
+                {
+                    b.Property<int>("CategoryLimitId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryLimitId"));
+
+                    b.Property<string>("BrugerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Limit")
+                        .HasColumnType("int");
+
+                    b.HasKey("CategoryLimitId");
+
+                    b.HasIndex("BrugerId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("CategoryLimits");
+                });
+
+>>>>>>> 308dc0de3f3dae263dcbd1d10eadf104dacf711e
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
                 {
                     b.Property<int>("FindtægtId")
@@ -377,6 +407,7 @@ namespace PRJ4.Migrations
                     b.ToTable("Kategorier");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("PRJ4.Models.KategoryLimit", b =>
                 {
                     b.Property<int>("KategoryLimitId")
@@ -405,6 +436,8 @@ namespace PRJ4.Migrations
                     b.ToTable("KategoryLimits");
                 });
 
+=======
+>>>>>>> 308dc0de3f3dae263dcbd1d10eadf104dacf711e
             modelBuilder.Entity("PRJ4.Models.LoginModel", b =>
                 {
                     b.Property<int>("LoginId")
@@ -579,6 +612,28 @@ namespace PRJ4.Migrations
                     b.Navigation("Bruger");
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("PRJ4.Models.CategoryLimit", b =>
+                {
+                    b.HasOne("PRJ4.Models.ApiUser", "Bruger")
+                        .WithMany()
+                        .HasForeignKey("BrugerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PRJ4.Models.Kategori", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bruger");
+
+                    b.Navigation("Category");
+                });
+
+>>>>>>> 308dc0de3f3dae263dcbd1d10eadf104dacf711e
             modelBuilder.Entity("PRJ4.Models.Findtægt", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -626,6 +681,7 @@ namespace PRJ4.Migrations
                     b.Navigation("Bruger");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("PRJ4.Models.KategoryLimit", b =>
                 {
                     b.HasOne("PRJ4.Models.ApiUser", "Bruger")
@@ -645,6 +701,8 @@ namespace PRJ4.Migrations
                     b.Navigation("Kategory");
                 });
 
+=======
+>>>>>>> 308dc0de3f3dae263dcbd1d10eadf104dacf711e
             modelBuilder.Entity("PRJ4.Models.Saving", b =>
                 {
                     b.HasOne("PRJ4.Models.Budget", "Budget")
@@ -709,11 +767,14 @@ namespace PRJ4.Migrations
                 {
                     b.Navigation("Savings");
                 });
+<<<<<<< HEAD
 
             modelBuilder.Entity("PRJ4.Models.Kategori", b =>
                 {
                     b.Navigation("KategoryLimit");
                 });
+=======
+>>>>>>> 308dc0de3f3dae263dcbd1d10eadf104dacf711e
 #pragma warning restore 612, 618
         }
     }

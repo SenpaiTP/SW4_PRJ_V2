@@ -26,16 +26,20 @@ namespace PRJ4.Services
             {
                 throw new ArgumentException(nameof(savingDTO), "Saving data cannot be null.");
             }
+            if (savingDTO.Amount < 0)
+            {
+                throw new ArgumentException(nameof(savingDTO), "Saving has to be positive");
+            }
             if (budgetId <= 0)
             {
                 throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
             }
 
-            // Retrieve the budget by its ID
+            // Get the budget by its ID
             var budget = await _budgetRepository.GetByIdAsync(budgetId);
-            if (budget == null || budget.BrugerId != userId)  // Ensure the budget belongs to the correct user
+            if (budget == null || budget.BrugerId != userId)  
             {
-                 throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
+                 throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user");
             }
          
 
@@ -75,11 +79,11 @@ namespace PRJ4.Services
 
         public async Task<IEnumerable<SavingResponsDTO>> GetAllSavingsAsync(int budgetId, string userId)
         {
-            // Retrieve the budget by its ID
+            // Get the budget by its ID
             var budget = await _budgetRepository.GetByIdAsync(budgetId);
             if (budget == null || budget.BrugerId != userId)  // Ensure the budget belongs to the correct user
             {
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user.");
             }
 
             try
@@ -108,13 +112,6 @@ namespace PRJ4.Services
 
         public async Task<SavingResponsDTO> GetSavingByIdAsync(int savingId, string userId)
         {
-            // Retrieve the budget by its ID
-            // var budget = await _budgetRepository.GetByIdAsync(budgetId);
-            // if (budget == null || budget.BrugerId != userId)  // Ensure the budget belongs to the correct user
-            // {
-            //     throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
-            // }
-
             try
             {
                 // Get the saving by its ID for the specified budget
@@ -150,28 +147,21 @@ namespace PRJ4.Services
             {
                 throw new ArgumentException(nameof(savingUpdateDTO), "Saving data cannot be null.");
             }
-            // if (budgetId <= 0)
-            // {
-            //     throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
-            // }
-
-            // Retrieve the budget by its ID
-            // var budget = await _budgetRepository.GetByIdAsync(budgetId);
-            // if (budget == null || budget.BrugerId != userId)  // Ensure the budget belongs to the correct user
-            // {
-            //     throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
-            // }
 
             try
             {
-                // Retrieve the saving by its ID for the specified budget
+                // Get the saving by its ID for the specifik budget
                 var saving = await _savingRepository.GetByIdAsync(savingId);
                 if (saving == null )
                 {
                     throw new KeyNotFoundException($"Saving with ID {savingId} not found.");
                 }
-
-                // Update the saving's properties
+                if (saving.BudgetId <= 0)
+                {
+                    throw new ArgumentException(nameof(saving.BudgetId), "Invalid budget ID.");
+                }
+              
+                // Update the saving
                 saving.Amount = savingUpdateDTO.Amount;
                 saving.Date = savingUpdateDTO.Date;
 
@@ -200,19 +190,7 @@ namespace PRJ4.Services
 
         public async Task DeleteSavingAsync(int savingId, string userId)
         {
-            // Validate input parameters
-            // if (budgetId <= 0)
-            // {
-            //     throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
-            // }
-
-            // Retrieve the budget by its ID
-            // var budget = await _budgetRepository.GetByIdAsync(budgetId);
-            // if (budget == null || budget.BrugerId != userId)  // Ensure the budget belongs to the correct user
-            // {
-            //     throw new KeyNotFoundException($"Budget with ID {budgetId} not found or does not belong to user {userId}.");
-            // }
-
+           
             try
             {
                 // Retrieve the saving by its ID for the specified budget
@@ -222,6 +200,7 @@ namespace PRJ4.Services
                     throw new KeyNotFoundException($"Saving with ID {savingId} not found");
                 }
 
+          
                 // Delete the saving from the repository
                 await _savingRepository.Delete(savingId);
                 await _savingRepository.SaveChangesAsync();
@@ -236,99 +215,7 @@ namespace PRJ4.Services
                 throw new InvalidOperationException("Could not delete the saving.");
             }
         }
-
-        // public async Task<List<BudgetSavingResponsDTO>> GetAllSavingsAsync(int budgetId, string userId)
-        // {
-        //     // Validate parameter
-        //     if (budgetId <= 0)
-        //     {
-        //         throw new ArgumentException(nameof(budgetId),"Invalid budget ID.");
-        //     }
-        //     if (string.IsNullOrEmpty(userId))
-        //     {
-        //         throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-        //     }
-
-        //     var budget = await GetByIdBudgetGoalAsync(budgetId, userId);
-        //     if (budget == null)
-        //     {
-        //         throw new ArgumentException($"Budget with ID {budgetId} not found.");
-        //     }
-
-        //     var udgifter = await _vudgifterRepository.GetAllByCategory(userId, budget.KategoryId);
-        //     if (udgifter == null || !udgifter.Any())
-        //     {
-        //         _logger.LogInformation($"No savings found for budget ID {budgetId} and category ID {budget.KategoryId}.");
-        //         return null; 
-        //     }
-
-        //      // Create response list
-        //     var udgiftReturnListe = new List<BudgetSavingResponsDTO>();
-        //     foreach (var udgift in udgifter)
-        //     {
-        //         var saving = new BudgetSavingResponsDTO
-        //         {
-        //             Saving = udgift.Pris,
-        //             KategoryId = udgift.KategoriId ?? 0,
-        //             Date = udgift.Dato
-        //         };
-        //         udgiftReturnListe.Add(saving);
-
-        //     }
-
-        //     _logger.LogInformation($"Successfully fetched all savings for budget ID {budgetId} and user ID {userId}.");
-        //     return udgiftReturnListe;
-        // }
-
-        //  public async Task<VudgifterResponseDTO> AddSavingAsync(int budgetId, string userId, BudgetSavingCreateDTO savingDTO)
-        // {
-        //     // Validate for parameter
-        //     if (savingDTO == null)
-        //     {
-        //         throw new ArgumentException(nameof(savingDTO), "Saving data cannot be null.");
-        //     }
-        //     if (budgetId <= 0)
-        //     {
-        //         throw new ArgumentException(nameof(budgetId), "Invalid budget ID.");
-        //     }
-
-        //     var budget = await GetByIdBudgetGoalAsync(budgetId, userId);
-        //     if (budget == null)
-        //     {
-        //         throw new KeyNotFoundException($"Budget with ID {budgetId} not found for user {userId}.");
-        //     }
-            
-      
-        //     var kategory = await _kategoryRepositry.GetByIdAsync(budget.KategoryId);
-        //     if (kategory == null)
-        //     {
-        //         throw new ArgumentException($"Category with ID {budget.KategoryId} not found for user {userId}.");
-        //     }
-    
-        //     var saving = new nyVudgifterDTO
-        //     {
-        //         KategoriNavn = kategory.KategoriNavn,
-        //         KategoriId = budget.KategoryId,
-        //         Pris = savingDTO.Saving, 
-        //         Dato = savingDTO.Date
-        //     };
-            
-        //     try{
-        //         var savingAdded = await _vudgifterService.AddVudgifter(userId, saving); 
-        //         await _budgetRepository.SaveChangesAsync();
-
-
-        //         _logger.LogInformation($"Successfully created saving for user ID: {userId}.");
-        //         return savingAdded;
-        //     }
-        //     catch(Exception ex){
-        //         _logger.LogError($"Error while saving the new saving: {ex.Message}");
-        //         throw new InvalidOperationException("Could not save the new saving.");
-
-        //     }
-
-        // }
-
+       
     }
 
 }

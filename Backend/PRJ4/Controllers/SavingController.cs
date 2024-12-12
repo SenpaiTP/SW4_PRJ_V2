@@ -100,8 +100,8 @@ namespace PRJ4.Controllers
         }
 
         // Update an existing saving
-        [HttpPut("{budgetId}/{savingId}")]
-        public async Task<IActionResult> UpdateSavingAsync(int savingId, int budgetId, [FromBody] SavingUpdateDTO savingUpdateDTO)
+        [HttpPut("{savingId}")]
+        public async Task<IActionResult> UpdateSavingAsync(int savingId, [FromBody] SavingUpdateDTO savingUpdateDTO)
         {
             var userId = GetUserId();
             if (userId == null)
@@ -122,7 +122,7 @@ namespace PRJ4.Controllers
         }
 
         // Delete a saving
-        [HttpDelete("{budgetId}/{savingId}")]
+        [HttpDelete("{savingId}")]
         public async Task<IActionResult> DeleteSavingAsync(int savingId)
         {
             var userId = GetUserId();

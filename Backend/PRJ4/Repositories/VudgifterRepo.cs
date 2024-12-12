@@ -33,11 +33,11 @@ namespace PRJ4.Repositories
                 .ToListAsync();
         }
 
-         public async Task<IEnumerable<Vudgifter>> GetAllByCategory(string brugerId, int kategoryId)
+         public async Task<IEnumerable<Vudgifter>> GetAllByCategory(string brugerId, int CategoryId)
         {
 
             return await _context.Vudgifters
-            .Where(v => v.KategoriId == kategoryId && v.BrugerId == brugerId)
+            .Where(v => v.KategoriId == CategoryId && v.BrugerId == brugerId)
             .Include(v => v.Kategori) // Including the Kategori for reference
             .ToListAsync();
         }
@@ -49,10 +49,10 @@ namespace PRJ4.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Vudgifter>> GetAllByCategoryADate(string brugerId, int kategoryId,DateTime from, DateTime end)
+        public async Task<IEnumerable<Vudgifter>> GetAllByCategoryADate(string brugerId, int CategoryId,DateTime from, DateTime end)
         {
             return await _context.Vudgifters
-                .Where(v => v.BrugerId == brugerId && v.Dato >= from && v.Dato <= end && v.KategoriId == kategoryId)
+                .Where(v => v.BrugerId == brugerId && v.Dato >= from && v.Dato <= end && v.KategoriId == CategoryId)
                 .Include(v => v.Kategori) // Including the Kategori for reference
                 .ToListAsync();
         }
